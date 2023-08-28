@@ -5,7 +5,7 @@
     "lint": "eslint .",
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
-    "start": "npm run shell",
+    "start": "index.js",
     "deploy": "firebase deploy --only functions",
     "logs": "firebase functions:log"
   },
@@ -22,5 +22,6 @@
     "eslint-config-google": "^0.14.0",
     "firebase-functions-test": "^3.1.0"
   },
+
   "private": true
 }
