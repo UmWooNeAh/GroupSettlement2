@@ -1,11 +1,11 @@
-import '../class_group.dart';
-import '../class_settlement.dart';
-import '../class_settlementpaper.dart';
-import '../class_user.dart';
+import '../class/class_group.dart';
+import '../class/class_settlement.dart';
+import '../class/class_settlementpaper.dart';
+import '../class/class_user.dart';
 
 class UserViewModel {
 
-  User? userData;
+  ServiceUser? userData;
   List<Group>? myGroup;
   List<Settlement>? mySettlements;
   List<SettlementPaper>? mySettlementPapers;

@@ -1,9 +1,9 @@
-import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
+//import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 
-import '../class_group.dart';
-import '../class_settlement.dart';
-import '../class_settlementpaper.dart';
-import '../class_user.dart';
+import '../class/class_group.dart';
+import '../class/class_settlement.dart';
+import '../class/class_settlementpaper.dart';
+import '../class/class_user.dart';
 
 class GroupViewModel {
 
