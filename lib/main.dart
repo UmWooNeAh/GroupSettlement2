@@ -4,6 +4,7 @@ import 'firebase_options.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:async';
+import 'package:groupsettlement2/class/class_user.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("백그라운드 메시지 처리.. ${message.notification!.body!}");
@@ -95,14 +96,16 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
 
   var messageString = "";
+  ServiceUser me = ServiceUser();
 
-  void getMyDeviceToken() async {
+  void getMyDeviceToken(ServiceUser user) async {
     final token = await FirebaseMessaging.instance.getToken();
     print("내 디바이스 토큰: $token");
+    user.setDeviceToken(token!);
   }
   @override
   void initState(){
-    getMyDeviceToken();
+    getMyDeviceToken(me);
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       RemoteNotification? notification = message.notification;
 

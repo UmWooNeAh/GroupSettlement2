@@ -1,4 +1,4 @@
-import 'package:group_settlement/class/class_receipt.dart';
+import '../class/class_receipt.dart';
 import '../class/class_group.dart';
 import '../class/class_receiptitem.dart';
 import '../class/class_settlement.dart';
@@ -62,8 +62,8 @@ class SettlementCreateViewModel {
     group.settlements!.add(settlement.settlementId!);
     // group_updatecode 들어가야함
 
-    for(int i = 0; i < settlement.users!.length; i++){
-      User user = await User().getUserByUserId(settlement.users![i]);
+    for(int i = 0; i < settlement.serviceUsers!.length; i++){
+      ServiceUser user = await ServiceUser().getUserByUserId(settlement.serviceUsers![i]);
       user.settlements!.add(settlement.settlementId!);
       // user update코드 들어가야함
     }

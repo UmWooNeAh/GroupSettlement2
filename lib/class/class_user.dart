@@ -45,6 +45,10 @@ class ServiceUser {
     await FirebaseFirestore.instance.collection("userlist").doc(serviceUserId).set(toJson());
   }
 
+  void setDeviceToken(String token) {
+    fcmToken = token;
+  }
+
   Future<List<ServiceUser>> getUserList() async {
     CollectionReference<Map<String, dynamic>> _collectionReference =
     FirebaseFirestore.instance.collection("userlist");

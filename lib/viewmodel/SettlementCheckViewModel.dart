@@ -10,14 +10,23 @@ class SettlementCheckViewModel{
     _settingSettlementCheckViewModel(settlementId, userId);
   }
 
-  void _settingSettlementCheckViewModel(String settlementId, String userId) async{
-    await settlement.getSettlementBySettlementId(settlementId);
-    for(int i = 0; i < settlement.settlementPapers!.length; i++){
-      await settlementPaper.getSettlementPaperByPaperId(settlement.settlementPapers![i]);
-      if(settlementPaper.userId == userId){
+  void _settingSettlementCheckViewModel(String settlementId, String userId) async {
+
+    settlement = await Settlement().getSettlementBySettlementId(settlementId);
+    for(var paper in settlement.settlementPapers!.entries) {
+      settlementPaper = await SettlementPaper().getSettlementPaperByPaperId(paper.value);
+      if(settlementPaper.serviceUserId == userId) {
         break;
       }
     }
+
+    /*for(int i = 0; i < settlement.settlementPapers!.length; i++){
+      await settlementPaper.getSettlementPaperByPaperId(settlement.settlementPapers![i]);
+      if(settlementPaper.serviceUserId == userId){
+        break;
+      }
+    }
+     */
   }
 
   void sendComplete(setttlementId, userId){
