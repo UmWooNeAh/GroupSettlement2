@@ -1,3 +1,5 @@
+import 'package:groupsettlement2/common_fireservice.dart';
+
 import '../class/class_receipt.dart';
 import '../class/class_group.dart';
 import '../class/class_receiptitem.dart';
@@ -34,15 +36,15 @@ class SettlementCreateViewModel {
     receipts[newReceipt.receiptId!] = newReceipt;
   }
   // Naver OCR
-  Receipt receiptFromNaverOCR(){
-    Receipt newReceipt = Receipt();
-    return newReceipt;
+  Receipt receiptFromNaverOCR() {
+    return Receipt();
   }
 
   // 3. 영수증 수정하기
-  void editReceipt(Receipt edittedReceipt, List<ReceiptItem> edittedReceiptItems){
+  void editReceipt(Receipt edittedReceipt, List<ReceiptItem> edittedReceiptItems) {
     receipts[edittedReceipt.receiptId!] = edittedReceipt;
     edittedReceipt.receiptItems!.clear();
+
     for(int i = 0; i < edittedReceiptItems.length; i++){
       edittedReceipt.receiptItems!.add(edittedReceiptItems[i].receiptItemId!);
     }
@@ -56,15 +58,17 @@ class SettlementCreateViewModel {
     receipts.remove(receiptId);
   }
 
-  // 5. 정산 생성하기기
+  // 5. 정산 생성하기
   void createSettlement() async {
     Group group = await Group().getGroupByGroupId(groupId);
     group.settlements!.add(settlement.settlementId!);
+    FireService().updateDoc("grouplist", group.groupName!, group.toJson());
     // group_updatecode 들어가야함
 
     for(int i = 0; i < settlement.serviceUsers!.length; i++){
       ServiceUser user = await ServiceUser().getUserByUserId(settlement.serviceUsers![i]);
       user.settlements!.add(settlement.settlementId!);
+      FireService().updateDoc("userlist", user.name!, user.toJson());
       // user update코드 들어가야함
     }
 

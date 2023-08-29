@@ -16,18 +16,18 @@ class GroupViewModel {
     required this.users
   });
 
-  updateSettlement(String settlementId) async{
+  updateSettlement(String settlementId) async {
     Settlement data = await Settlement().getSettlementBySettlementId(settlementId);
     settlementGroup.add(data);
   }
 
-  createGroup(Group myGroup,List<ServiceUser> users){
+  createGroup(Group myGroup, List<ServiceUser> users) {
     this.myGroup = myGroup;
     this.users = users;
     settlementGroup = [];
   }
 
-  addByKakaoFriends() async{
+  addByKakaoFriends() async {
     var params = PickerFriendRequestParams(
       title: 'Multi Picker',
       enableSearch: true,
@@ -39,20 +39,22 @@ class GroupViewModel {
       enableBackButton: true,
     );
     
-    SelectedUsers users = await PickerApi.instance.selectFriends(
-          params: params);
+    SelectedUsers users = await PickerApi.instance.selectFriends(params: params);
 
-    for(int i=0;i<users.totalCount;i++){
+    for(int i = 0; i < users.totalCount; i++){
       SelectedUser kuser = users.users![i];
+
       ServiceUser user = ServiceUser(serviceUserId: "null", name: kuser.profileNickname, kakaoId: kuser.id);
       user.createUser();
+
       this.users.add(user);
     }
   }
 
   addByDirect(String userId, String Name, String kId){
-    ServiceUser user = ServiceUser(serviceUserId: userId, name: Name,kakaoId: kId);
+    ServiceUser user = ServiceUser(serviceUserId: userId, name: Name, kakaoId: kId);
     user.createUser();
+
     this.users.add(user);
   }
 
@@ -71,12 +73,13 @@ class GroupViewModel {
 
   updateUserName(String userId, String newName) async{
     ServiceUser user = await ServiceUser().getUserByUserId(userId);
-    if(user.kakaoId == null){
+    if(user.kakaoId == null) {
       user.name = newName;
       FireService().updateDoc("userlist", user.serviceUserId!, user.toJson());
       //user.UpdateUser();
-    }else{
-      print("You cannot modify user added by Kakao");
+    }
+    else {
+      print("카카오톡으로 추가한 유저의 이름은 변경할 수 없습니다.");
     }
   }
 }

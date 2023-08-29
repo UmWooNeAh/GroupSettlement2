@@ -1,4 +1,6 @@
 
+import 'package:groupsettlement2/common_fireservice.dart';
+
 import '../class/class_settlement.dart';
 import '../class/class_settlementpaper.dart';
 
@@ -6,7 +8,7 @@ class SettlementCheckViewModel{
   Settlement      settlement      = Settlement();
   SettlementPaper settlementPaper = SettlementPaper();
 
-  SettlementCheckViewModel(String settlementId, String userId){
+  SettlementCheckViewModel(String settlementId, String userId) {
     _settingSettlementCheckViewModel(settlementId, userId);
   }
 
@@ -29,13 +31,13 @@ class SettlementCheckViewModel{
      */
   }
 
-  void sendComplete(setttlementId, userId){
+  void sendComplete(String userId) {
     settlement.checkSent![userId] = true;
-    //settlement.updatesettlement();
+    FireService().updateDoc("settlementlist", settlement.settlementId!, settlement.toJson());
   }
 
-  void finishSettlement(){
-    //settlement.isFinished = true;
-    //settlement.updatesettlement();
+  void finishSettlement() {
+    settlement.isFinished = true;
+    FireService().updateDoc("settlementlist", settlement.settlementId!, settlement.toJson());
   }
 }

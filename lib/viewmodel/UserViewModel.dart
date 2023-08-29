@@ -14,7 +14,7 @@ class UserViewModel {
     fetchData(userId);
   }
 
-  fetchData(String userId) async{
+  fetchData(String userId) async {
     //User Fetch
     fetchUser(userId);
 
@@ -30,11 +30,11 @@ class UserViewModel {
     });
   }
 
-  fetchUser(String userId)async{
+  fetchUser(String userId) async {
     userData = await ServiceUser().getUserByUserId(userId);
   }
 
-  fetchSettlement(List<String> stm) async{
+  fetchSettlement(List<String> stm) async {
     stm.forEach((id) async{
       Settlement temp = await Settlement().getSettlementBySettlementId(id);
       //Settlement Fetch
@@ -44,7 +44,7 @@ class UserViewModel {
   }
 
   fetchPaper(Map<String, String> stmpapers) async{
-    stmpapers.forEach((key, value) async{
+    stmpapers.forEach((key, value) async {
       //SettlementPaper Fetch
       SettlementPaper temp = await SettlementPaper().getSettlementPaperByPaperId(value);
       mySettlementPapers!.add(temp);
