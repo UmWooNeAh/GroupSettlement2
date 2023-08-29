@@ -1,4 +1,7 @@
 import 'dart:ffi';
+import 'package:groupsettlement2/class/class_user.dart';
+import 'package:groupsettlement2/common_fireservice.dart';
+
 import '../class/class_receipt.dart';
 import '../class/class_receiptitem.dart';
 import '../class/class_settlement.dart';
@@ -187,13 +190,36 @@ class SettlementViewModel{
     subGroups[subGroupId]!.add(userId);
   }
 
-  void completeSettlement() {
+  void completeSettlement() async {
     // settlement Update
+    FireService().updateDoc("settlementlist", settlement.settlementId!, settlement.toJson());
     // SettlementPaper Update
+    for(var stmpaper in settlementPapers!.entries) {
+      FireService().updateDoc("settlementpaperlist", stmpaper.key!, stmpaper.value!.toJson());
+    }
     // SettlementItem Update
+    for(var stmitem in settlementItems!.entries) {
+      FireService().updateDoc("settlementpaperlist", stmitem.key!, stmitem.value!.toJson());
+    }
     // User Update
+    for(var userid in settlement.serviceUsers!) {
+
+      ServiceUser user = await ServiceUser().getUserByUserId(userid);
+      for(var stmpaper in settlementPapers!.entries) {
+        user.settlementPapers?.add(stmpaper.value!.settlementPaperId!);
+      }
+      
+      user.settlements?.add(settlement.settlementId!);
+      FireService().updateDoc("userlist", userid, user.toJson());
+    }
     // Receipt Update
+    for(var rcp in receipts!.entries) {
+      FireService().updateDoc("settlementpaperlist", rcp.key!, rcp.value!.toJson());
+    }
     // ReceiptItem Update
+    for(var rcpitem in receiptItems!.entries) {
+      FireService().updateDoc("settlementpaperlist", rcpitem.key!, rcpitem.value!.toJson());
+    }
   }
 
   void requestSettlement(){
