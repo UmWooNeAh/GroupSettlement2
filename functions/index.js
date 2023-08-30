@@ -2,7 +2,6 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 
 admin.initializeApp();
-const db = admin.firestore();
 
 exports.sendNotification = functions.region("asia-northeast3").firestore
 .document("userlist/{docId}").onUpdate(async (change, context) => {
@@ -31,6 +30,3 @@ exports.sendNotification = functions.region("asia-northeast3").firestore
         }
     }
   });
-
-
-});
