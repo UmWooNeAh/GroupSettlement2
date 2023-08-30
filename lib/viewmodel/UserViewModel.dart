@@ -14,40 +14,40 @@ class UserViewModel {
     fetchData(userId);
   }
 
-  fetchData(String userId) async{
+  fetchData(String userId) async {
     //User Fetch
     fetchUser(userId);
 
     List<Group> groups = await Group().getGroupList();
     groups.forEach((group) {
-      group.Users!.forEach((user) {
+      group.serviceUsers!.forEach((user) {
         if(user == userId){
           //Group Fetch
           myGroup!.add(group);
-          fetchSettlement(group.Settlements!);
+          fetchSettlement(group.settlements!);
         }
       });
     });
   }
 
-  fetchUser(String userId)async{
-    userData = await User().getUserByUserId(userId);
+  fetchUser(String userId) async {
+    userData = await ServiceUser().getUserByUserId(userId);
   }
 
-  fetchSettlement(List<String> set) async{
-    set.forEach((id) async{
-      Settlement temp = Settlement();
-      temp = await Settlement().getSettlementBySettlementId(id);
+  fetchSettlement(List<String> stm) async {
+    stm.forEach((id) async{
+      Settlement temp = await Settlement().getSettlementBySettlementId(id);
       //Settlement Fetch
       mySettlements!.add(temp);
-      fetchPaper(temp.SettlementPapers!);
+      fetchPaper(temp.settlementPapers!);
     });
   }
 
-  fetchPaper(List<String> paper)async{
-    paper.forEach((id) async{
+  fetchPaper(Map<String, String> stmpapers) async{
+    stmpapers.forEach((key, value) async {
       //SettlementPaper Fetch
-      mySettlementPapers!.add(await SettlementPaper().getSettlementPaperByPaperId(id));
+      SettlementPaper temp = await SettlementPaper().getSettlementPaperByPaperId(value);
+      mySettlementPapers!.add(temp);
     });
   }
 

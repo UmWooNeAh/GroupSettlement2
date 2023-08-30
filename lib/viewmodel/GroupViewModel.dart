@@ -1,15 +1,14 @@
-//import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
-
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
+import 'package:groupsettlement2/common_fireservice.dart';
 import '../class/class_group.dart';
 import '../class/class_settlement.dart';
-import '../class/class_settlementpaper.dart';
 import '../class/class_user.dart';
 
 class GroupViewModel {
 
   Group myGroup;
   List<Settlement> settlementGroup;
-  List<User> users;
+  List<ServiceUser> users;
 
   GroupViewModel({
     required this.myGroup,
@@ -17,18 +16,18 @@ class GroupViewModel {
     required this.users
   });
 
-  updateSettlement(String settlementId) async{
+  updateSettlement(String settlementId) async {
     Settlement data = await Settlement().getSettlementBySettlementId(settlementId);
     settlementGroup.add(data);
   }
 
-  createGroup(Group myGroup,List<User> users){
+  createGroup(Group myGroup, List<ServiceUser> users) {
     this.myGroup = myGroup;
     this.users = users;
     settlementGroup = [];
   }
 
-  addByKakaoFriends() async{
+  addByKakaoFriends() async {
     var params = PickerFriendRequestParams(
       title: 'Multi Picker',
       enableSearch: true,
@@ -37,44 +36,50 @@ class GroupViewModel {
       showPickedFriend: true,
       maxPickableCount: null,
       minPickableCount: null,
-      enableBackButton: true;
+      enableBackButton: true,
     );
     
-    SelectedUsers users = await PickerApi.instance.selectFriends(
-          params: params);
+    SelectedUsers users = await PickerApi.instance.selectFriends(params: params);
 
-    for(int i=0;i<users.totalCount;i++){
+    for(int i = 0; i < users.totalCount; i++){
       SelectedUser kuser = users.users![i];
-      User user = User().createUser("null",kuser.profileNickname,kuser.id);
+
+      ServiceUser user = ServiceUser(serviceUserId: "null", name: kuser.profileNickname, kakaoId: kuser.id);
+      user.createUser();
+
       this.users.add(user);
     }
   }
 
-  addByDirect(String userId,String Name,String kId){
-    User user = User().createUser(userId,Name,kId);
+  addByDirect(String userId, String Name, String kId){
+    ServiceUser user = ServiceUser(serviceUserId: userId, name: Name, kakaoId: kId);
+    user.createUser();
+
     this.users.add(user);
   }
 
   deleteUser(String userId){
-    this.users.removeWhere((user) => user.UserId == userId);
+    this.users.removeWhere((user) => user.serviceUserId == userId);
   }
 
-  updateGroupName(String GroupId,String name){
-    myGroup.GroupName = name;
-    myGroup.updateGroup();
-
+  updateGroupName(String GroupId, String name){
+    myGroup.groupName = name;
+    FireService().updateDoc("grouplist", myGroup.groupId!, myGroup.toJson());
+    //myGroup.UpdateGroup();
     // Group group = await Group().getGroupByGroupId(GroupId);
     // group.GroupName = name;
     // group.updateGroup();
   }
 
-  updateUserName(String userId,String newName) async{
-    User user = await User().getUserByUserId(userId);
-    if(user.KakaoId == null){
-      user.Name = newName;
-      user.UpdateUser();
-    }else{
-      print("You cannot modify user added by Kakao");
+  updateUserName(String userId, String newName) async{
+    ServiceUser user = await ServiceUser().getUserByUserId(userId);
+    if(user.kakaoId == null) {
+      user.name = newName;
+      FireService().updateDoc("userlist", user.serviceUserId!, user.toJson());
+      //user.UpdateUser();
+    }
+    else {
+      print("카카오톡으로 추가한 유저의 이름은 변경할 수 없습니다.");
     }
   }
 }
