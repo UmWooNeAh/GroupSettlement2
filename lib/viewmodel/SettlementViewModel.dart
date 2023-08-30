@@ -208,7 +208,7 @@ class SettlementViewModel{
       for(var stmpaper in settlementPapers!.entries) {
         user.settlementPapers?.add(stmpaper.value!.settlementPaperId!);
       }
-      
+
       user.settlements?.add(settlement.settlementId!);
       FireService().updateDoc("userlist", userid, user.toJson());
     }
@@ -222,7 +222,7 @@ class SettlementViewModel{
     }
   }
 
-  void requestSettlement(){
+  void requestSettlement() {
 
   }
 }

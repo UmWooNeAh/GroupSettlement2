@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:groupsettlement2/common_fireservice.dart';
 import 'firebase_options.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -98,14 +100,26 @@ class _MyHomePageState extends State<MyHomePage> {
   var messageString = "";
   ServiceUser me = ServiceUser();
 
-  void getMyDeviceToken(ServiceUser user) async {
+  void _getMyDeviceToken(ServiceUser user) async {
     final token = await FirebaseMessaging.instance.getToken();
     print("내 디바이스 토큰: $token");
-    user.setDeviceToken(token!);
+    user.fcmToken = token;
+    user.tokenTimestamp = DateTime.now().millisecondsSinceEpoch;
   }
+
+  void _checkToken(String userid) async {
+    ServiceUser user = await ServiceUser().getUserByUserId(userid);
+    int nowtime = DateTime.now().millisecondsSinceEpoch;
+    if(user.fcmToken == null || (nowtime - user.tokenTimestamp!) / (1000*60*60*24*30) >= 28)
+      {
+        _getMyDeviceToken(user);
+        FireService().updateDoc("userlist", userid, user.toJson());
+      }
+  }
+
   @override
   void initState(){
-    getMyDeviceToken(me);
+    //_checkToken(me.serviceUserId!);
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       RemoteNotification? notification = message.notification;
 

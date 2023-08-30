@@ -7,6 +7,7 @@ class ServiceUser {
   String? name;
   String? kakaoId;
   String? fcmToken;
+  int? tokenTimestamp;
   List<String>? groups;
   List<String>? settlements;
   List<String>? settlementPapers;
@@ -16,6 +17,7 @@ class ServiceUser {
     this.name,
     this.kakaoId,
     this.fcmToken,
+    this.tokenTimestamp,
     this.groups,
     this.settlements,
     this.settlementPapers
@@ -43,10 +45,6 @@ class ServiceUser {
 
   void createUser() async {
     await FirebaseFirestore.instance.collection("userlist").doc(serviceUserId).set(toJson());
-  }
-
-  void setDeviceToken(String token) {
-    fcmToken = token;
   }
 
   Future<List<ServiceUser>> getUserList() async {
