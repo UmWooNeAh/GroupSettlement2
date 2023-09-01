@@ -58,6 +58,15 @@ class _MainPageState extends State<MainPage> {
                     child: Text("류지원의 페이지"),
                   ),
                   Positioned(
+                    top: 120, left: 10,
+                    child: ElevatedButton(
+                      child: Text("Ryu Page"),
+                      onPressed: (){
+                        context.push("/RyuPage");
+                      },
+                    ),
+                  ),
+                  Positioned(
                     top: 40, left: 10,
                     child: Draggable(
                       data: 10,
@@ -109,6 +118,15 @@ class _MainPageState extends State<MainPage> {
                   Positioned(
                     top: 10, left: 10,
                     child: Text("신성민의 페이지"),
+                  ),
+                  Positioned(
+                    top: 120, left: 10,
+                    child: ElevatedButton(
+                      child: Text("Sin Page"),
+                      onPressed: (){
+                        context.push("/SinPage");
+                      },
+                    ),
                   ),
                   Positioned(
                     top: 50, left: 10,
