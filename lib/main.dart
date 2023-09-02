@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'firebase_options.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:async';
+
+import 'kakao_login_page.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("백그라운드 메시지 처리.. ${message.notification!.body!}");
@@ -38,6 +41,8 @@ void main() async{
     options: DefaultFirebaseOptions.currentPlatform,
   );
   initializeNotification();
+  // KakaoSdk 초기화
+  KakaoSdk.init(nativeAppKey: '61d2f04404d1af59525e321122656821',javaScriptAppKey: '8ca75a685044490ddca27a224c42130e');
   runApp(const MyApp());
 }
 
@@ -136,6 +141,10 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text("정산 앱", style: TextStyle(fontSize:40.0),),
+            ElevatedButton(onPressed: (){
+              Navigator.push(context,
+              MaterialPageRoute(builder:(context)=>kakaoLoginPage()));
+            }, child: Text('로그인'))
           ],
         ),
       ),
