@@ -1,12 +1,20 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
+import 'package:groupsettlement2/view/MainPage.dart';
+import 'package:groupsettlement2/view/gun_page.dart';
+import 'package:groupsettlement2/view/ryu_page.dart';
+import 'package:groupsettlement2/view/sin_page.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
+import 'design_element.dart';
 import 'firebase_options.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:async';
 import 'package:groupsettlement2/class/class_user.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'dart:math';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("백그라운드 메시지 처리.. ${message.notification!.body!}");
@@ -34,6 +42,22 @@ void initializeNotification() async {
   );
 }
 
+
+final firstProvider = Provider((_) => 'Hello World');
+final GoRouter _router = GoRouter(
+  routes: <RouteBase>[
+    GoRoute(path: '/', builder:  (context, state){return const SplashView();},
+      routes: <RouteBase>[
+        GoRoute(path: 'MainPage', builder: (context, state){return const MainPage();}),
+        GoRoute(path: 'RyuPage', builder: (context, state){return const RyuPage();}),
+        GoRoute(path: 'SinPage', builder: (context, state){return const SinPage();}),
+        GoRoute(path: 'GunPage', builder: (context, state){return const GunPage();}),
+      ],
+    ),
+  ],
+);
+
+
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   // runApp() 호출 전 Flutter SDK 초기화
@@ -41,62 +65,36 @@ void main() async{
     options: DefaultFirebaseOptions.currentPlatform,
   );
   initializeNotification();
-  runApp(const MyApp());
+  KakaoSdk.init(nativeAppKey: '',javaScriptAppKey: '');
+  runApp(const ProviderScope(child: MyApp()),);
 }
 
-class MyApp extends StatelessWidget {
+
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a blue toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      routerConfig: _router,
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class SplashView extends StatefulWidget {
+  const SplashView({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<SplashView> createState() => _SplashViewState();
 }
-
-class _MyHomePageState extends State<MyHomePage> {
-
+class _SplashViewState extends State<SplashView> {
   var messageString = "";
   ServiceUser me = ServiceUser();
 
@@ -111,15 +109,17 @@ class _MyHomePageState extends State<MyHomePage> {
     ServiceUser user = await ServiceUser().getUserByUserId(userid);
     int nowtime = DateTime.now().millisecondsSinceEpoch;
     if(user.fcmToken == null || (nowtime - user.tokenTimestamp!) / (1000*60*60*24*30) >= 28)
-      {
-        _getMyDeviceToken(user);
-        FireService().updateDoc("userlist", userid, user.toJson());
-      }
+    {
+      _getMyDeviceToken(user);
+      FireService().updateDoc("userlist", userid, user.toJson());
+    }
   }
 
   @override
   void initState(){
-    //_checkToken(me.serviceUserId!);
+    super.initState();
+    _getMyDeviceToken(me);
+    // _checkToken(me.serviceUserId!);
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       RemoteNotification? notification = message.notification;
 
@@ -135,27 +135,41 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
         );
-        setState(() {
-          messageString = message.notification!.body!;
-          print("Foreground 메시지 수신: $messageString");
-        });
+        messageString = message.notification!.body!;
+        print("Foreground 메시지 수신: $messageString");
       }
     });
-    super.initState();
+
+    Timer(
+      const Duration(seconds: 2),
+      (){
+        context.go("/MainPage");
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        alignment: Alignment.center,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text("정산 앱", style: TextStyle(fontSize:40.0),),
-          ],
+    final Size size = MediaQuery.of(context).size;
+    return Stack(
+      children: [
+        Center(child: Container(color: Colors.white,),),
+        Center(child: Container(height: 100, width: 100, color: Colors.deepPurpleAccent),),
+        Positioned(
+          bottom: size.height * 0.6,
+          child: Transform.rotate(
+            angle: pi * 3 / 4,
+            child: Container(height:size.width * 1.7, width: size.width, color: color1,),
+          ),
         ),
-      ),
+        Positioned(
+          top: size.height * 0.6,
+          child: Transform.rotate(
+            angle: pi * 3 / 4,
+            child: Container(height:size.width * 1.7, width: size.width, color: color2,),
+          ),
+        ),
+      ],
     );
   }
 }
