@@ -116,7 +116,8 @@ class _SplashViewState extends State<SplashView> {
   @override
   void initState(){
     super.initState();
-    _checkToken(me.serviceUserId!);
+    _getMyDeviceToken(me);
+    // _checkToken(me.serviceUserId!);
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       RemoteNotification? notification = message.notification;
 
