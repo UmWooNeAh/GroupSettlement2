@@ -4,6 +4,7 @@ import 'package:groupsettlement2/common_fireservice.dart';
 import 'package:groupsettlement2/view/MainPage.dart';
 import 'package:groupsettlement2/view/ryu_page.dart';
 import 'package:groupsettlement2/view/sin_page.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'design_element.dart';
 import 'firebase_options.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -62,7 +63,7 @@ void main() async{
     options: DefaultFirebaseOptions.currentPlatform,
   );
   initializeNotification();
-
+  KakaoSdk.init(nativeAppKey: '',javaScriptAppKey: '');
   runApp(const ProviderScope(child: MyApp()),);
 }
 
@@ -115,7 +116,7 @@ class _SplashViewState extends State<SplashView> {
   @override
   void initState(){
     super.initState();
-    //_checkToken(me.serviceUserId!);
+    _checkToken(me.serviceUserId!);
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       RemoteNotification? notification = message.notification;
 
