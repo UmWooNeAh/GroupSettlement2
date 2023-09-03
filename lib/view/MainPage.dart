@@ -163,6 +163,12 @@ class _MainPageState extends State<MainPage> {
 
                 },
               ),
+              ElevatedButton(
+                child: Text("Gun Page"),
+                onPressed: (){
+                  context.push("/GunPage");
+                },
+              ),
             ],
           ),
         ],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
 import 'package:groupsettlement2/view/MainPage.dart';
+import 'package:groupsettlement2/view/gun_page.dart';
 import 'package:groupsettlement2/view/ryu_page.dart';
 import 'package:groupsettlement2/view/sin_page.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
@@ -50,6 +51,7 @@ final GoRouter _router = GoRouter(
         GoRoute(path: 'MainPage', builder: (context, state){return const MainPage();}),
         GoRoute(path: 'RyuPage', builder: (context, state){return const RyuPage();}),
         GoRoute(path: 'SinPage', builder: (context, state){return const SinPage();}),
+        GoRoute(path: 'GunPage', builder: (context, state){return const GunPage();}),
       ],
     ),
   ],
