@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
 import 'package:groupsettlement2/view/MainPage.dart';
 import 'package:groupsettlement2/view/gun_page.dart';
@@ -15,6 +18,8 @@ import 'package:groupsettlement2/class/class_user.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:math';
+import 'Kakao/kakao_login_page.dart';
+
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("백그라운드 메시지 처리.. ${message.notification!.body!}");
@@ -65,7 +70,11 @@ void main() async{
     options: DefaultFirebaseOptions.currentPlatform,
   );
   initializeNotification();
-  KakaoSdk.init(nativeAppKey: '',javaScriptAppKey: '');
+  // KakaoSdk 초기화
+  final nativeKey = await File("./Kakao/kakaoKey.txt").readAsString();
+  final jsKey = await File("./Kakao/kakaoJsKey.txt").readAsString();
+  KakaoSdk.init(nativeAppKey: nativeKey,
+      javaScriptAppKey: jsKey);
   runApp(const ProviderScope(child: MyApp()),);
 }
 
@@ -142,7 +151,7 @@ class _SplashViewState extends State<SplashView> {
 
     Timer(
       const Duration(seconds: 2),
-      (){
+          (){
         context.go("/MainPage");
       },
     );
