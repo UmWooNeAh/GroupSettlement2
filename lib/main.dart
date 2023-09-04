@@ -6,7 +6,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:async';
 
-import 'kakao_login_page.dart';
+import 'Kakao/kakao_login_page.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("백그라운드 메시지 처리.. ${message.notification!.body!}");
@@ -42,7 +42,8 @@ void main() async{
   );
   initializeNotification();
   // KakaoSdk 초기화
-  KakaoSdk.init(nativeAppKey: '61d2f04404d1af59525e321122656821',javaScriptAppKey: '8ca75a685044490ddca27a224c42130e');
+  KakaoSdk.init(nativeAppKey: '00b83bf69fba554145c773d6737772fc',
+      javaScriptAppKey: 'aa3a51d84f03c87a103a1a127dfcd8f9');
   runApp(const MyApp());
 }
 
