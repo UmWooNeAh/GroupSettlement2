@@ -203,6 +203,55 @@ class _kakaoLoginPageState extends State<kakaoLoginPage> {
                   ),
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.only(
+                    top: 50.0,
+                    left: 16.0,
+                    right: 16.0,
+                    bottom: 16.0),
+                child: ElevatedButton(
+                  onPressed: () async {
+                    var params = PickerFriendRequestParams(
+                      title: '멀티 친구 피커',
+                      enableSearch: true,
+                      showMyProfile: true,
+                      showFavorite: true,
+                      showPickedFriend: null,
+                      maxPickableCount: null,
+                      minPickableCount: null,
+                      enableBackButton: true,
+                    );
+
+// 피커 호출
+                    try {
+                      SelectedUsers users = await PickerApi.instance.selectFriends(params: params, context: context);
+                      print('친구 선택 성공: ${users.users!.length}');
+                    } catch(e) {
+                      print('친구 선택 실패: $e');
+                    }
+                    setState(() {
+                    });
+                  },
+                  child: Container(
+                    height: 45.0,
+                    alignment: Alignment.center,
+                    child: Text(
+                      "피커로 선택하기",
+                      style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                          fontSize: 18.0,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold
+                      ),
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                      primary: kPrimary,
+                      elevation: 5.0,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(45.0))
+                  ),
+                ),
+              ),
             ],
           )
         )
