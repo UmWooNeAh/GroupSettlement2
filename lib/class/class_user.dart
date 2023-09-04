@@ -7,6 +7,7 @@ class ServiceUser {
   String? name;
   String? kakaoId;
   String? fcmToken;
+  int? tokenTimestamp;
   List<String>? groups;
   List<String>? settlements;
   List<String>? settlementPapers;
@@ -16,6 +17,7 @@ class ServiceUser {
     this.name,
     this.kakaoId,
     this.fcmToken,
+    this.tokenTimestamp,
     this.groups,
     this.settlements,
     this.settlementPapers

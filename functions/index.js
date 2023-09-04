@@ -17,7 +17,7 @@ exports.sendNotification = functions.region("asia-northeast3").firestore
                     title: "회원 이름 변경 알림",
                     body: prev.name + " 회원님의 이름이 " + now.name + " 으로 변경되었어요! 지금 확인해보세요.",
                   },
-                  token: now.token,
+                  token: now.fcmtoken,
             };
             admin.messaging().send(message).then((response) => {
                   console.log("Successfully sent message:", response);
