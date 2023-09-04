@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
@@ -42,8 +44,10 @@ void main() async{
   );
   initializeNotification();
   // KakaoSdk 초기화
-  KakaoSdk.init(nativeAppKey: '00b83bf69fba554145c773d6737772fc',
-      javaScriptAppKey: 'aa3a51d84f03c87a103a1a127dfcd8f9');
+  final nativeKey = await File("./Kakao/kakaoKey.txt").readAsString();
+  final jsKey = await File("./Kakao/kakaoJsKey.txt").readAsString();
+  KakaoSdk.init(nativeAppKey: nativeKey,
+      javaScriptAppKey: jsKey);
   runApp(const MyApp());
 }
 

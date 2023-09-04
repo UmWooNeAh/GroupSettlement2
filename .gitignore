@@ -139,3 +139,7 @@ app.*.symbols
 
 # Naver Clova OCR keys
 /lib/clova/clovaKey.txt
+
+# Kakao App keys
+/lib/Kakao/kakaoJsKey.txt
+/lib/Kakao/kakaoKey.txt
