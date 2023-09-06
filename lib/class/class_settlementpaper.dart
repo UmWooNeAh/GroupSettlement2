@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../modeluuid.dart';
 
 class SettlementPaper {
 
@@ -6,17 +7,13 @@ class SettlementPaper {
   String? settlementId;
   String? serviceUserId;
   String? accountInfo;
-  List<String>? settlementItems;
+  List<String> settlementItems = <String> [];
   double? totalPrice;
 
-  SettlementPaper({
-    this.settlementPaperId,
-    this.settlementId,
-    this.serviceUserId,
-    this.accountInfo,
-    this.settlementItems,
-    this.totalPrice
-  });
+  SettlementPaper() {
+    ModelUuid uuid = ModelUuid();
+    settlementPaperId = uuid.randomId;
+  }
 
   SettlementPaper.fromJson(dynamic json) {
     settlementPaperId = json['settlementpaperid'];

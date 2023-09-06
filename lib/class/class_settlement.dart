@@ -1,41 +1,44 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../modeluuid.dart';
 
 class Settlement {
 
   String? settlementId;
+  String? masterUserId;
+  String? groupId;
+  String? settlementName;
   String? accountInfo;
-  List<String>? receipts;
-  Map<String, String>? settlementPapers;
-  List<String>? serviceUsers;
-  Map<String, bool>? checkSent;
+  List<String> receipts = <String> [];
+  Map<String, String> settlementPapers = <String, String> {};
+  Map<String, bool> checkSent = <String, bool> {};
   bool? isFinished;
 
-  Settlement({
-    this.settlementId,
-    this.accountInfo,
-    this.receipts,
-    this.settlementPapers,
-    this.serviceUsers,
-    this.checkSent,
-    this.isFinished,
-  });
+  Settlement() {
+    ModelUuid uuid = ModelUuid();
+    settlementId = uuid.randomId;
+    isFinished = false;
+  }
 
   Settlement.fromJson(dynamic json) {
     settlementId = json['settlementid'];
+    masterUserId = json['masteruserid'];
+    groupId = json['groupid'];
+    settlementName = json['settlementname'];
     accountInfo = json['accountinfo'];
     receipts = List<String>.from(json["receipts"]);
     settlementPapers = Map<String, String>.from(json["settlementpapers"]);
-    serviceUsers = List<String>.from(json["serviceusers"]);
     checkSent = Map<String, bool>.from(json['checksent']);
     isFinished = json['isfinished'];
   }
 
   Map<String, dynamic> toJson() => {
     'settlementid' : settlementId,
+    'masteruserid' : masterUserId,
+    'groupid' : groupId,
+    'settlementname' : settlementName,
     'accountinfo' : accountInfo,
     'receipts' : receipts,
     'settlementpapers' : settlementPapers,
-    'serviceusers' : serviceUsers,
     'checksent' : checkSent,
     'isfinished' : isFinished,
   };

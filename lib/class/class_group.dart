@@ -1,20 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:groupsettlement2/modeluuid.dart';
 import 'class_settlement.dart';
 import 'class_user.dart';
 
 class Group {
 
   String? groupId;
-  List<String>? settlements;
-  List<String>? serviceUsers;
+  List<String> settlements = <String> [];
+  List<String> serviceUsers = <String> [];
   String? groupName;
 
-  Group({
-    this.groupId,
-    this.settlements,
-    this.serviceUsers,
-    this.groupName
-  });
+  Group() {
+    ModelUuid uuid = ModelUuid();
+    groupId = uuid.randomId;
+  }
 
   Group.fromJson(dynamic json) {
     groupId = json['groupid'];

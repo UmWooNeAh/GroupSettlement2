@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'class_settlement.dart';
+import 'package:groupsettlement2/modeluuid.dart';
 
 class ServiceUser {
  
@@ -8,20 +9,15 @@ class ServiceUser {
   String? kakaoId;
   String? fcmToken;
   int? tokenTimestamp;
-  List<String>? groups;
-  List<String>? settlements;
-  List<String>? settlementPapers;
+  List<String> groups = <String> [];
+  List<String> settlements = <String> [];
+  List<String> settlementPapers = <String> [];
+  List<String> accountInfo = <String> [];
 
-  ServiceUser ({
-    this.serviceUserId,
-    this.name,
-    this.kakaoId,
-    this.fcmToken,
-    this.tokenTimestamp,
-    this.groups,
-    this.settlements,
-    this.settlementPapers
-  });
+  ServiceUser () {
+    ModelUuid uuid = ModelUuid();
+    serviceUserId = uuid.randomId;
+  }
 
   ServiceUser.fromJson(dynamic json) {
     serviceUserId = json['serviceuserid'];
@@ -31,6 +27,7 @@ class ServiceUser {
     groups = List<String>.from(json["groups"]);
     settlements = List<String>.from(json["settlements"]);
     settlementPapers = List<String>.from(json["settlementpapers"]);
+    accountInfo = List<String>.from(json["accountinfo"]);
   }
 
   Map<String, dynamic> toJson() => {
@@ -41,6 +38,7 @@ class ServiceUser {
     'groups' : groups,
     'settlements' : settlements,
     'settlementpapers' : settlementPapers,
+    'accountinfo' : accountInfo,
   };
 
   void createUser() async {
