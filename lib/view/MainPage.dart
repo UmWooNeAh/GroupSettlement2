@@ -186,7 +186,9 @@ class _MainPageState extends State<MainPage> {
               const Text("내 그룹"),
               ElevatedButton(
                 child: const Text("Settlement Page"),
-                onPressed: () {},
+                onPressed: () {
+                  context.push("/SettlementPage");
+                },
               ),
               ElevatedButton(
                 child: const Text("Gun Page"),

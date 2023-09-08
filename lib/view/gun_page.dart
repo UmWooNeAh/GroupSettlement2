@@ -7,7 +7,7 @@ class TestClass {
   int a = 0;
   List<int> b = [];
 
-  void classIncrement() => a++;
+  void classIncrement() => a += 1;
 }
 
 class NotifierTest extends Notifier<TestClass> {
@@ -19,10 +19,16 @@ class NotifierTest extends Notifier<TestClass> {
   void increment() => state.a++;
 }
 
-class StateNotifierTest extends StateNotifier {
-  StateNotifierTest() : super(0);
+class StateNotifierTest extends StateNotifier<TestClass> {
+  StateNotifierTest() : super(TestClass());
 
-  void increment() => state++;
+  void increment() {
+    state.a = state.a + 1;
+  }
+
+  int getAValue() {
+    return state.a;
+  }
 }
 
 class ChangeNotifierTest extends ChangeNotifier {
@@ -72,7 +78,9 @@ class _GunPageState extends State<GunPage> {
           TestContainer3(
             size: size,
             color: const Color.fromARGB(255, 140, 140, 140),
-          )
+          ),
+          TestContainer4(
+              size: size, color: const Color.fromARGB(255, 160, 160, 160)),
         ],
       ),
     );
@@ -354,7 +362,7 @@ class _TestContainerState3 extends ConsumerState<TestContainer3> {
         ref.watch(statefulWidgetChangeNotifierProvider);
     // final changeNotifierProviderValue = ref.watch(changeNotifierProvider);
     // final stateNotifierProviderValue = ref.watch(stateNotifierProvider);
-    final notifierProviderValue = ref.watch(notifierProvider);
+    // final notifierProviderValue = ref.watch(notifierProvider);
     return Container(
       height: widget.size.height * 0.2,
       color: widget.color,
@@ -366,7 +374,7 @@ class _TestContainerState3 extends ConsumerState<TestContainer3> {
             child: ElevatedButton(
               child: const Text("Button"),
               onPressed: () {
-                ref.watch(notifierProvider.notifier).increment();
+                ref.watch(stateNotifierProvider.notifier).increment();
               },
             ),
           ),
@@ -436,7 +444,115 @@ class _TestContainerState3 extends ConsumerState<TestContainer3> {
                     Text(
                         "Success Counter Local: ${statefulWidgetChangeNotifierProvidervalue.testClass.a}"),
                     Text(
-                      "Success Counter Notifier: ${notifierProviderValue.a}",
+                      "Success Counter Notifier: ${ref.watch(stateNotifierProvider.notifier).getAValue()}",
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class Counter extends StateNotifier<int> {
+  Counter() : super(0);
+
+  void increment() => state++;
+}
+
+final counterStateNotifierProvider = StateNotifierProvider((ref) => Counter());
+
+class TestContainer4 extends ConsumerWidget {
+  const TestContainer4({super.key, required this.size, required this.color});
+  final Size size;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container(
+      height: size.height * 0.2,
+      color: color,
+      child: Stack(
+        children: [
+          Positioned(
+            top: 5,
+            left: 10,
+            child: ElevatedButton(
+              child: const Text("Button"),
+              onPressed: () {
+                ref.watch(changeNotifierProvider.notifier).increment();
+                ref.watch(counterStateNotifierProvider.notifier).increment();
+              },
+            ),
+          ),
+          Positioned(
+            top: 10,
+            left: 150,
+            child: Draggable(
+              data: 1,
+              feedback: Container(
+                height: 40,
+                width: 80,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.white),
+              ),
+              childWhenDragging: const SizedBox(),
+              child: Container(
+                height: 40,
+                width: 80,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.white),
+                child: const Center(
+                  child: Text("Draggable"),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            top: 10,
+            left: 250,
+            child: DragTarget(
+              builder: (context, accepted, rejected) {
+                return Container(
+                  height: 40,
+                  width: 70,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.white),
+                  child: const Text(
+                    "Drag Target",
+                    textAlign: TextAlign.center,
+                  ),
+                );
+              },
+              onAccept: (int data) {
+                ref.watch(stateNotifierProvider.notifier).increment();
+              },
+            ),
+          ),
+          Positioned(
+            top: 70,
+            left: 150,
+            child: Container(
+              height: 80,
+              width: 200,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                color: Colors.white,
+              ),
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                        "Success Counter Local: ${ref.watch(changeNotifierProvider).testClass.a}"),
+                    Text(
+                      "Success Counter Notifier: ${ref.watch(counterStateNotifierProvider)}, ${ref.watch(stateNotifierProvider.notifier).getAValue()}",
                     ),
                   ],
                 ),
