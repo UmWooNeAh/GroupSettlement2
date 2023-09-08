@@ -19,10 +19,18 @@ class SettlementCreateViewModel {
   }
 
   // 1-1. Settlement 객체 생성
-  void _settingSettlementCreateViewModel(String groupid, String masterid, String accountInfo) {
+  void _settingSettlementCreateViewModel(String groupid, String masterid, String accountInfo) async{
     settlement.groupId = groupid;
     settlement.masterUserId = masterid;
     settlement.accountInfo = accountInfo;
+    settlement.isFinished = false;
+    
+    Group group = await Group().getGroupByGroupId(groupid);
+    for(var user in group.serviceUsers) {
+        if(user == settlement.masterUserId) continue;
+        settlement.checkSent[user] = false;
+      }
+
   }
 
   // Naver OCR 영수증 인식
