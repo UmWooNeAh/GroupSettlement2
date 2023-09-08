@@ -11,11 +11,11 @@ class SettlementCheckViewModel{
   }
 
   void _settingSettlementCheckViewModel(String settlementId, String userId) async {
-
     settlement = await Settlement().getSettlementBySettlementId(settlementId);
     for(var paper in settlement.settlementPapers.entries) {
-      settlementPaper = await SettlementPaper().getSettlementPaperByPaperId(paper.value);
+      SettlementPaper temp = await SettlementPaper().getSettlementPaperByPaperId(paper.value);
       if(settlementPaper.serviceUserId == userId) {
+        settlementPaper = temp;
         break;
       }
     }

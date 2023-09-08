@@ -78,7 +78,6 @@ class SettlementViewModel{
     _updateSettlementItemPrice(receiptItemId);
   }
 
-
   void deleteSettlementItem(String receiptItemId, String userId) {
     _deleteItemToSettlementPaper(receiptItemId, userId);
     // ReceiptItem에 매칭되어있는 user 삭제
@@ -116,15 +115,13 @@ class SettlementViewModel{
     if(!settlementPapers.containsKey(userId)) {
       SettlementPaper newSettlementPaper = SettlementPaper();
       newSettlementPaper.serviceUserId = userId;
-      newSettlementPaper.settlementPaperId = "Random";
       settlementPapers[userId] = newSettlementPaper;
       settlement.settlementPapers[userId] = newSettlementPaper.settlementPaperId!;
     }
 
-    // 어떤 item의 등록은 반드시 settlementItem 객체를 생성하므로 settlementitem이 생성된다
+    // item의 등록으로 인해 settlementItem 생성
     SettlementItem newSettlementItem = SettlementItem();
-    newSettlementItem.receiptItemId    = "Random";
-    newSettlementItem.settlementItemId = "Random";
+    newSettlementItem.receiptItemId    = receiptItemId;
     newSettlementItem.menuName         = receiptItems[receiptItemId]!.menuName;
     newSettlementItem.menuCount        = receiptItems[receiptItemId]!.serviceUsers.length;
     newSettlementItem.price            = (receiptItems[receiptItemId]!.menuPrice!.toDouble() / newSettlementItem.menuCount!.toDouble());
@@ -215,7 +212,18 @@ class SettlementViewModel{
     }
   }
 
-  void requestSettlement() {
+  void requestSettlement() async {
 
+      for(var userid in settlementUsers) {
+
+        ServiceUser user = await ServiceUser().getUserByUserId(userid);
+
+        if(user.kakaoId == null) { //카카오톡 공유하기
+            
+        }
+        else {//카카오 피커
+
+        }
+      }
   }
 }

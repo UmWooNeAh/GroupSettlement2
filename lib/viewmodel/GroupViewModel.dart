@@ -11,9 +11,9 @@ class GroupViewModel {
   List<Settlement> settlementInGroup = <Settlement> [];
 
   GroupViewModel(
-    this.myGroup,
-    this.serviceUsers,
-    this.settlementInGroup
+      this.myGroup,
+      this.serviceUsers,
+      this.settlementInGroup
   );
 
   void updateSettlement(String settlementId) async {

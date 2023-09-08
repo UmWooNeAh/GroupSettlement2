@@ -11,6 +11,10 @@ class UserViewModel {
 
   UserViewModel(String userId)
   {
+    _settingUserViewModel(userId);
+  }
+
+  void _settingUserViewModel(String userId) {
     fetchUser(userId);
     fetchGroup(userId);
     for(var group in myGroup)
