@@ -25,10 +25,20 @@ class Informations {
   Informations();
 }
 
+class SlidablePage extends StateNotifier<double> {
+  SlidablePage() : super(0);
+
+  void changeOffset(double delta) {
+    state += delta;
+  }
+}
+
 class Receiptss extends ChangeNotifier {
   Informations information = Informations();
 }
 
+final slidablePageStateNotifierProvider =
+    StateNotifierProvider<SlidablePage, double>((ref) => SlidablePage());
 final receiptssChangeNotifierProvider =
     ChangeNotifierProvider((ref) => Receiptss());
 
@@ -40,129 +50,10 @@ class SettlementPage extends ConsumerStatefulWidget {
 }
 
 class _SettlementPageState extends ConsumerState<SettlementPage> {
-  OverlayEntry? overlayEntry;
-  int currentPageIndex = 0;
-  void createHighlightOverlay({
-    required AlignmentDirectional alignment,
-    required Color borderColor,
-  }) {
-    // Remove the existing OverlayEntry.
-    removeHighlightOverlay();
-
-    assert(overlayEntry == null);
-
-    overlayEntry = OverlayEntry(
-      // Create a new OverlayEntry.
-      builder: (BuildContext context) {
-        // Align is used to position the highlight overlay
-        // relative to the NavigationBar destination.
-        return SafeArea(
-          child: Align(
-            alignment: alignment,
-            heightFactor: 1.0,
-            child: DefaultTextStyle(
-              style: const TextStyle(
-                color: Colors.blue,
-                fontWeight: FontWeight.bold,
-                fontSize: 14.0,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  const Text('Tap here for'),
-                  Builder(builder: (BuildContext context) {
-                    switch (currentPageIndex) {
-                      case 0:
-                        return const Column(
-                          children: <Widget>[
-                            Text(
-                              'Explore page',
-                              style: TextStyle(
-                                color: Colors.red,
-                              ),
-                            ),
-                            Icon(
-                              Icons.arrow_downward,
-                              color: Colors.red,
-                            ),
-                          ],
-                        );
-                      case 1:
-                        return const Column(
-                          children: <Widget>[
-                            Text(
-                              'Commute page',
-                              style: TextStyle(
-                                color: Colors.green,
-                              ),
-                            ),
-                            Icon(
-                              Icons.arrow_downward,
-                              color: Colors.green,
-                            ),
-                          ],
-                        );
-                      case 2:
-                        return const Column(
-                          children: <Widget>[
-                            Text(
-                              'Saved page',
-                              style: TextStyle(
-                                color: Colors.orange,
-                              ),
-                            ),
-                            Icon(
-                              Icons.arrow_downward,
-                              color: Colors.orange,
-                            ),
-                          ],
-                        );
-                      default:
-                        return const Text('No page selected.');
-                    }
-                  }),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width / 3,
-                    height: 80.0,
-                    child: Center(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: borderColor,
-                            width: 4.0,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-
-    // Add the OverlayEntry to the Overlay.
-    Overlay.of(context, debugRequiredFor: widget).insert(overlayEntry!);
-  }
-
-  // Remove the OverlayEntry.
-  void removeHighlightOverlay() {
-    overlayEntry?.remove();
-    overlayEntry = null;
-  }
-
-  @override
-  void dispose() {
-    // Make sure to remove OverlayEntry when the widget is disposed.
-    removeHighlightOverlay();
-    super.dispose();
-  }
-
   @override
   void initState() {
     super.initState();
+    ref.read(slidablePageStateNotifierProvider);
     ref.read(receiptssChangeNotifierProvider);
   }
 
@@ -175,71 +66,95 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(
-            child: Container(
-              width: size.width,
-              height: size.height * 0.6,
-              color: Colors.blue[100],
-              child: Stack(
-                children: List.generate(
-                  ref
-                      .watch(receiptssChangeNotifierProvider.notifier)
-                      .information
-                      .receipts
-                      .length,
-                  (index) => SettlementPageReceipt(index: index),
-                ),
+          InteractiveViewer(
+            minScale: 0.5,
+            maxScale: 5.0,
+            boundaryMargin: const EdgeInsets.all(5),
+            child: Stack(
+              children: List.generate(
+                ref
+                    .watch(receiptssChangeNotifierProvider.notifier)
+                    .information
+                    .receipts
+                    .length,
+                (index) => SettlementPageReceipt(index: index),
               ),
             ),
           ),
-          Container(
-            color: Colors.grey[200],
-            width: size.width,
-            height: 120,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text("그룹원"),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                      children: List.generate(
-                          ref
-                              .watch(receiptssChangeNotifierProvider.notifier)
-                              .information
-                              .members
-                              .length, (index) {
-                    return SettlementPageGroupUser(index: index);
-                  })),
-                ),
-              ],
+          Positioned(
+            bottom: 0,
+            child: Container(
+              color: Colors.grey[200],
+              width: size.width,
+              height: 180,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("그룹원"),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                        children: List.generate(
+                            ref
+                                .watch(receiptssChangeNotifierProvider.notifier)
+                                .information
+                                .members
+                                .length, (index) {
+                      return SettlementPageGroupUser(index: index);
+                    })),
+                  ),
+                  Container(
+                    height: 60,
+                    width: size.width,
+                    color: Colors.brown[200],
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                            height: 30,
+                            width: 50,
+                            color: Colors.pink[100],
+                            child: GestureDetector(
+                                onVerticalDragEnd: (details) {},
+                                onVerticalDragUpdate: (details) {
+                                  print(details.delta);
+                                  ref
+                                      .watch(slidablePageStateNotifierProvider
+                                          .notifier)
+                                      .changeOffset(details.delta.dy);
+                                },
+                                child: const Center(child: Text("Button")))),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-          Container(
-            height: 60,
-            width: size.width,
-            color: Colors.brown[200],
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                    height: 30,
-                    width: 50,
-                    color: Colors.pink[100],
-                    child: GestureDetector(
-                        onVerticalDragEnd: (details) {
-                          createHighlightOverlay(
-                            alignment: AlignmentDirectional.bottomStart,
-                            borderColor: Colors.red,
-                          );
-                        },
-                        onVerticalDragUpdate: (details) {},
-                        child: const Center(child: Text("Button")))),
-              ],
-            ),
+          Positioned(
+            top: ref.watch(slidablePageStateNotifierProvider),
+            child: Column(children: [
+              Container(
+                height: 60,
+                width: size.width,
+                color: Colors.pink[200],
+                child: GestureDetector(
+                  onVerticalDragUpdate: (details) {
+                    ref
+                        .watch(slidablePageStateNotifierProvider.notifier)
+                        .changeOffset(details.delta.dy);
+                  },
+                ),
+              ),
+              Container(
+                height: 400,
+                width: size.width,
+                color: Colors.pink[100],
+              )
+            ]),
           ),
         ],
       ),
