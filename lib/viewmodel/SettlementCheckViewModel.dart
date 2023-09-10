@@ -20,9 +20,19 @@ class SettlementCheckViewModel{
       }
     }
   }
+  
+  void requestCheckMySent(String userId) {
+    settlement.checkSent[userId] = 1;
+    FireService().updateDoc("settlementlist", settlement.settlementId!, settlement.toJson());
+  }
 
-  void sendComplete(String userId) {
-    settlement.checkSent[userId] = true;
+  void requestSendAgain(String userId) {
+    settlement.checkSent[userId] = 2;
+    FireService().updateDoc("settlementlist", settlement.settlementId!, settlement.toJson());
+  }
+
+  void confirmSent(String userId) {
+    settlement.checkSent[userId] = 3;
     FireService().updateDoc("settlementlist", settlement.settlementId!, settlement.toJson());
   }
 

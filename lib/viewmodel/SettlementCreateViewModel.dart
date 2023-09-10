@@ -24,11 +24,11 @@ class SettlementCreateViewModel {
     settlement.masterUserId = masterid;
     settlement.accountInfo = accountInfo;
     settlement.isFinished = false;
-    
+
     Group group = await Group().getGroupByGroupId(groupid);
     for(var user in group.serviceUsers) {
         if(user == settlement.masterUserId) continue;
-        settlement.checkSent[user] = false;
+        settlement.checkSent[user] = 0;
       }
 
   }

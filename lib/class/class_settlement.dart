@@ -10,7 +10,7 @@ class Settlement {
   String? accountInfo;
   List<String> receipts = <String> [];
   Map<String, String> settlementPapers = <String, String> {};
-  Map<String, bool> checkSent = <String, bool> {};
+  Map<String, int> checkSent = <String, int> {};
   bool? isFinished;
 
   Settlement() {
@@ -27,7 +27,7 @@ class Settlement {
     accountInfo = json['accountinfo'];
     receipts = List<String>.from(json["receipts"]);
     settlementPapers = Map<String, String>.from(json["settlementpapers"]);
-    checkSent = Map<String, bool>.from(json['checksent']);
+    checkSent = Map<String, int>.from(json['checksent']);
     isFinished = json['isfinished'];
   }
 

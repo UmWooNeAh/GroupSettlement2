@@ -19,14 +19,14 @@ class Group {
     groupId = json['groupid'];
     settlements = List<String>.from(json["settlements"]);
     serviceUsers = List<String>.from(json["serviceusers"]);
-    groupName = json['groupName'];
+    groupName = json['groupname'];
   }
 
   Map<String, dynamic> toJson() => {
     'groupid' : groupId,
     'settlements': settlements,
     'serviceusers' : serviceUsers,
-    'groupName' : groupName,
+    'groupname' : groupName,
   };
 
   void createGroup() async {
