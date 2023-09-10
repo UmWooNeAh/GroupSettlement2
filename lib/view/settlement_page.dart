@@ -26,19 +26,56 @@ class Informations {
 }
 
 class SlidablePage extends StateNotifier<double> {
-  SlidablePage() : super(0);
+  SlidablePage() : super(1000);
 
-  void changeOffset(double delta) {
+  void changeOffset(double delta, double initial) {
     state += delta;
+    if (state > initial - 110) {
+      state = initial - 110;
+    } else if (state < 150) {
+      state = 150;
+    }
   }
+
+  void settingOffset(double initial) {
+    state = initial;
+  }
+
+  void judgeState(double initial, bool isopened) async {
+    if (isopened) {
+      if (state > 220) {
+        double difference = initial - 110 - state;
+        for (int i = 0; i < difference; i++) {
+          await Future.delayed(const Duration(microseconds: 1));
+          state += 1;
+        }
+        state = initial - 110;
+      } else {
+        state = 150;
+      }
+    } else {
+      if (initial - 110 - state > 70) {
+        double difference = state - 150;
+        for (int i = 0; i < difference; i++) {
+          await Future.delayed(const Duration(microseconds: 1));
+          state -= 1;
+        }
+        state = 150;
+      } else {
+        state = initial - 110;
+      }
+    }
+  }
+}
+
+class IsOpened extends StateNotifier<bool> {
+  IsOpened() : super(false);
 }
 
 class Receiptss extends ChangeNotifier {
   Informations information = Informations();
 }
 
-final slidablePageStateNotifierProvider =
-    StateNotifierProvider<SlidablePage, double>((ref) => SlidablePage());
 final receiptssChangeNotifierProvider =
     ChangeNotifierProvider((ref) => Receiptss());
 
@@ -50,6 +87,8 @@ class SettlementPage extends ConsumerStatefulWidget {
 }
 
 class _SettlementPageState extends ConsumerState<SettlementPage> {
+  final slidablePageStateNotifierProvider =
+      StateNotifierProvider<SlidablePage, double>((ref) => SlidablePage());
   @override
   void initState() {
     super.initState();
@@ -57,7 +96,9 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
     ref.read(receiptssChangeNotifierProvider);
   }
 
-  double angularValue = 0;
+  final GlobalKey _slidableKey = GlobalKey();
+  double initialValue = 0;
+  bool isopened = false;
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -93,7 +134,7 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("그룹원"),
+                  const SizedBox(height: 20, child: Text("그룹원")),
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
@@ -106,30 +147,32 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
                       return SettlementPageGroupUser(index: index);
                     })),
                   ),
-                  Container(
-                    height: 60,
-                    width: size.width,
-                    color: Colors.brown[200],
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                            height: 30,
-                            width: 50,
-                            color: Colors.pink[100],
-                            child: GestureDetector(
-                                onVerticalDragEnd: (details) {},
-                                onVerticalDragUpdate: (details) {
-                                  print(details.delta);
-                                  ref
-                                      .watch(slidablePageStateNotifierProvider
-                                          .notifier)
-                                      .changeOffset(details.delta.dy);
-                                },
-                                child: const Center(child: Text("Button")))),
-                      ],
-                    ),
-                  ),
+                  GestureDetector(
+                      onTapDown: (details) {
+                        RenderBox renderBox = _slidableKey.currentContext!
+                            .findRenderObject()! as RenderBox;
+                        Offset offset = renderBox.localToGlobal(Offset.zero);
+                        initialValue = offset.dy;
+                        ref
+                            .watch(slidablePageStateNotifierProvider.notifier)
+                            .settingOffset(offset.dy - 110);
+                      },
+                      onVerticalDragEnd: (details) {
+                        ref
+                            .watch(slidablePageStateNotifierProvider.notifier)
+                            .judgeState(initialValue, isopened);
+                      },
+                      onVerticalDragUpdate: (details) {
+                        // ref
+                        //     .watch(slidablePageStateNotifierProvider.notifier)
+                        //     .changeOffset(details.delta.dy, initialValue);
+                      },
+                      child: Container(
+                          key: _slidableKey,
+                          height: 60,
+                          width: size.width,
+                          color: Colors.pink[200],
+                          child: const Icon(Icons.arrow_drop_up))),
                 ],
               ),
             ),
@@ -142,15 +185,23 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
                 width: size.width,
                 color: Colors.pink[200],
                 child: GestureDetector(
+                  onVerticalDragEnd: (details) {
+                    ref
+                        .watch(slidablePageStateNotifierProvider.notifier)
+                        .judgeState(initialValue, isopened);
+                    ref.watch(slidablePageStateNotifierProvider) == 150
+                        ? isopened = true
+                        : isopened = false;
+                  },
                   onVerticalDragUpdate: (details) {
                     ref
                         .watch(slidablePageStateNotifierProvider.notifier)
-                        .changeOffset(details.delta.dy);
+                        .changeOffset(details.delta.dy, initialValue);
                   },
                 ),
               ),
               Container(
-                height: 400,
+                height: 600,
                 width: size.width,
                 color: Colors.pink[100],
               )
@@ -213,10 +264,13 @@ class SettlementPageGroupUser extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(100)),
           ),
         ),
-        Text(ref
-            .watch(receiptssChangeNotifierProvider.notifier)
-            .information
-            .members[index]),
+        SizedBox(
+          height: 30,
+          child: Text(ref
+              .watch(receiptssChangeNotifierProvider.notifier)
+              .information
+              .members[index]),
+        ),
       ],
     );
   }
