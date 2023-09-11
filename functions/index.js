@@ -4,9 +4,9 @@ const admin = require("firebase-admin");
 admin.initializeApp();
 const db = admin.firestore();
 
-const { v4 } = require('uuid');
+const { v4 } = require("uuid");
 const uuid = () => {
-    const tokens = v4().split('-')
+    const tokens = v4().split("-")
     return tokens[2] + tokens[1] + tokens[0] + tokens[3] + tokens[4];
 }
 
@@ -19,13 +19,27 @@ exports.sendNtf_CreateGroup  = functions.region("asia-northeast3").firestore
             const userRef = db.collection("userlist").doc(user);
             const userDoc = await userRef.get();
 
+            const alarmTitle = "그룹 생성 알림";
+            const alarmBody = newvalue.groupname + " 그룹이 생성되었어요! 그룹에 소속된 사람들을 살펴보세요.";
+            const alarmId = uuid();
+
             const message = {
               notification: {
-                  title: "그룹 생성 알림",
-                  body: newvalue.groupname + " 그룹이 생성되었어요! 그룹에 소속된 사람들을 살펴보세요.",
+                  title: alarmTitle,
+                  body: alarmBody,
                 },
                 token: userDoc.data().fcmtoken,
             };
+            const alarm = {
+                alarmid: alarmId,
+                title: alarmTitle,
+                body: alarmBody,
+                category: 2
+            };
+
+            db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+            .collection("myalarmlist").doc(alarmId).set(alarm);
+
             admin.messaging().send(message).then((response) => {
                 console.log("Successfully sent message:", response);
               })
@@ -56,16 +70,32 @@ try {
       const serviceusers = groupDoc.data().serviceusers;
 
       for(const userid of serviceusers) {
+        if(userid == masterid) continue;
+
         const userRef = db.collection("userlist").doc(userid);
         const userDoc = await userRef.get();
 
+        const alarmTitle = "정산 생성 알림";
+        const alarmBody = master + " 님이 생성한 " + newvalue.settlementName + " 정산을 확인해보세요.";
+        const alarmId = uuid();
+
         const message = {
           notification: {
-              title: "정산 생성 알림",
-              body: master + " 님이 생성한 " + newvalue.settlementName + " 정산을 확인해보세요.",
+              title: alarmTitle,
+              body: alarmBody,
             },
             token: userDoc.data().fcmtoken,
         };
+        const alarm = {
+            alarmid: alarmId,
+            title: alarmTitle,
+            body: alarmBody,
+            category: 1
+        };
+
+        db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+        .collection("myalarmlist").doc(alarmId).set(alarm);
+
         admin.messaging().send(message).then((response) => {
             console.log("Successfully sent message:", response);
           })
@@ -97,19 +127,33 @@ try {
       const masterRef = db.collection("userlist").doc(master);
       const masterDoc = await masterRef.get();
 
+      const alarmTitle = "정산서 전송 알림";
+      const alarmBody = masterDoc.data().name+ " 님이 보내신 " + settlementDoc.data().settlementname  + " 정산의 정산서를 확인해보세요!";
+      const alarmId = uuid();
+
       const message = {
           notification: {
-              title: "정산서 전송 알림",
-              body: masterDoc.data().name+ " 님이 보내신 " + settlementDoc.data().settlementname  + " 정산의 정산서를 확인해보세요!",
+              title: alarmTitle,
+              body: alarmBody,
             },
             token: userDoc.data().fcmtoken,
         };
-        admin.messaging().send(message).then((response) => {
-            console.log("Successfully sent message:", response);
-          })
-          .catch((error) => {
-            console.log("Error sending message:", error);
-          });
+      const alarm = {
+            alarmid: alarmId,
+            title: alarmTitle,
+            body: alarmBody,
+            category: 1
+      };
+
+      db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+      .collection("myalarmlist").doc(alarmId).set(alarm);
+
+      admin.messaging().send(message).then((response) => {
+        console.log("Successfully sent message:", response);
+        })
+      .catch((error) => {
+        console.log("Error sending message:", error);
+      });
       
 }
 catch (err) {
@@ -141,13 +185,28 @@ exports.sendNtf_CheckSent  = functions.region("asia-northeast3").firestore
       try {
 
         if(prevValue == 0 && value == 1) {
+          const alarmTitle = "송금 확인 요청 알림";
+          const alarmBody = settlementname + " 정산: " + userDoc.data().name+ " 님이 보내신 송금을 확인해주세요!";
+          const alarmId = uuid();
+
           const message = {
-            notification: {
-                title: "송금 확인 요청 알림",
-                body: settlementname + " 정산: " + userDoc.data().name+ " 님이 보내신 송금을 확인해주세요!",
-              },
-              token: masterDoc.data().fcmtoken,
-          };
+                notification: {
+                    title: alarmTitle,
+                    body: alarmBody,
+                  },
+                  token: userDoc.data().fcmtoken,
+              };
+
+          const alarm = {
+                  alarmid: alarmId,
+                  title: alarmTitle,
+                  body: alarmBody,
+                  category: 0
+            };
+
+          db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+            .collection("myalarmlist").doc(alarmId).set(alarm);
+
           admin.messaging().send(message).then((response) => {
               console.log("Successfully sent message:", response);
             })
@@ -156,13 +215,28 @@ exports.sendNtf_CheckSent  = functions.region("asia-northeast3").firestore
             });
         }
         else if(prevValue == 1 && value == 2) {
+          const alarmTitle = "송금 재요청 알림";
+          const alarmBody = settlementname + " 정산: " + "회원님의 송금이 반려되었어요. 확인 후 다시 송금해주세요!";
+          const alarmId = uuid();
+
           const message = {
-            notification: {
-                title: "송금 재요청 알림",
-                body: settlementname + " 정산: " + "회원님의 송금이 반려되었어요. 확인 후 다시 송금해주세요!",
-              },
-              token: userDoc.data().fcmtoken,
-          };
+                notification: {
+                    title: alarmTitle,
+                    body: alarmBody,
+                  },
+                  token: userDoc.data().fcmtoken,
+              };
+
+          const alarm = {
+                  alarmid: alarmId,
+                  title: alarmTitle,
+                  body: alarmBody,
+                  category: 1
+            };
+
+          db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+            .collection("myalarmlist").doc(alarmId).set(alarm);
+
           admin.messaging().send(message).then((response) => {
               console.log("Successfully sent message:", response);
             })
@@ -171,13 +245,28 @@ exports.sendNtf_CheckSent  = functions.region("asia-northeast3").firestore
             });
         }
         else if(prevValue == 1 && value == 3) {
+          const alarmTitle = "송금 확인 알림";
+          const alarmBody = settlementname + " 정산: " + masterDoc.data().name+ "님이 송금을 컨펌하였어요!";
+          const alarmId = uuid();
+
           const message = {
-            notification: {
-                title: "송금 확인 알림",
-                body: settlementname + " 정산: " + masterDoc.data().name+ "님이 송금을 컨펌하였어요!",
-              },
-              token: userDoc.data().fcmtoken,
-          };
+                notification: {
+                    title: alarmTitle,
+                    body: alarmBody,
+                  },
+                  token: userDoc.data().fcmtoken,
+              };
+
+          const alarm = {
+                  alarmid: alarmId,
+                  title: alarmTitle,
+                  body: alarmBody,
+                  category: 1
+            };
+
+          db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+            .collection("myalarmlist").doc(alarmId).set(alarm);
+
           admin.messaging().send(message).then((response) => {
               console.log("Successfully sent message:", response);
             })
@@ -209,16 +298,32 @@ exports.sendNtf_finishSettlement  = functions.region("asia-northeast3").firestor
         const serviceusers = groupDoc.data().serviceusers;
 
         for(const user of serviceusers) {
+            if(user == now.masteruserid) continue;
             const userRef = db.collection("userlist").doc(user);
             const userDoc = await userRef.get();
-            
+
+            const alarmTitle = "정산 종료 알림";
+            const alarmBody = now.settlementname + " 정산이 종료되었어요.";
+            const alarmId = uuid();
+
             const message = {
-                notification: {
-                    title: "정산 종료 알림",
-                    body: now.settlementname + " 정산이 종료되었어요.",
-                  },
-                  token: userDoc.data().fcmtoken,
-            };
+                  notification: {
+                      title: alarmTitle,
+                      body: alarmBody,
+                    },
+                    token: userDoc.data().fcmtoken,
+                };
+
+            const alarm = {
+                    alarmid: alarmId,
+                    title: alarmTitle,
+                    body: alarmBody,
+                    category: 1
+              };
+
+            db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+              .collection("myalarmlist").doc(alarmId).set(alarm);
+
             admin.messaging().send(message).then((response) => {
                   console.log("Successfully sent message:", response);
                 })
