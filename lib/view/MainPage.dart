@@ -169,6 +169,12 @@ class _MainPageState extends State<MainPage> {
                   context.push("/GunPage");
                 },
               ),
+              ElevatedButton(
+                child: Text("Kakao Page"),
+                onPressed: (){
+                  context.push("/kakaoLoginPage");
+                },
+              )
             ],
           ),
         ],
