@@ -51,7 +51,6 @@ class SettlementCreateViewModel {
         rcpitem.menuPrice = item['priceInfo']['price']['text'] as int;
         rcpitem.serviceUsers.add(settlement.masterUserId!);
         newReceiptItems.add(rcpitem);
-        newReceipt.receiptItems.add(rcpitem.receiptItemId!);
     }
     addReceipt(newReceipt, newReceiptItems);
   }
