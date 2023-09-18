@@ -8,6 +8,9 @@ import 'package:groupsettlement2/view/gun_page.dart';
 import 'package:groupsettlement2/view/ryu_page.dart';
 import 'package:groupsettlement2/view/sin_page.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
+import 'clova/clova.dart';
+import 'clova/clovaPage.dart';
+import 'clova/receiptCheckView.dart';
 import 'design_element.dart';
 import 'firebase_options.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -56,6 +59,8 @@ final GoRouter _router = GoRouter(
         GoRoute(path: 'RyuPage', builder: (context, state){return const RyuPage();}),
         GoRoute(path: 'SinPage', builder: (context, state){return const SinPage();}),
         GoRoute(path: 'GunPage', builder: (context, state){return const GunPage();}),
+        GoRoute(path: 'kakaoLoginPage', builder: (context, state){return const kakaoLoginPage();}),
+        GoRoute(path: 'clovaPage',builder: (context, state){return const clovaPage();}),
       ],
     ),
   ],
@@ -69,11 +74,12 @@ void main() async{
     options: DefaultFirebaseOptions.currentPlatform,
   );
   initializeNotification();
+
   // KakaoSdk 초기화
   final nativeKey = await File("./Kakao/kakaoKey.txt").readAsString();
   final jsKey = await File("./Kakao/kakaoJsKey.txt").readAsString();
-  KakaoSdk.init(nativeAppKey: nativeKey,
-      javaScriptAppKey: jsKey);
+
+  KakaoSdk.init(nativeAppKey: nativeKey,javaScriptAppKey: jsKey);
   runApp(const ProviderScope(child: MyApp()),);
 }
 
