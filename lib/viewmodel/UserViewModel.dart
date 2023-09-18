@@ -2,55 +2,63 @@ import '../class/class_group.dart';
 import '../class/class_settlement.dart';
 import '../class/class_settlementpaper.dart';
 import '../class/class_user.dart';
-
 class UserViewModel {
 
-  ServiceUser? userData;
-  List<Group>? myGroup;
-  List<Settlement>? mySettlements;
-  List<SettlementPaper>? mySettlementPapers;
+  ServiceUser userData = ServiceUser();
+  List<Group> myGroup = <Group> [];
+  List<Settlement> mySettlements = <Settlement> [];
+  List<SettlementPaper> mySettlementPapers = <SettlementPaper> [];
 
-  UserViewModel(String userId) {
-    fetchData(userId);
+  UserViewModel(String userId)
+  {
+    _settingUserViewModel(userId);
   }
 
-  fetchData(String userId) async {
-    //User Fetch
+  void _settingUserViewModel(String userId) {
     fetchUser(userId);
+    fetchGroup(userId);
+    for(var group in myGroup)
+    {
+      fetchSettlement(group.settlements);
+    }
+    for(var stm in mySettlements)
+    {
+      fetchStmPaper(stm.settlementPapers);
+    }
+  }
+
+  void fetchUser(String userId) async {
+    userData = await ServiceUser().getUserByUserId(userId);
+  }
+
+  void fetchGroup(String userId) async {
 
     List<Group> groups = await Group().getGroupList();
     groups.forEach((group) {
-      group.serviceUsers!.forEach((user) {
+      group.serviceUsers.forEach((user) {
         if(user == userId){
           //Group Fetch
-          myGroup!.add(group);
-          fetchSettlement(group.settlements!);
+          myGroup.add(group);
         }
       });
     });
   }
 
-  fetchUser(String userId) async {
-    userData = await ServiceUser().getUserByUserId(userId);
-  }
-
-  fetchSettlement(List<String> stm) async {
-    stm.forEach((id) async{
+  void fetchSettlement(List<String> stms) async {
+    stms.forEach((id) async{
       Settlement temp = await Settlement().getSettlementBySettlementId(id);
       //Settlement Fetch
-      mySettlements!.add(temp);
-      fetchPaper(temp.settlementPapers!);
+      mySettlements.add(temp);
     });
   }
 
-  fetchPaper(Map<String, String> stmpapers) async{
+  void fetchStmPaper(Map<String, String> stmpapers) async{
     stmpapers.forEach((key, value) async {
       //SettlementPaper Fetch
       SettlementPaper temp = await SettlementPaper().getSettlementPaperByPaperId(value);
-      mySettlementPapers!.add(temp);
+      mySettlementPapers.add(temp);
     });
   }
-
 
 }
 
