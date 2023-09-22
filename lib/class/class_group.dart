@@ -6,9 +6,9 @@ import 'class_user.dart';
 class Group {
 
   String? groupId;
-  List<String> settlements = <String> [];
-  List<String> serviceUsers = <String> [];
   String? groupName;
+  List<String> serviceUsers = <String> [];
+  List<String> settlements = <String> [];
 
   Group() {
     ModelUuid uuid = ModelUuid();
@@ -17,16 +17,16 @@ class Group {
 
   Group.fromJson(dynamic json) {
     groupId = json['groupid'];
-    settlements = List<String>.from(json["settlements"]);
-    serviceUsers = List<String>.from(json["serviceusers"]);
     groupName = json['groupname'];
+    serviceUsers = List<String>.from(json['serviceusers']);
+    settlements = List<String>.from(json['settlements']);
   }
 
   Map<String, dynamic> toJson() => {
     'groupid' : groupId,
-    'settlements': settlements,
-    'serviceusers' : serviceUsers,
     'groupname' : groupName,
+    'serviceusers' : serviceUsers,
+    'settlements': settlements,
   };
 
   void createGroup() async {
@@ -52,29 +52,7 @@ class Group {
     Group group = Group.fromSnapShot(result);
     return group;
   }
-
-  Future<List<ServiceUser>> getUserListInGroup() async {
-    List<ServiceUser> userlist = [];
-    for(var userid in serviceUsers!) {
-      DocumentSnapshot<Map<String, dynamic>> result =
-      await FirebaseFirestore.instance.collection("userlist").doc(userid).get();
-      ServiceUser user = ServiceUser.fromSnapShot(result);
-      userlist.add(user);
-    }
-    return userlist;
-  }
-
-  Future<List<Settlement>> getSettlementListInGroup() async {
-    List<Settlement> stmlist = [];
-    for(var stmid in settlements!) {
-      DocumentSnapshot<Map<String, dynamic>> result =
-      await FirebaseFirestore.instance.collection("settlementlist").doc(stmid).get();
-      Settlement stm = Settlement.fromSnapShot(result);
-      stmlist.add(stm);
-    }
-    return stmlist;
-  }
-
+  
   Group.fromSnapShot(
       DocumentSnapshot<Map<String, dynamic>> snapshot)
       : this.fromJson(snapshot.data());

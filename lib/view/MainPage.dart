@@ -129,6 +129,15 @@ class _MainPageState extends State<MainPage> {
                     ),
                   ),
                   Positioned(
+                    top: 120, left: 120,
+                    child: ElevatedButton(
+                      child: Text("ViewModel Test Page"),
+                      onPressed: (){
+                        context.push("/VMTestPage");
+                      },
+                    ),
+                  ),
+                  Positioned(
                     top: 50, left: 10,
                     child: Slidable(
                       key: ValueKey(0),
@@ -169,24 +178,10 @@ class _MainPageState extends State<MainPage> {
                   context.push("/GunPage");
                 },
               ),
-              ElevatedButton(
-                child: Text("Kakao Page"),
-                onPressed: (){
-                  context.push("/kakaoLoginPage");
-                },
-              ),
-              ElevatedButton(
-                child: Text("Clova Page"),
-                onPressed: (){
-                  context.push("/clovaPage");
-                },
-              ),
             ],
           ),
-
         ],
       ),
-
     );
   }
 }

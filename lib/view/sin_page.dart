@@ -1,92 +1,126 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:groupsettlement2/common_fireservice.dart';
+import '../class/class_group.dart';
+import '../class/class_receipt.dart';
+import '../class/class_receiptitem.dart';
+import '../class/class_settlement.dart';
+import '../class/class_user.dart';
 
-class SinPage extends StatefulWidget {
+final userProvider = StateNotifierProvider<UserStateNotifier, List<ServiceUser>>((ref) => UserStateNotifier());
+final userProvider2 = ChangeNotifierProvider<UserChangeNotifier>((ref) => UserChangeNotifier());
+
+class UserStateNotifier extends StateNotifier<List<ServiceUser>> {
+  UserStateNotifier() : super([]); //초기화 부분
+
+  void addUser(ServiceUser user) {
+    state = [...state, user];
+    //state.add(user);
+  }
+  void deleteUser(ServiceUser removeUser) {
+    state = state.where((user) => user != removeUser).toList();
+  }
+}
+
+class UserChangeNotifier extends ChangeNotifier {
+   //초기화 부분
+  final List<ServiceUser> userlist = [];
+
+  void addUser(ServiceUser user) {
+    userlist.add(user);
+    notifyListeners();
+  }
+  void deleteUser(ServiceUser removeUser) {
+    userlist.remove(removeUser);
+    notifyListeners();
+  }
+}
+
+class SinPage extends ConsumerStatefulWidget {
   const SinPage({super.key});
 
   @override
-  State<SinPage> createState() => _SinPageState();
+  ConsumerState<SinPage> createState() => _SinPageState();
 }
 
-class _SinPageState extends State<SinPage> {
-  int firstSuccessCount = 0;
+class _SinPageState extends ConsumerState<SinPage> {
+  final TextEditingController _inputController = TextEditingController();
+
+  @override
+  void dispose() {
+    _inputController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final Size size = MediaQuery
-        .of(context)
-        .size;
+    //final userlist = ref.watch(userProvider);
+    List<ServiceUser> userlist = ref.watch(userProvider2).userlist;
+
     return Scaffold(
-      appBar: AppBar(title: Text("Sin Page"),),
-      body: Column(
-        children: [
-          Container(height: size.height * 0.2, color: Colors.grey[600],
-            child: Stack(
-              children: [
-                Positioned(
-                  top: 5, left: 10,
-                  child: ElevatedButton(
-                    child: const Text("Button"),
-                    onPressed: () {},
-                  ),
-                ),
-                Positioned(
-                  top: 10, left: 150,
-                  child: Draggable(
-                    data: 1,
-                    feedback: Container(
-                      height: 40, width: 80, decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.white
-                    ),),
-                    child: Container(
-                      height: 40, width: 80, decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.white
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: Text('유저 생성 및 관리'),
+      ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          setState(() { });
+        },
+        child: Column(
+          children: [
+            userlist.isEmpty
+              ? Text("담긴 유저가 없습니다.")
+              : Expanded(
+              child: ListView.builder(
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onDoubleTap: () {
+                        //ref.watch(userProvider.notifier).deleteUser(userlist[index]);
+                        ref.watch(userProvider2.notifier).deleteUser(userlist[index]);
+                      },
+                    child: ListTile(
+                      title: Text("${userlist[index].name}"),
+                      subtitle: Text("${userlist[index].serviceUserId}"),
                     ),
-                      child: Center(child: Text("Draggable"),),
-                    ),
-                    childWhenDragging: SizedBox(),
-                  ),
-                ),
-                Positioned(
-                  top: 10, left: 250,
-                  child: DragTarget(
-                    builder: (context, accepted, rejected) {
-                      return Container(
-                        height: 40, width: 70, decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: Colors.white
+                  );
+                  },
+                itemCount: userlist.length,
+              ),
+            ),
+            SizedBox(width:0, height:20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Expanded(
+                    child: TextFormField(
+                      controller: _inputController,
+                      decoration: const InputDecoration(
+                        hintText: "생성할 유저 이름을 입력해주세요.",
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.blue),
+                        ),
                       ),
-                        child: Text(
-                          "Drag Target", textAlign: TextAlign.center,),
-                      );
-                    },
-                    onAccept: (int data) {
-                      setState(() {
-                        firstSuccessCount += data;
-                      });
-                    },
-                  ),
+                    )
                 ),
-                Positioned(
-                  top: 70, left: 150,
-                  child: Container(
-                    height: 80, width: 200, decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: Colors.white,
-                  ),
-                    child: Center(
-                      child: Text("Success Counter: $firstSuccessCount"),),
-                  ),
+                TextButton(
+                  onPressed: () async{
+                    ServiceUser user = ServiceUser(); user.name = _inputController.text;
+                    print('유저 생성이 완료되었습니다.');
+                    _inputController.clear();
+                    //ref.watch(userProvider.notifier).addUser(user);
+                    ref.watch(userProvider2.notifier).addUser(user);
+                  },
+                  child: const Icon(Icons.send),
                 ),
               ],
             ),
-          ),
-          Container(height: size.height * 0.2, color: Colors.grey[700]),
-          Container(height: size.height * 0.2, color: Colors.grey[800]),
-          Container(height: size.height * 0.2, color: Colors.grey[850]),
-        ],
+            SizedBox(width:0, height:20),
+
+          ],
+        ),
       ),
     );
   }
 }
+
+

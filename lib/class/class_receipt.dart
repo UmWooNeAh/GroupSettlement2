@@ -5,10 +5,11 @@ import '../modeluuid.dart';
 class Receipt {
 
   String? receiptId;
+  String? receiptName;
   String? settlementId;
   List<String> receiptItems = <String> [];
   String? storeName;
-  DateTime? time;
+  Timestamp? time;
   int? totalPrice;
 
   Receipt() {
@@ -19,8 +20,9 @@ class Receipt {
 
   Receipt.fromJson(dynamic json) {
     receiptId = json['receiptid'];
+    receiptName = json['receiptname'];
     settlementId = json['settlementid'];
-    receiptItems = List<String>.from(json["receiptsitems"]);
+    receiptItems = List<String>.from(json["receiptitems"]);
     storeName = json['storename'];
     time = json['time'];
     totalPrice = json['totalprice'];
@@ -28,6 +30,7 @@ class Receipt {
 
   Map<String, dynamic> toJson() => {
     'receiptid' : receiptId,
+    'receiptname' : receiptName,
     'settlementid' : settlementId,
     'receiptitems' : receiptItems,
     'storename' : storeName,
