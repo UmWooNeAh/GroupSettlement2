@@ -174,11 +174,19 @@ class _MainPageState extends State<MainPage> {
                 onPressed: (){
                   context.push("/kakaoLoginPage");
                 },
-              )
+              ),
+              ElevatedButton(
+                child: Text("Clova Page"),
+                onPressed: (){
+                  context.push("/clovaPage");
+                },
+              ),
             ],
           ),
+
         ],
       ),
+
     );
   }
 }
