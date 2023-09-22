@@ -50,6 +50,8 @@ dependencies:
   flutter_slidable: ^3.0.0
   wolt_modal_sheet: ^0.1.2
   bottom_sheet_scaffold: ^0.1.9
+  bottom_sheet: ^4.0.0
+  draggable_bottom_sheet: ^1.0.2
 
 dev_dependencies:
   flutter_test:
