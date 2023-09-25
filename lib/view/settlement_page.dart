@@ -1,11 +1,10 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/design_element.dart';
 import 'dart:math' as math;
-import 'package:groupsettlement2/view/gun_page.dart';
 import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
-import 'package:bottom_sheet_scaffold/bottom_sheet_scaffold.dart';
 // import 'package:draggable_bottom_sheet/draggable_bottom_sheet.dart';
 // import 'package:bottom_sheet/bottom_sheet.dart';
 
@@ -43,6 +42,7 @@ class Receiptss extends ChangeNotifier {
 
   void disableReceipt(index) {
     information.receiptSize[index] = 130;
+    notifyListeners();
   }
 
   void ableReceiptSelected(index) {
@@ -52,6 +52,57 @@ class Receiptss extends ChangeNotifier {
 
   void disableReceiptSelected(index) {
     information.receiptSelected[index] = false;
+    notifyListeners();
+  }
+}
+
+class BottomSheetValue {
+  double currentHeight = 600;
+  double previousHeight = 0;
+  double closedHeight = 600;
+  double openedHeight = 200;
+  bool isOpen = false;
+  BottomSheetValue();
+}
+
+class BottomSheetSlider extends ChangeNotifier {
+  BottomSheetValue bottomsheet = BottomSheetValue();
+
+  void setBottomSheetSlider(initial, closed, opened) {
+    bottomsheet.currentHeight = initial;
+    bottomsheet.closedHeight = closed;
+    bottomsheet.openedHeight = opened;
+  }
+
+  void updateHeight(double updateHeight) {
+    bottomsheet.previousHeight = bottomsheet.currentHeight;
+
+    if (bottomsheet.currentHeight + updateHeight >= bottomsheet.openedHeight &&
+        bottomsheet.currentHeight + updateHeight <= bottomsheet.closedHeight) {
+      bottomsheet.currentHeight += updateHeight;
+    }
+    print(bottomsheet.currentHeight);
+    notifyListeners();
+  }
+
+  void updateOpenState() {
+    if (!bottomsheet.isOpen) {
+      if (bottomsheet.currentHeight - bottomsheet.previousHeight < -1.5 ||
+          bottomsheet.currentHeight - bottomsheet.closedHeight < -50) {
+        bottomsheet.isOpen = true;
+        bottomsheet.currentHeight = bottomsheet.openedHeight;
+      } else {
+        bottomsheet.currentHeight = bottomsheet.closedHeight;
+      }
+    } else {
+      if (bottomsheet.currentHeight - bottomsheet.previousHeight > 1.5 ||
+          bottomsheet.currentHeight - bottomsheet.openedHeight > 50) {
+        bottomsheet.isOpen = false;
+        bottomsheet.currentHeight = bottomsheet.closedHeight;
+      } else {
+        bottomsheet.currentHeight = bottomsheet.openedHeight;
+      }
+    }
     notifyListeners();
   }
 }
@@ -102,19 +153,23 @@ class SettlementPage extends ConsumerStatefulWidget {
 class _SettlementPageState extends ConsumerState<SettlementPage> {
   final slidableAdderStateNotifierProvider =
       StateNotifierProvider((ref) => SlidableAdder());
-
-  @override
-  void initState() {
-    super.initState();
-    ref.read(receiptssChangeNotifierProvider);
-    ref.read(changeNotifierProvider);
-  }
+  final bottomSheetSliderChangeNotifierProviedr =
+      ChangeNotifierProvider<BottomSheetSlider>((ref) => BottomSheetSlider());
+  int i = 0;
 
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-
-    return BottomSheetScaffold(
+    final bottomsheetValue =
+        ref.watch(bottomSheetSliderChangeNotifierProviedr.notifier);
+    if (i == 0) {
+      ref
+          .watch(bottomSheetSliderChangeNotifierProviedr.notifier)
+          .setBottomSheetSlider(
+              size.height - 225, size.height - 225, size.height * 0.2);
+      i++;
+    }
+    return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
       ),
@@ -305,82 +360,120 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
               ],
             ),
           ),
-        ],
-      ),
-      bottomSheet: DraggableBottomSheet(
-        gradientOpacity: false,
-        animationDuration: const Duration(milliseconds: 200),
-        headerVisibilityOnTap: true,
-        radius: 20,
-        body: Column(
-          children: [
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text("에상 최종 정산서"),
-            ),
-            Column(
+          AnimatedPositioned(
+            top: ref
+                .watch(bottomSheetSliderChangeNotifierProviedr.notifier)
+                .bottomsheet
+                .currentHeight,
+            duration: (bottomsheetValue.bottomsheet.currentHeight -
+                            bottomsheetValue.bottomsheet.previousHeight)
+                        .abs() >
+                    3
+                ? const Duration(milliseconds: 250)
+                : const Duration(),
+            child: Column(
               children: [
                 Container(
+                  color: colorGrey,
+                  height: 60,
+                  width: size.width,
+                  child: GestureDetector(
+                    onVerticalDragUpdate: (details) {
+                      ref
+                          .watch(
+                              bottomSheetSliderChangeNotifierProviedr.notifier)
+                          .updateHeight(details.delta.dy);
+
+                      // setState(() {});
+                    },
+                    onVerticalDragEnd: (details) {
+                      ref
+                          .watch(
+                              bottomSheetSliderChangeNotifierProviedr.notifier)
+                          .updateOpenState();
+                      // setState(() {});
+                    },
+                  ),
+                ),
+                Container(
+                  height: size.height * 0.6,
+                  width: size.width,
+                  color: Colors.white,
                   child: Column(
                     children: [
-                      const Text("정산서 목록"),
-                      SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: List.generate(
-                                10,
-                                (index) => Column(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(15.0),
-                                          child: Container(
-                                            height: 50,
-                                            width: 50,
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(100),
-                                                color: Colors.black54),
-                                          ),
-                                        ),
-                                        const Text("이름"),
-                                      ],
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text("에상 최종 정산서"),
+                      ),
+                      Column(
+                        children: [
+                          Container(
+                            child: Column(
+                              children: [
+                                const Text("정산서 목록"),
+                                SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children: List.generate(
+                                          10,
+                                          (index) => Column(
+                                                children: [
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            15.0),
+                                                    child: Container(
+                                                      height: 50,
+                                                      width: 50,
+                                                      decoration: BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      100),
+                                                          color:
+                                                              Colors.black54),
+                                                    ),
+                                                  ),
+                                                  const Text("이름"),
+                                                ],
+                                              )),
                                     )),
-                          )),
+                              ],
+                            ),
+                          ),
+                          const Text("전체 정산서"),
+                          Container(
+                              height: 300,
+                              width: size.width * 0.9,
+                              color: Colors.pink[50],
+                              child: Column(
+                                children: List.generate(4, (index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.all(15),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        const Text("류지원"),
+                                        Text("짜장면 등 $index 메뉴"),
+                                        const Text("10000원",
+                                            style: TextStyle(
+                                              color: color2,
+                                            ))
+                                      ],
+                                    ),
+                                  );
+                                }),
+                              ))
+                        ],
+                      ),
                     ],
                   ),
                 ),
-                const Text("전체 정산서"),
-                Container(
-                    height: 300,
-                    width: size.width * 0.9,
-                    color: Colors.pink[50],
-                    child: Column(
-                      children: List.generate(4, (index) {
-                        return Padding(
-                          padding: const EdgeInsets.all(15),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              const Text("류지원"),
-                              Text("짜장면 등 $index 메뉴"),
-                              const Text("10000원",
-                                  style: TextStyle(
-                                    color: color2,
-                                  ))
-                            ],
-                          ),
-                        );
-                      }),
-                    ))
               ],
             ),
-          ],
-        ),
-        header: Container(
-          height: 60,
-          width: size.width,
-          color: colorGrey,
-        ),
+          )
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
@@ -526,7 +619,6 @@ class SettlementPageReceipt extends ConsumerWidget {
             ref
                 .watch(receiptssChangeNotifierProvider.notifier)
                 .disableReceiptSelected(index);
-            print("drag success!! =======================");
           },
           builder: (context, candidateData, rejectedData) {
             return Container(
