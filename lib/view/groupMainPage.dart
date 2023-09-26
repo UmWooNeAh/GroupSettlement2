@@ -73,13 +73,16 @@ class _State extends State<groupMainPage> {
                       ]
                       )
                     ),
-                    Text(
-                      '자세히 보기 >',
-                      style: TextStyle(
-                        color: Color(0xFF454545),
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        height: 0,
+                    Padding(
+                      padding: EdgeInsets.only(right:10),
+                      child: Text(
+                        '자세히 보기 >',
+                        style: TextStyle(
+                          color: Color(0xFF454545),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          height: 0,
+                        ),
                       ),
                     )
                   ]),
@@ -377,101 +380,107 @@ class _State extends State<groupMainPage> {
                     child:Divider(thickness: 5,color:Color(0xFFF4F4F4)),
                   ),
                   SizedBox(height:30),
-                  Container(
-                    width: size.width * 0.95,
-                    height: 100,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Color(0xFFDADADA)),
-                        borderRadius: BorderRadius.circular(10)),
+                  Padding(
+                    padding: EdgeInsets.only(right:15),
+                    child: Container(
+                      width: size.width * 0.95,
+                      height: 100,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Color(0xFFDADADA)),
+                          borderRadius: BorderRadius.circular(10)),
 
-                      child: Text.rich(
-                        TextSpan(
-                          children: [
-                            TextSpan(
-                              text: '엄우네아',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w800,
-                                height: 0,
+                        child: Text.rich(
+                          TextSpan(
+                            children: [
+                              TextSpan(
+                                text: '엄우네아',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w800,
+                                  height: 0,
+                                ),
                               ),
-                            ),
-                            TextSpan(
-                              text: ' 그룹에서 가장 많이 \n',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                height: 0,
+                              TextSpan(
+                                text: ' 그룹에서 가장 많이 \n',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  height: 0,
+                                ),
                               ),
-                            ),
-                            TextSpan(
-                              text: '정산',
-                              style: TextStyle(
-                                color: Color(0xFFFE5F55),
-                                fontSize: 15,
-                                fontWeight: FontWeight.w800,
-                                height: 0,
+                              TextSpan(
+                                text: '정산',
+                                style: TextStyle(
+                                  color: Color(0xFFFE5F55),
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w800,
+                                  height: 0,
+                                ),
                               ),
-                            ),
-                            TextSpan(
-                              text: '을 진행한 사람은 ',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                height: 0,
+                              TextSpan(
+                                text: '을 진행한 사람은 ',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  height: 0,
+                                ),
                               ),
-                            ),
-                            TextSpan(
-                              text: '‘박건우’님',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w800,
-                                height: 0,
+                              TextSpan(
+                                text: '‘박건우’님',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w800,
+                                  height: 0,
+                                ),
                               ),
-                            ),
-                            TextSpan(
-                              text: ' 입니다',
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                height: 0,
+                              TextSpan(
+                                text: ' 입니다',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  height: 0,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
-                      ),
 
+                    ),
                   ),
                   SizedBox(height: 20),
                   GestureDetector(
                     onTap: (){
                       // context.push();
                     },
-                    child: Container(
-                      width: size.width *0.95,
-                      height: 65,
-                      child:Align(
-                        alignment : Alignment.center,
-                        child: Text(
-                            "새 정산 만들기",
-                            textAlign: TextAlign.center,
-                            style:TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                              color:Colors.white,
-                            )
+                    child: Padding(
+                      padding: EdgeInsets.only(right:15),
+                      child: Container(
+                        width: size.width *0.95,
+                        height: 65,
+                        child:Align(
+                          alignment : Alignment.center,
+                          child: Text(
+                              "새 정산 만들기",
+                              textAlign: TextAlign.center,
+                              style:TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color:Colors.white,
+                              )
+                          ),
                         ),
-                      ),
-                      decoration: ShapeDecoration(
-                        color: Color(0xFF454545),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                        decoration: ShapeDecoration(
+                          color: Color(0xFF454545),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
                       ),
                     ),
