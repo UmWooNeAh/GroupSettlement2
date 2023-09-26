@@ -181,6 +181,12 @@ class _MainPageState extends State<MainPage> {
                   context.push("/clovaPage");
                 },
               ),
+              ElevatedButton(
+                child: Text("Group Main Page"),
+                onPressed: (){
+                  context.push("/groupMainPage");
+                },
+              ),
             ],
           ),
 
