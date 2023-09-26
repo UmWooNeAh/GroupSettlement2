@@ -103,11 +103,7 @@ class Clova {
   }
 
   Receipt makeReceipt() {
-    Receipt receipt = Receipt(receiptId: 'a',
-        receiptItems: [],
-        storeName: '',
-        time: DateTime.now(),
-        totalPrice:0);
+    Receipt receipt = Receipt();
     //가게 이름
     try {
       receipt.storeName =
@@ -146,11 +142,15 @@ class Clova {
       print(name + count.toString() + ' ' + price.toString());
       //id
       var id = uuid.v4();
-      ReceiptItem item = ReceiptItem(receiptItemId: id,
-          serviceUsers: [],
+      ReceiptItem item = ReceiptItem();
+      /*
+      serviceUsers: [],
           menuName: name,
           menuCount: count,
-          menuPrice: price);
+          menuPrice: price
+       */
+      item.serviceUsers = [];
+      item.menuName = name; item.menuCount = count; item.menuPrice = price;
       a.add(item);
       receipt.receiptItems!.add(id);
     }
