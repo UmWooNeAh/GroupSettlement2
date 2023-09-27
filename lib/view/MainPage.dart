@@ -16,7 +16,6 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    Offset destinationPosition = Offset(0.0, 0.0);
 
     return Scaffold(
       body: Column(
@@ -39,7 +38,10 @@ class _MainPageState extends State<MainPage> {
               const Text("그룹 모시깽"),
             ],
           ),
-          const Divider(color: colorGrey, thickness: 7,),
+          const Divider(
+            color: colorGrey,
+            thickness: 7,
+          ),
           Row(
             children: [
               Container(
@@ -51,48 +53,58 @@ class _MainPageState extends State<MainPage> {
               Stack(
                 children: [
                   Container(
-                    height: 180, width: size.width * 0.9, color: color1,
+                    height: 180,
+                    width: size.width * 0.9,
+                    color: color1,
                   ),
                   const Positioned(
-                    top: 10, left: 10,
+                    top: 10,
+                    left: 10,
                     child: Text("류지원의 페이지"),
                   ),
                   Positioned(
-                    top: 120, left: 10,
+                    top: 120,
+                    left: 10,
                     child: ElevatedButton(
-                      child: Text("Ryu Page"),
-                      onPressed: (){
+                      child: const Text("Ryu Page"),
+                      onPressed: () {
                         context.push("/RyuPage");
                       },
                     ),
                   ),
                   Positioned(
-                    top: 40, left: 10,
+                    top: 40,
+                    left: 10,
                     child: Draggable(
                       data: 10,
                       feedback: Container(
-                        height: 20, width: 20, color: color2,
+                        height: 20,
+                        width: 20,
+                        color: color2,
                       ),
                       childWhenDragging: Container(
                         color: Colors.transparent,
                       ),
-                      onDraggableCanceled: (velocity, offset){
-
-                      },
+                      onDraggableCanceled: (velocity, offset) {},
                       child: Container(
-                        height: 20, width: 20, color: color2,
+                        height: 20,
+                        width: 20,
+                        color: color2,
                       ),
                     ),
                   ),
                   Positioned(
-                    top: 100, left: 200,
+                    top: 100,
+                    left: 200,
                     child: DragTarget(
-                      builder: (context, accepted, rejected){
+                      builder: (context, accepted, rejected) {
                         return Container(
-                          height: 20, width: 20, color: color2,
+                          height: 20,
+                          width: 20,
+                          color: color2,
                         );
                       },
-                      onAccept: (data){
+                      onAccept: (data) {
                         context.push('/RyuPage');
                       },
                     ),
@@ -101,7 +113,10 @@ class _MainPageState extends State<MainPage> {
               ),
             ],
           ),
-          const Divider(color: colorGrey, thickness: 5,),
+          const Divider(
+            color: colorGrey,
+            thickness: 5,
+          ),
           Row(
             children: [
               Container(
@@ -113,30 +128,43 @@ class _MainPageState extends State<MainPage> {
               Stack(
                 children: [
                   Container(
-                    height: 180, width: size.width * 0.9, color: color2,
+                    height: 180,
+                    width: size.width * 0.9,
+                    color: color2,
                   ),
-                  Positioned(
-                    top: 10, left: 10,
+                  const Positioned(
+                    top: 10,
+                    left: 10,
                     child: Text("신성민의 페이지"),
                   ),
                   Positioned(
-                    top: 120, left: 10,
+                    top: 120,
+                    left: 10,
                     child: ElevatedButton(
-                      child: Text("Sin Page"),
-                      onPressed: (){
+                      child: const Text("Sin Page"),
+                      onPressed: () {
                         context.push("/SinPage");
+                      },
+                    ),
+                  ),
+                  Positioned(
+                    top: 120, left: 120,
+                    child: ElevatedButton(
+                      child: Text("ViewModel Test Page"),
+                      onPressed: (){
+                        context.push("/VMTestPage");
                       },
                     ),
                   ),
                   Positioned(
                     top: 50, left: 10,
                     child: Slidable(
-                      key: ValueKey(0),
+                      key: const ValueKey(0),
                       startActionPane: ActionPane(
                         motion: const ScrollMotion(),
                         children: [
                           SlidableAction(
-                            onPressed: (context){
+                            onPressed: (context) {
                               context.push("/SinPage");
                             },
                             backgroundColor: colorGrey,
@@ -146,26 +174,33 @@ class _MainPageState extends State<MainPage> {
                           ),
                         ],
                       ),
-                      child: Container(height: 50, width: 200, color: color1,),
+                      child: Container(
+                        height: 50,
+                        width: 200,
+                        color: color1,
+                      ),
                     ),
                   ),
                 ],
               ),
             ],
           ),
-          const Divider(color: colorGrey, thickness: 5,),
+          const Divider(
+            color: colorGrey,
+            thickness: 5,
+          ),
           Column(
             children: [
-              Text("내 그룹"),
+              const Text("내 그룹"),
               ElevatedButton(
-                child: Text("Settlement Page"),
-                onPressed: (){
-
+                child: const Text("Settlement Page"),
+                onPressed: () {
+                  context.push("/SettlementPage");
                 },
               ),
               ElevatedButton(
-                child: Text("Gun Page"),
-                onPressed: (){
+                child: const Text("Gun Page"),
+                onPressed: () {
                   context.push("/GunPage");
                 },
               ),
@@ -189,11 +224,8 @@ class _MainPageState extends State<MainPage> {
               ),
             ],
           ),
-
         ],
       ),
-
     );
   }
 }
-

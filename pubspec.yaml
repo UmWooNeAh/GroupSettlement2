@@ -48,6 +48,10 @@ dependencies:
   flutter_riverpod: ^2.3.10
   go_router: ^10.1.2
   flutter_slidable: ^3.0.0
+  wolt_modal_sheet: ^0.1.2
+  bottom_sheet_scaffold: ^0.1.9
+  bottom_sheet: ^4.0.0
+  draggable_bottom_sheet: ^1.0.2
   image_picker: ^1.0.4
 
 dev_dependencies:
@@ -73,7 +77,6 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
-
   assets:
     - images/
   # To add assets to your application, add an assets section, like this:
