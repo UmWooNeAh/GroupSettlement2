@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
 import '../class/class_group.dart';
@@ -9,12 +11,32 @@ class GroupViewModel {
   Group myGroup = Group();
   List<ServiceUser> serviceUsers = <ServiceUser> [];
   List<Settlement> settlementInGroup = <Settlement> [];
+  List<Settlement> mergedSettlementInGroup = <Settlement> [];
 
-  GroupViewModel(
-      this.myGroup,
-      this.serviceUsers,
-      this.settlementInGroup
-  );
+  GroupViewModel(String groupId) {
+    _settingGroupViewModel(groupId);
+  }
+
+  void _settingGroupViewModel(String groupId) async {
+    myGroup = await Group().getGroupByGroupId(groupId);
+    myGroup.serviceUsers.forEach((userid) async {
+      serviceUsers.add(await ServiceUser().getUserByUserId(userid));
+    });
+
+    myGroup.settlements.forEach((stmid) async {
+      Settlement stm = await Settlement().getSettlementBySettlementId(stmid);
+
+      if(!stm.mergedSettlement.isEmpty) {
+        mergedSettlementInGroup.add(stm);
+        //log("합쳐진 정산: ${stm.settlementName}");
+      }
+      else {
+        settlementInGroup.add(stm);
+        //log("그냥 정산: ${stm.settlementName}");
+      }
+    });
+
+  }
 
   void updateSettlement(String settlementId) async {
     Settlement data = await Settlement().getSettlementBySettlementId(settlementId);
@@ -79,4 +101,32 @@ class GroupViewModel {
     }
     myGroup.createGroup();
   }
+
+  void mergeSettlement(Settlement stm1, Settlement stm2, String newName) async {
+    Settlement newMergedStm = Settlement();
+    newMergedStm.settlementName = newName;
+    newMergedStm.mergedSettlement.addAll([stm1.settlementId!, stm2.settlementId!]);
+
+    stm1.isMerged = true; stm2.isMerged = true;
+    FireService().updateDoc("settlementlist", stm1.settlementId!, stm1.toJson());
+    FireService().updateDoc("settlementlist", stm2.settlementId!, stm2.toJson());
+
+    newMergedStm.createSettlement();
+    myGroup.settlements.add(newMergedStm.settlementId!);
+    mergedSettlementInGroup.add(newMergedStm);
+  }
+
+  void restoreMergedSettlement(Settlement mergedSettlement) async {
+
+    mergedSettlement.mergedSettlement.forEach((stmid) async {
+      Settlement stm = await Settlement().getSettlementBySettlementId(stmid);
+      stm.isMerged = false;
+      FireService().updateDoc("settlementlist", stm.settlementId!, stm.toJson());
+    });
+
+    FireService().deleteDoc("settlementlist", mergedSettlement.settlementId!);
+    myGroup.settlements.remove(mergedSettlement.settlementId);
+    mergedSettlementInGroup.remove(mergedSettlement);
+  }
+
 }

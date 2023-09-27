@@ -29,6 +29,10 @@ class Alarm {
     'category' : category
   };
 
+  void creatAlarm(String userid) async {
+    await FirebaseFirestore.instance.collection("alarmlist").doc(userid).collection("myalarmlist").doc(alarmId).set(toJson());
+  }
+  
   Future<List<Alarm>> getAlarmListByUserId(String userid) async{
     List<Alarm> alarmlist = [];
     await FirebaseFirestore.instance.collection("alarmlist").doc(userid)
@@ -43,6 +47,7 @@ class Alarm {
 
     return alarmlist;
   }
+  
 
   Alarm.fromSnapShot(
       DocumentSnapshot<Map<String, dynamic>> snapshot)

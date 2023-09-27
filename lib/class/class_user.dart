@@ -13,6 +13,7 @@ class ServiceUser {
   List<String> settlements = <String> [];
   List<String> settlementPapers = <String> [];
   List<String> accountInfo = <String> [];
+  List<String> savedReceipts = <String> [];
 
   ServiceUser () {
     ModelUuid uuid = ModelUuid();
@@ -28,6 +29,7 @@ class ServiceUser {
     settlements = List<String>.from(json["settlements"]);
     settlementPapers = List<String>.from(json["settlementpapers"]);
     accountInfo = List<String>.from(json["accountinfo"]);
+    savedReceipts = List<String>.from(json["savedreceipts"]);
   }
 
   Map<String, dynamic> toJson() => {
@@ -39,6 +41,7 @@ class ServiceUser {
     'settlements' : settlements,
     'settlementpapers' : settlementPapers,
     'accountinfo' : accountInfo,
+    'savedreceipts' : savedReceipts,
   };
 
   void createUser() async {
