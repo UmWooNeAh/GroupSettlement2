@@ -12,11 +12,14 @@ class Settlement {
   Map<String, String> settlementPapers = <String, String> {};
   Map<String, int> checkSent = <String, int> {};
   bool? isFinished;
+  bool? isMerged;
+  List<String> mergedSettlement = <String> [];
 
   Settlement() {
     ModelUuid uuid = ModelUuid();
     settlementId = uuid.randomId;
     isFinished = false;
+    isMerged = false;
   }
 
   Settlement.fromJson(dynamic json) {
@@ -29,6 +32,8 @@ class Settlement {
     settlementPapers = Map<String, String>.from(json["settlementpapers"]);
     checkSent = Map<String, int>.from(json['checksent']);
     isFinished = json['isfinished'];
+    isMerged = json['ismerged'];
+    mergedSettlement= List<String>.from(json['mergedsettlement']);
   }
 
   Map<String, dynamic> toJson() => {
@@ -41,6 +46,8 @@ class Settlement {
     'settlementpapers' : settlementPapers,
     'checksent' : checkSent,
     'isfinished' : isFinished,
+    'ismerged' : isMerged,
+    'mergedsettlement' : mergedSettlement,
   };
 
   void createSettlement() async {
@@ -60,9 +67,9 @@ class Settlement {
     return settlements;
   }
 
-  Future<Settlement> getSettlementBySettlementId(String settlemntid) async{
+  Future<Settlement> getSettlementBySettlementId(String settlemntid) async {
     DocumentSnapshot<Map<String, dynamic>> result =
-    await FirebaseFirestore.instance.collection("settlemntlist").doc(settlemntid).get();
+    await FirebaseFirestore.instance.collection("settlementlist").doc(settlemntid).get();
     Settlement stment = Settlement.fromSnapShot(result);
     return stment;
   }

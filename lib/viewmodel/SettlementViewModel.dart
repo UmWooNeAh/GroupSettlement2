@@ -25,7 +25,7 @@ class SettlementViewModel{
   }
 
   void _settingSettlementViewModel(String settlementId) async {
-    settlement.getSettlementBySettlementId(settlementId);
+    settlement = await Settlement().getSettlementBySettlementId(settlementId);
     Group group = await Group().getGroupByGroupId(settlement.groupId!);
 
     //정산자 제외하고 그룹의 유저 목록 불러오기
