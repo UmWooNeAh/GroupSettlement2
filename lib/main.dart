@@ -1,9 +1,11 @@
+import 'dart:collection';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:groupsettlement2/view/groupMainPage.dart';
 import 'package:groupsettlement2/view/settlementDetailPage.dart';
 import 'package:groupsettlement2/class/class_settlement.dart';
+import 'package:groupsettlement2/view/settlement_final_check.dart';
 import 'package:groupsettlement2/viewmodel/UserViewModel.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
@@ -52,58 +54,67 @@ void initializeNotification() async {
 
 final firstProvider = Provider((_) => 'Hello World');
 final GoRouter _router = GoRouter(
+  initialLocation: "/SplashView",
   routes: <RouteBase>[
     GoRoute(
       path: '/',
       builder: (context, state) {
-        return const SplashView();
+        return const MainPage();
       },
       routes: <RouteBase>[
         GoRoute(
-            path: 'MainPage', 
-            builder: (context, state){
-              return const MainPage();
+            path: 'SplashView',
+            builder: (context, state) {
+              return const SplashView();
             }),
         GoRoute(
-            path: 'RyuPage', 
-            builder: (context, state){
+            path: 'RyuPage',
+            builder: (context, state) {
               return const RyuPage();
             }),
         GoRoute(
-            path: 'SinPage', 
-            builder: (context, state){
+            path: 'SinPage',
+            builder: (context, state) {
               return const SinPage();
             }),
         GoRoute(
-            path: 'GunPage', 
-            builder: (context, state){
+            path: 'GunPage',
+            builder: (context, state) {
               return const GunPage();
             }),
         GoRoute(
-            path: 'kakaoLoginPage', 
-            builder: (context, state){
+            path: 'kakaoLoginPage',
+            builder: (context, state) {
               return const kakaoLoginPage();
             }),
         GoRoute(
             path: 'clovaPage',
-            builder: (context, state){
+            builder: (context, state) {
               return const clovaPage();
             }),
         GoRoute(
             path: 'groupMainPage',
-            builder: (context, state){
+            builder: (context, state) {
               return const groupMainPage();
             }),
         GoRoute(
             path: 'settlementDetailPage',
-            builder: (context,state){
+            builder: (context, state) {
               return const settlementDetailPage();
             }),
         GoRoute(
-            path: "SettlementPage",
-            builder: (context, state) {
-              return const SettlementPage();
-            }),
+          path: "SettlementPage",
+          builder: (context, state) {
+            return const SettlementPage();
+          },
+          routes: <RouteBase>[
+            GoRoute(
+                path: 'SettlementFinalCheckPage',
+                builder: (context, state) {
+                  return const SettlementFinalCheckPage();
+                }),
+          ],
+        ),
       ],
     ),
   ],
@@ -120,8 +131,12 @@ void main() async {
   // final nativeKey = await File("./Kakao/kakaoKey.txt").readAsString();
   // final jsKey = await File("./Kakao/kakaoJsKey.txt").readAsString();
 
-  KakaoSdk.init(nativeAppKey: '00b83bf69fba554145c773d6737772fc',javaScriptAppKey: 'aa3a51d84f03c87a103a1a127dfcd8f9');
-  runApp(const ProviderScope(child: MyApp()),);
+  KakaoSdk.init(
+      nativeAppKey: '00b83bf69fba554145c773d6737772fc',
+      javaScriptAppKey: 'aa3a51d84f03c87a103a1a127dfcd8f9');
+  runApp(
+    const ProviderScope(child: MyApp()),
+  );
 }
 
 class MyApp extends ConsumerWidget {
@@ -198,7 +213,7 @@ class _SplashViewState extends State<SplashView> {
     Timer(
       const Duration(seconds: 2),
       () {
-        context.go("/MainPage");
+        context.go("/");
       },
     );
   }
