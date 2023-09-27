@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
 import 'package:groupsettlement2/view/MainPage.dart';
 import 'package:groupsettlement2/view/gun_page.dart';
@@ -7,6 +9,9 @@ import 'package:groupsettlement2/view/ryu_page.dart';
 import 'package:groupsettlement2/view/settlement_page.dart';
 import 'package:groupsettlement2/view/sin_page.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
+import 'clova/clova.dart';
+import 'clova/clovaPage.dart';
+import 'clova/receiptCheckView.dart';
 import 'design_element.dart';
 import 'firebase_options.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -16,6 +21,8 @@ import 'package:groupsettlement2/class/class_user.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:math';
+import 'Kakao/kakao_login_page.dart';
+
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("백그라운드 메시지 처리.. ${message.notification!.body!}");
@@ -50,24 +57,34 @@ final GoRouter _router = GoRouter(
       },
       routes: <RouteBase>[
         GoRoute(
-            path: 'MainPage',
-            builder: (context, state) {
+            path: 'MainPage', 
+            builder: (context, state){
               return const MainPage();
             }),
         GoRoute(
-            path: 'RyuPage',
-            builder: (context, state) {
+            path: 'RyuPage', 
+            builder: (context, state){
               return const RyuPage();
             }),
         GoRoute(
-            path: 'SinPage',
-            builder: (context, state) {
+            path: 'SinPage', 
+            builder: (context, state){
               return const SinPage();
             }),
         GoRoute(
-            path: 'GunPage',
-            builder: (context, state) {
+            path: 'GunPage', 
+            builder: (context, state){
               return const GunPage();
+            }),
+        GoRoute(
+            path: 'kakaoLoginPage', 
+            builder: (context, state){
+              return const kakaoLoginPage();
+            }),
+        GoRoute(
+            path: 'clovaPage',
+            builder: (context, state){
+              return const clovaPage();
             }),
         GoRoute(
             path: "SettlementPage",
@@ -86,10 +103,12 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   initializeNotification();
-  KakaoSdk.init(nativeAppKey: '', javaScriptAppKey: '');
-  runApp(
-    const ProviderScope(child: MyApp()),
-  );
+  // KakaoSdk 초기화
+  final nativeKey = await File("./Kakao/kakaoKey.txt").readAsString();
+  final jsKey = await File("./Kakao/kakaoJsKey.txt").readAsString();
+
+  KakaoSdk.init(nativeAppKey: nativeKey,javaScriptAppKey: jsKey);
+  runApp(const ProviderScope(child: MyApp()),);
 }
 
 class MyApp extends ConsumerWidget {

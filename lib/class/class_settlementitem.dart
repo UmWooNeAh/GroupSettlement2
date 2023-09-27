@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../modeluuid.dart';
 
 
 class SettlementItem {
@@ -9,13 +10,10 @@ class SettlementItem {
   int? menuCount;
   double? price;
 
-  SettlementItem({
-    this.settlementItemId,
-    this.receiptItemId,
-    this.menuName,
-    this.menuCount,
-    this.price
-  });
+  SettlementItem() {
+    ModelUuid uuid = ModelUuid();
+    settlementItemId = uuid.randomId;
+  }
 
   SettlementItem.fromJson(dynamic json) {
     settlementItemId = json['settlementitemid'];

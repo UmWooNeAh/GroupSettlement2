@@ -1,20 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../modeluuid.dart';
 
 class ReceiptItem {
 
   String? receiptItemId;
-  List<String>? serviceUsers;
+  List<String> serviceUsers = <String> [];
   String? menuName;
   int? menuCount;
   int? menuPrice;
 
-  ReceiptItem({
-    this.receiptItemId,
-    this.serviceUsers,
-    this.menuName,
-    this.menuCount,
-    this.menuPrice
-  });
+  ReceiptItem() {
+    ModelUuid uuid = ModelUuid();
+    receiptItemId = uuid.randomId;
+  }
 
   ReceiptItem.fromJson(dynamic json) {
     receiptItemId = json['receiptitemid'];
