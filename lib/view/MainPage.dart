@@ -187,6 +187,12 @@ class _MainPageState extends State<MainPage> {
                   context.push("/groupMainPage");
                 },
               ),
+              ElevatedButton(
+                child: Text("Settlement Group Select Page"),
+                onPressed: (){
+                  context.push("/settlementGroupSelectionPage");
+                },
+              ),
             ],
           ),
 
