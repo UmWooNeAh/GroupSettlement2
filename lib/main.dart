@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:groupsettlement2/view/groupMainPage.dart';
+import 'package:groupsettlement2/view/settlementDetailPage.dart';
 import 'package:groupsettlement2/class/class_settlement.dart';
 import 'package:groupsettlement2/viewmodel/UserViewModel.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
@@ -12,6 +14,8 @@ import 'package:groupsettlement2/view/settlement_page.dart';
 import 'package:groupsettlement2/view/sin_page.dart';
 import 'package:groupsettlement2/view/viewmodelTest_page.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
+import 'clova/clova.dart';
+import 'clova/clovaPage.dart';
 import 'design_element.dart';
 import 'firebase_options.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -86,10 +90,20 @@ final GoRouter _router = GoRouter(
               return const clovaPage();
             }),
         GoRoute(
+            path: 'groupMainPage',
+            builder: (context, state){
+              return const groupMainPage();
+            }),
+        GoRoute(
+            path: 'settlementDetailPage',
+            builder: (context,state){
+              return const settlementDetailPage();
+            }),
+        GoRoute(
             path: "SettlementPage",
             builder: (context, state) {
               return const SettlementPage();
-            })
+            }),
       ],
     ),
   ],
@@ -102,10 +116,11 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   initializeNotification();
-  //final nativeKey = await File("./Kakao/kakaoKey.txt").readAsString();
-  //final jsKey = await File("./Kakao/kakaoJsKey.txt").readAsString();
-  //KakaoSdk.init(nativeAppKey: nativeKey,
-  //    javaScriptAppKey: jsKey);
+  // KakaoSdk 초기화
+  // final nativeKey = await File("./Kakao/kakaoKey.txt").readAsString();
+  // final jsKey = await File("./Kakao/kakaoJsKey.txt").readAsString();
+
+  KakaoSdk.init(nativeAppKey: '00b83bf69fba554145c773d6737772fc',javaScriptAppKey: 'aa3a51d84f03c87a103a1a127dfcd8f9');
   runApp(const ProviderScope(child: MyApp()),);
 }
 
