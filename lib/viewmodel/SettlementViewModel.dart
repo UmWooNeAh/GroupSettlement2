@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:groupsettlement2/class/class_group.dart';
 import 'package:groupsettlement2/class/class_user.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
@@ -27,8 +29,9 @@ class SettlementViewModel{
   void _settingSettlementViewModel(String settlementId) async {
     settlement = await Settlement().getSettlementBySettlementId(settlementId);
     Group group = await Group().getGroupByGroupId(settlement.groupId!);
-
+    //log("정산 이름: ${settlement.settlementName}");
     //정산자 제외하고 그룹의 유저 목록 불러오기
+
     for(var userid in group.serviceUsers) {
       if(userid == settlement.masterUserId) {
         continue;
@@ -36,17 +39,18 @@ class SettlementViewModel{
       settlementUsers.add(userid);
     }
 
-    for(var receipt in settlement.receipts) {
+    settlement.receipts.forEach((receipt) async {
       // Settlement -> Receipt 하나씩 불러오기
       Receipt newReceipt = await Receipt().getReceiptByReceiptId(receipt);
       receipts[receipt] = newReceipt;
 
-      for(var receiptitem in receipts[receipt]!.receiptItems) {
+      receipts[receipt]!.receiptItems.forEach((receiptitem) async {
         // Receipt -> ReceiptItem 하나씩 불러오기
         ReceiptItem newReceiptItem = await ReceiptItem().getReceiptItemByReceiptItemId(receiptitem);
         receiptItems[receiptitem] = newReceiptItem;
-      }
-    }
+      });
+    });
+
   }
 
   void addSettlementItem(String receiptItemId, String userId) {
@@ -219,7 +223,7 @@ class SettlementViewModel{
         ServiceUser user = await ServiceUser().getUserByUserId(userid);
 
         if(user.kakaoId == null) { //카카오톡 공유하기
-            
+
         }
         else {//카카오 피커
 
