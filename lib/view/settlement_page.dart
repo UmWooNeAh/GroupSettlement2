@@ -620,7 +620,7 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
             left: 100,
             top: 100,
             child: Visibility(
-              visible: true,
+              visible: false,
               child: Container(
                 padding: const EdgeInsets.all(20),
                 width: size.width - 110,

@@ -2,6 +2,8 @@ import 'dart:collection';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:groupsettlement2/view/create_new_settlement.dart';
+import 'package:groupsettlement2/view/edit_receipt.dart';
 import 'package:groupsettlement2/view/groupMainPage.dart';
 import 'package:groupsettlement2/view/settlementDetailPage.dart';
 import 'package:groupsettlement2/class/class_settlement.dart';
@@ -102,6 +104,19 @@ final GoRouter _router = GoRouter(
             builder: (context, state) {
               return const settlementDetailPage();
             }),
+        GoRoute(
+            path: 'CreateNewSettlementPage',
+            builder: (context, state) {
+              return const CreateNewSettlement();
+            },
+            routes: [
+              GoRoute(
+                path: 'EditReceiptPage',
+                builder: (context, state) {
+                  return const EditReceiptPage();
+                },
+              ),
+            ]),
         GoRoute(
           path: "SettlementPage",
           builder: (context, state) {

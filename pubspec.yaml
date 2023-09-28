@@ -53,6 +53,7 @@ dependencies:
   bottom_sheet: ^4.0.0
   draggable_bottom_sheet: ^1.0.2
   image_picker: ^1.0.4
+  flutter_svg: ^2.0.7
 
 dev_dependencies:
   flutter_test:
