@@ -103,20 +103,27 @@ class GroupViewModel {
   }
 
   void mergeSettlement(Settlement stm1, Settlement stm2, String newName) async {
-    Settlement newMergedStm = Settlement();
-    newMergedStm.settlementName = newName;
-    newMergedStm.mergedSettlement.addAll([stm1.settlementId!, stm2.settlementId!]);
 
-    stm1.isMerged = true; stm2.isMerged = true;
-    FireService().updateDoc("settlementlist", stm1.settlementId!, stm1.toJson());
-    FireService().updateDoc("settlementlist", stm2.settlementId!, stm2.toJson());
+    if(stm1.mergedSettlement.length > 0) { //합쳐진 정산 + 하나의 정산
+        stm1.mergedSettlement.add(stm2.settlementId!);
+        stm2.isMerged = true;
+        FireService().updateDoc("settlementlist", stm1.settlementId!, stm1.toJson());
+    }
+    else  { //하나의 정산 + 하나의 정산
+      Settlement newMergedStm = Settlement();
+      newMergedStm.settlementName = newName;
+      newMergedStm.mergedSettlement.addAll([stm1.settlementId!, stm2.settlementId!]);
+      stm1.isMerged = true; stm2.isMerged = true;
+      newMergedStm.createSettlement();
+      FireService().updateDoc("settlementlist", stm1.settlementId!, stm1.toJson());
+      FireService().updateDoc("settlementlist", stm2.settlementId!, stm2.toJson());
+      myGroup.settlements.add(newMergedStm.settlementId!);
+      mergedSettlementInGroup.add(newMergedStm);
+    }
 
-    newMergedStm.createSettlement();
-    myGroup.settlements.add(newMergedStm.settlementId!);
-    mergedSettlementInGroup.add(newMergedStm);
   }
 
-  void restoreMergedSettlement(Settlement mergedSettlement) async {
+  void disassembleMergedSettlement(Settlement mergedSettlement) async {
 
     mergedSettlement.mergedSettlement.forEach((stmid) async {
       Settlement stm = await Settlement().getSettlementBySettlementId(stmid);
@@ -129,4 +136,13 @@ class GroupViewModel {
     mergedSettlementInGroup.remove(mergedSettlement);
   }
 
+  void pilferFromMergedSettlement(Settlement mergedSettlement, String stmid) async {
+    Settlement stm = await Settlement().getSettlementBySettlementId(stmid);
+    stm.isMerged = false;
+    FireService().updateDoc("settlementlist", stm.settlementId!, stm.toJson());
+
+    mergedSettlement.mergedSettlement.remove(stmid);
+    FireService().updateDoc("settlementlist", mergedSettlement.settlementId!, mergedSettlement.toJson());
+  }
+  
 }
