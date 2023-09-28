@@ -49,6 +49,7 @@ dependencies:
   go_router: ^10.1.2
   flutter_slidable: ^3.0.0
   image_picker: ^1.0.4
+  wolt_modal_sheet: ^0.1.2
 
 dev_dependencies:
   flutter_test:

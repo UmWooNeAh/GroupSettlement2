@@ -10,8 +10,7 @@ import '../main.dart';
 import '../viewmodel/SettlementViewModel.dart';
 
 final provider = Provider<SettlementViewModel> ((_) => SettlementViewModel("54d974c2-ea2a-4998-89a3-6d9cca52db80"));
-final vmProvider =
-StateNotifierProvider<vmNotifier, SettlementViewModel>((ref) => vmNotifier());
+final vmProvider = StateNotifierProvider<vmNotifier, SettlementViewModel>((ref) => vmNotifier());
 final vmProvdier2 = ChangeNotifierProvider<vmNotifier2>((ref) => vmNotifier2());
 final vmProvider3 = FutureProvider<SettlementViewModel>((ref) async {
   final vm = await ref.watch(provider);
