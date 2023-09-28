@@ -1,13 +1,14 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
+import 'package:cloud_firestore_platform_interface/src/timestamp.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:uuid/uuid.dart';
 import '../class/class_receipt.dart';
 import '../class/class_receiptitem.dart';
+
+
 class Clova {
   final apiURL = 'https://zp8rrjf47i.apigw.ntruss.com/custom/v1/24397/7b50d31ceaa021de059374371153a3ef5f1353a184df9ebd874269a23a174339/document/receipt';
   String? secretKey;
@@ -103,11 +104,10 @@ class Clova {
   }
 
   Receipt makeReceipt() {
-    Receipt receipt = Receipt(receiptId: 'a',
-        receiptItems: [],
-        storeName: '',
-        time: DateTime.now(),
-        totalPrice:0);
+    Receipt receipt = Receipt();
+    receipt.receiptItems = [];
+    receipt.time = Timestamp.now();
+
     //가게 이름
     try {
       receipt.storeName =
@@ -145,14 +145,13 @@ class Clova {
       }
       print(name + count.toString() + ' ' + price.toString());
       //id
-      var id = uuid.v4();
-      ReceiptItem item = ReceiptItem(receiptItemId: id,
-          serviceUsers: [],
-          menuName: name,
-          menuCount: count,
-          menuPrice: price);
+      ReceiptItem item = ReceiptItem();
+        item.serviceUsers = [];
+        item.menuName = name;
+        item.menuCount = count;
+        item.menuPrice = price;
       a.add(item);
-      receipt.receiptItems!.add(id);
+      receipt.receiptItems!.add(item.receiptItemId!);
     }
     return receipt;
   }

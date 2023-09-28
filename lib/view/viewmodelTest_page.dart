@@ -98,23 +98,25 @@ class _VMTestPageState extends ConsumerState<VMTestPage> {
                 },
               ),
            ),
-            /*uvm.mergedSettlementInGroup.isEmpty ?
-              Text("합쳐진 정산: 현재 담긴 목록이 없습니다.", style: TextStyle(fontSize: 30),) :
-              Expanded(
-                child:
-                ListView.builder(
-                  itemCount: uvm.mergedSettlementInGroup.length,
-                  itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text("합쳐진 정산 ${index + 1}: ${uvm
-                            .mergedSettlementInGroup[index].settlementName}",
-                          style: TextStyle(fontSize: 30),),
-                        //subtitle: Text("진행중인 정산: ${mygroup[index].settlements.length}개", style: TextStyle(fontSize: 20),),
-                      );
-                  },
-                ),
+            /*Expanded(
+              child: ListView.builder(
+                itemCount: svm.receipts.length,
+                itemBuilder: (context, index) {
+                  String key = svm.receipts.keys.elementAt(index);
+                  return ListTile(
+                    title: Text(
+                      "영수증 항목 ${index + 1}: ${svm.receipts[key]!.receiptName}",
+                      style: TextStyle(fontSize: 30),
+                    ),
+                    subtitle: Text(
+                      "날짜: ${svm.receipts[key]!.time!.toDate()}",
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  );
+                },
               ),
-               */
+           ),
+              */
           ],
         ),
       ),

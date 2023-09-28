@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
@@ -104,11 +105,16 @@ class _SinPageState extends ConsumerState<SinPage> {
                 ),
                 TextButton(
                   onPressed: () async{
-                    ServiceUser user = ServiceUser(); user.name = _inputController.text;
+                    Receipt receipt = Receipt();
+                    receipt.receiptName = _inputController.text;
+                    receipt.storeName = '';
+                    receipt.time = Timestamp.now();
+                    receipt.totalPrice = 0;
                     print('유저 생성이 완료되었습니다.');
+                    receipt.createReceipt();
                     _inputController.clear();
                     //ref.watch(userProvider.notifier).addUser(user);
-                    ref.watch(userProvider2.notifier).addUser(user);
+
                   },
                   child: const Icon(Icons.send),
                 ),

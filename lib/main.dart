@@ -75,6 +75,11 @@ final GoRouter _router = GoRouter(
               return const SinPage();
             }),
         GoRoute(
+            path: 'VMTestPage',
+            builder: (context, state) {
+              return const VMTestPage();
+            }),
+        GoRoute(
             path: 'GunPage', 
             builder: (context, state){
               return const GunPage();
