@@ -7,6 +7,7 @@ import 'package:groupsettlement2/view/edit_receipt.dart';
 import 'package:groupsettlement2/view/groupMainPage.dart';
 import 'package:groupsettlement2/view/settlementDetailPage.dart';
 import 'package:groupsettlement2/class/class_settlement.dart';
+import 'package:groupsettlement2/view/settlement_detail_page_sender.dart';
 import 'package:groupsettlement2/view/settlement_final_check.dart';
 import 'package:groupsettlement2/viewmodel/UserViewModel.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
@@ -102,7 +103,7 @@ final GoRouter _router = GoRouter(
         GoRoute(
             path: 'settlementDetailPage',
             builder: (context, state) {
-              return const settlementDetailPage();
+              return const SettlementDetailPageSettlementer();
             }),
         GoRoute(
             path: 'CreateNewSettlementPage',
@@ -129,6 +130,12 @@ final GoRouter _router = GoRouter(
                   return const SettlementFinalCheckPage();
                 }),
           ],
+        ),
+        GoRoute(
+          path: "SettlementDetailPageSender",
+          builder: (context, state) {
+            return const SettlementDetailPageSender();
+          },
         ),
       ],
     ),

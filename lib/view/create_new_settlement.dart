@@ -113,7 +113,9 @@ class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
                       elevation: 2,
                       backgroundColor: const Color(0xFFFFFFFF),
                       foregroundColor: const Color(0xFFFFFFFF),
-                      onPressed: () {},
+                      onPressed: () {
+                        context.push("/SettlementDetailPageSender");
+                      },
                       child: SizedBox(
                         width: 40,
                         height: 40,
