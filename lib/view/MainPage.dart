@@ -231,7 +231,10 @@ class _MainPageState extends State<MainPage> {
           ],
         ),
       ),
-      bottomNavigationBar: const CustomBottomNavigationBar(),
+      bottomNavigationBar: const CustomBottomNavigationBar(
+        index: 0,
+        isIn: true,
+      ),
     );
   }
 }

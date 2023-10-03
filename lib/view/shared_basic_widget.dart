@@ -1,21 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
-class BottomNavigationBarIndex extends StateNotifier<int> {
-  BottomNavigationBarIndex() : super(0);
-
-  void changeIndex(value) {
-    state = value;
-  }
-}
-
-final bottomIndexProvider =
-    StateNotifierProvider((ref) => BottomNavigationBarIndex());
+var priceToString = NumberFormat.currency(locale: 'ko_KR', symbol: "");
 
 class CustomBottomNavigationBar extends ConsumerStatefulWidget {
-  const CustomBottomNavigationBar({super.key});
+  const CustomBottomNavigationBar(
+      {super.key, required this.index, required this.isIn});
+  final int index;
+  final bool isIn;
 
   @override
   ConsumerState<CustomBottomNavigationBar> createState() =>
@@ -40,28 +34,23 @@ class _CustomBottomNavigationBarState
       unselectedLabelStyle: const TextStyle(
         color: Colors.black,
       ),
-      currentIndex: ref.watch(bottomIndexProvider) as int,
+      currentIndex: widget.index,
       onTap: (value) {
-        if (ref.watch(bottomIndexProvider) != value) {
+        if (!widget.isIn || widget.index != value) {
           switch (value) {
             case 0:
               context.go('/');
-              ref.watch(bottomIndexProvider.notifier).changeIndex(value);
             case 1:
               1;
-              ref.watch(bottomIndexProvider.notifier).changeIndex(value);
             // context.go('/ReceiptBox');
             case 2:
               context.go('/CreateNewSettlementPage');
-              ref.watch(bottomIndexProvider.notifier).changeIndex(value);
             case 3:
               1;
-              // context.go('/Notification');
-              ref.watch(bottomIndexProvider.notifier).changeIndex(value);
+            // context.go('/Notification');
             case 4:
               1;
-              // context.go('/Mypage');
-              ref.watch(bottomIndexProvider.notifier).changeIndex(value);
+            // context.go('/Mypage');
           }
         }
       },

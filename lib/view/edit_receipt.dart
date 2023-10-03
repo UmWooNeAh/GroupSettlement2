@@ -15,7 +15,10 @@ class _EditReceiptState extends ConsumerState<EditReceiptPage> {
     return Scaffold(
       appBar: AppBar(),
       body: const Column(),
-      bottomNavigationBar: const CustomBottomNavigationBar(),
+      bottomNavigationBar: const CustomBottomNavigationBar(
+        index: 0,
+        isIn: false,
+      ),
     );
   }
 }

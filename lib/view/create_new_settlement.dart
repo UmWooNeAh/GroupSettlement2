@@ -185,7 +185,10 @@ class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
           ],
         ),
       ),
-      bottomNavigationBar: const CustomBottomNavigationBar(),
+      bottomNavigationBar: const CustomBottomNavigationBar(
+        index: 2,
+        isIn: true,
+      ),
     );
   }
 }
