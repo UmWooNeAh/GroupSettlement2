@@ -1,8 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
 import '../class/class_settlement.dart';
 import '../class/class_settlementpaper.dart';
 
-class SettlementCheckViewModel{
+class SettlementCheckViewModel extends ChangeNotifier{
   Settlement      settlement      = Settlement();
   SettlementPaper settlementPaper = SettlementPaper();
 
@@ -19,6 +20,7 @@ class SettlementCheckViewModel{
         break;
       }
     }
+    notifyListeners();
   }
   
   void requestCheckMySent(String userId) {

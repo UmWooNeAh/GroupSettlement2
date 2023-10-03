@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
 import '../class/class_receipt.dart';
 import '../class/class_group.dart';
@@ -7,7 +8,7 @@ import '../class/class_receiptitem.dart';
 import '../class/class_settlement.dart';
 import '../class/class_user.dart';
 
-class SettlementCreateViewModel {
+class SettlementCreateViewModel extends ChangeNotifier{
   // 0. Settlement 생성에 필요한 객체들 선언
   Settlement           settlement = Settlement();
   Map<String, Receipt> receipts = <String, Receipt> {};
@@ -30,7 +31,7 @@ class SettlementCreateViewModel {
         if(user == settlement.masterUserId) continue;
         settlement.checkSent[user] = 0;
       }
-
+    notifyListeners();
   }
 
   // Naver OCR 영수증 인식
@@ -49,16 +50,17 @@ class SettlementCreateViewModel {
         rcpitem.menuName = item['name']['text'];
         rcpitem.menuCount = item['count']['text'] as int;
         rcpitem.menuPrice = item['priceInfo']['price']['text'] as int;
-        rcpitem.serviceUsers.add(settlement.masterUserId!);
         newReceiptItems.add(rcpitem);
     }
     addReceipt(newReceipt, newReceiptItems);
+    notifyListeners();
   }
   //직접 추가
   void createReceiptFromTyping() {
     Receipt newReceipt = Receipt();
     List<ReceiptItem> newReceiptItems = [];
     addReceipt(newReceipt, newReceiptItems);
+    notifyListeners();
   }
 
   // 영수증 뷰모델에 추가하기
@@ -73,6 +75,7 @@ class SettlementCreateViewModel {
     settlement.receipts.add(newReceipt.receiptId!);
     receipts[newReceipt.receiptId!] = newReceipt;
     receiptItems[newReceipt.receiptId!] = newReceiptItems;
+    notifyListeners();
   }
 
   void editReceipt(int option, String receiptid, String originitemid, ReceiptItem item) {
@@ -106,6 +109,7 @@ class SettlementCreateViewModel {
 
     receiptItems[edittedReceipt.receiptId!] = edittedReceiptItems;
      */
+    notifyListeners();
   }
 
   // 영수증 삭제하기
@@ -113,6 +117,7 @@ class SettlementCreateViewModel {
     settlement.receipts.remove(receiptId);
     receiptItems.remove(receiptId);
     receipts.remove(receiptId);
+    notifyListeners();
   }
 
   // 5. 정산 최종 생성하기, DB 접근이 이루어지는 시점
@@ -142,9 +147,8 @@ class SettlementCreateViewModel {
 
       }
       settlement.createSettlement();
+      notifyListeners();
     }
-
   }
-
 
 }

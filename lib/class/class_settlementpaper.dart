@@ -12,6 +12,7 @@ class SettlementPaper {
 
   SettlementPaper() {
     ModelUuid uuid = ModelUuid();
+    totalPrice = 0;
     settlementPaperId = uuid.randomId;
   }
 

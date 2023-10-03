@@ -1,12 +1,13 @@
 import 'dart:developer';
 
+import 'package:flutter/cupertino.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
 import '../class/class_group.dart';
 import '../class/class_settlement.dart';
 import '../class/class_user.dart';
 
-class GroupViewModel {
+class GroupViewModel extends ChangeNotifier {
 
   Group myGroup = Group();
   List<ServiceUser> serviceUsers = <ServiceUser> [];
@@ -19,8 +20,10 @@ class GroupViewModel {
 
   void _settingGroupViewModel(String groupId) async {
     myGroup = await Group().getGroupByGroupId(groupId);
+
     myGroup.serviceUsers.forEach((userid) async {
       serviceUsers.add(await ServiceUser().getUserByUserId(userid));
+      notifyListeners();
     });
 
     myGroup.settlements.forEach((stmid) async {
@@ -34,6 +37,7 @@ class GroupViewModel {
         settlementInGroup.add(stm);
         //log("그냥 정산: ${stm.settlementName}");
       }
+      notifyListeners();
     });
 
   }
@@ -41,11 +45,13 @@ class GroupViewModel {
   void updateSettlement(String settlementId) async {
     Settlement data = await Settlement().getSettlementBySettlementId(settlementId);
     settlementInGroup.add(data);
+    notifyListeners();
   }
 
   void addByDirect(ServiceUser user) {
     serviceUsers.add(user);
     user.createUser();
+    notifyListeners();
   }
 
   void addByKakaoFriends() async {
@@ -70,15 +76,18 @@ class GroupViewModel {
       user.createUser();
       serviceUsers.add(user);
     }
+    notifyListeners();
   }
 
   void deleteUser(String userId){
     serviceUsers.removeWhere((user) => user.serviceUserId == userId);
+    notifyListeners();
   }
 
   void updateGroupName(String GroupId, String name){
     myGroup.groupName = name;
     FireService().updateDoc("grouplist", myGroup.groupId!, myGroup.toJson());
+    notifyListeners();
   }
 
   void updateUserName(String userId, String newName) async {
@@ -92,6 +101,7 @@ class GroupViewModel {
     else {
       print("카카오톡으로 추가한 유저의 이름은 변경할 수 없습니다.");
     }
+    notifyListeners();
   }
 
   void createGroup(String groupname) async {
@@ -100,6 +110,7 @@ class GroupViewModel {
           myGroup.serviceUsers.add(user.serviceUserId!);
     }
     myGroup.createGroup();
+    notifyListeners();
   }
 
   void mergeSettlement(Settlement stm1, Settlement stm2, String newName) async {
@@ -120,7 +131,7 @@ class GroupViewModel {
       myGroup.settlements.add(newMergedStm.settlementId!);
       mergedSettlementInGroup.add(newMergedStm);
     }
-
+    notifyListeners();
   }
 
   void disassembleMergedSettlement(Settlement mergedSettlement) async {
@@ -134,6 +145,7 @@ class GroupViewModel {
     FireService().deleteDoc("settlementlist", mergedSettlement.settlementId!);
     myGroup.settlements.remove(mergedSettlement.settlementId);
     mergedSettlementInGroup.remove(mergedSettlement);
+    notifyListeners();
   }
 
   void pilferFromMergedSettlement(Settlement mergedSettlement, String stmid) async {
@@ -143,6 +155,7 @@ class GroupViewModel {
 
     mergedSettlement.mergedSettlement.remove(stmid);
     FireService().updateDoc("settlementlist", mergedSettlement.settlementId!, mergedSettlement.toJson());
+    notifyListeners();
   }
   
 }

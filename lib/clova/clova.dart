@@ -146,7 +146,6 @@ class Clova {
       print(name + count.toString() + ' ' + price.toString());
       //id
       ReceiptItem item = ReceiptItem();
-        item.serviceUsers = [];
         item.menuName = name;
         item.menuCount = count;
         item.menuPrice = price;

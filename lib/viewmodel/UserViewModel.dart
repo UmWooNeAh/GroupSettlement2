@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'package:flutter/cupertino.dart';
 import '../class/class_group.dart';
 import '../class/class_settlement.dart';
 import '../class/class_settlementpaper.dart';
@@ -6,8 +7,9 @@ import '../class/class_user.dart';
 import '../class/class_alarm.dart';
 import '../class/class_receipt.dart';
 import '../common_fireservice.dart';
+import 'package:riverpod/riverpod.dart';
 
-class UserViewModel {
+class UserViewModel extends ChangeNotifier {
 
   ServiceUser userData = ServiceUser();
   List<Group> myGroup = <Group> [];
@@ -30,6 +32,7 @@ class UserViewModel {
 
   void fetchUser(String userId) async {
     userData = await ServiceUser().getUserByUserId(userId);
+    notifyListeners();
     fetchReceipt(userData.savedReceipts);
     fetchGroup(userData.serviceUserId!);
   }
@@ -45,6 +48,7 @@ class UserViewModel {
           }
       }
     }
+    notifyListeners();
   }
 
   void fetchSettlement(Group group) async {
@@ -54,6 +58,7 @@ class UserViewModel {
       mySettlements.add(stm);
       fetchStmPaper(stm);
     });
+    notifyListeners();
   }
 
   void fetchStmPaper(Settlement settlement) async {
@@ -63,6 +68,7 @@ class UserViewModel {
       SettlementPaper temp = await SettlementPaper().getSettlementPaperByPaperId(value);
       mySettlementPapers.add(temp);
     });
+    notifyListeners();
   }
 
   void fetchReceipt(List<String> rcpIds) async {
@@ -72,6 +78,7 @@ class UserViewModel {
         Receipt rcp = await Receipt().getReceiptByReceiptId(rcpid);
         myReceipts.add(rcp);
       });
+      notifyListeners();
     }
   }
 
@@ -82,6 +89,7 @@ class UserViewModel {
     for(int i=0; i<3;i++) {
       newAlarm[i] = false;
     }
+    notifyListeners();
   }
 
   void classifyAlarm(List<Alarm> allalarmlist) {
@@ -97,6 +105,7 @@ class UserViewModel {
         etcStmAlarm.add(alarm);
       }
     }
+    notifyListeners();
   }
 
   //해당 알림 클릭시 이동할 페이지 지정(미구현)
@@ -117,6 +126,7 @@ class UserViewModel {
     }
 
     FireService().deleteDoc("alarmlist/" + userData.serviceUserId! + "/myalarmlist", removeAlarm.alarmId!);
+    notifyListeners();
   }
 
 }
