@@ -23,7 +23,6 @@ class vmNotifier extends StateNotifier<SettlementViewModel> {
   } //엄우네아
 
   Future<void> load(String id) async {
-    state = SettlementViewModel(id);
   }
 }
 
@@ -48,7 +47,6 @@ class VMTestPage extends ConsumerStatefulWidget {
 }
 
 class _VMTestPageState extends ConsumerState<VMTestPage> {
-
   @override
   void initState() {
     super.initState();
