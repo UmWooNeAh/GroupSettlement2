@@ -143,7 +143,3 @@ app.*.symbols
 # Kakao App keys
 /lib/Kakao/kakaoJsKey.txt
 /lib/Kakao/kakaoKey.txt
-
-#Test Page
-/lib/view/viewmodelTest_page.dart
-/lib/view/settlement_page.dart
