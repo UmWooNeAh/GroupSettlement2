@@ -27,6 +27,14 @@ class Informations {
     "그룹원9",
     "그룹원10",
     "그룹원11",
+    "그룹원12",
+    "그룹원13",
+    "그룹원14",
+    "그룹원15",
+    "그룹원16",
+    "그룹원17",
+    "그룹원18",
+    "그룹원19",
   ];
   List<bool> receiptSelected = [false, false, false];
   Informations();
@@ -902,6 +910,9 @@ class SettlementPageGroupUser extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       child: LongPressDraggable(
+        delay: const Duration(
+          milliseconds: 300,
+        ),
         data: 1,
         childWhenDragging: Column(
           children: [

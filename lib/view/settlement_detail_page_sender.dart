@@ -463,13 +463,13 @@ class _SettlementDetailPageSenderState
                 boxShadow: const [
                   BoxShadow(
                     inset: true,
-                    color: Color(0xffccccccc),
+                    color: Color(0xffcccccc),
                     blurRadius: 2,
                     offset: Offset(2, 2),
                   ),
                   BoxShadow(
                     inset: true,
-                    color: Color(0xffccccccc),
+                    color: Color(0xffcccccc),
                     blurRadius: 2,
                     offset: Offset(2, -2),
                   ),
