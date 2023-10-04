@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:groupsettlement2/view/groupMainPage.dart';
 import 'package:groupsettlement2/view/settlementDetailPage.dart';
+import 'package:groupsettlement2/view/settlementGroupSelectionPage.dart';
 import 'package:groupsettlement2/class/class_settlement.dart';
 import 'package:groupsettlement2/viewmodel/UserViewModel.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
@@ -103,6 +104,11 @@ final GoRouter _router = GoRouter(
             path: "SettlementPage",
             builder: (context, state) {
               return const SettlementPage();
+            }),
+         GoRoute(
+            path: 'settlementGroupSelectionPage',
+            builder: (context,state) {
+              return const settlementGroupSelectionPage();
             }),
       ],
     ),
