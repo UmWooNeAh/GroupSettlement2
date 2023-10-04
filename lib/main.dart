@@ -6,6 +6,7 @@ import 'package:groupsettlement2/view/create_new_settlement.dart';
 import 'package:groupsettlement2/view/edit_receipt.dart';
 import 'package:groupsettlement2/view/groupMainPage.dart';
 import 'package:groupsettlement2/view/settlementDetailPage.dart';
+import 'package:groupsettlement2/view/settlementGroupSelectionPage.dart';
 import 'package:groupsettlement2/class/class_settlement.dart';
 import 'package:groupsettlement2/view/settlement_detail_page_sender.dart';
 import 'package:groupsettlement2/view/settlement_final_check.dart';
@@ -131,6 +132,12 @@ final GoRouter _router = GoRouter(
                 }),
           ],
         ),
+        GoRoute(
+            path: 'settlementGroupSelectionPage',
+            builder: (context,state) {
+              return const settlementGroupSelectionPage();
+            }
+         ),
         GoRoute(
           path: "SettlementDetailPageSender",
           builder: (context, state) {
