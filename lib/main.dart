@@ -21,6 +21,7 @@ import 'package:groupsettlement2/view/ryu_page.dart';
 import 'package:groupsettlement2/view/settlement_page.dart';
 import 'package:groupsettlement2/view/sin_page.dart';
 import 'package:groupsettlement2/view/viewmodelTest_page.dart';
+import 'package:groupsettlement2/view/viewmodelTest_page.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'clova/clova.dart';
 import 'clova/clovaPage.dart';
@@ -82,6 +83,11 @@ final GoRouter _router = GoRouter(
             path: 'SinPage',
             builder: (context, state) {
               return const SinPage();
+            }),
+        GoRoute(
+            path: 'VMTestPage',
+            builder: (context, state) {
+              return const VMTestPage();
             }),
         GoRoute(
             path: 'GunPage',
