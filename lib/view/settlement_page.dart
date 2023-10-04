@@ -1,10 +1,10 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:groupsettlement2/design_element.dart';
 import 'dart:math' as math;
 import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
+
 // import 'package:draggable_bottom_sheet/draggable_bottom_sheet.dart';
 // import 'package:bottom_sheet/bottom_sheet.dart';
 
@@ -27,6 +27,14 @@ class Informations {
     "그룹원9",
     "그룹원10",
     "그룹원11",
+    "그룹원12",
+    "그룹원13",
+    "그룹원14",
+    "그룹원15",
+    "그룹원16",
+    "그룹원17",
+    "그룹원18",
+    "그룹원19",
   ];
   List<bool> receiptSelected = [false, false, false];
   Informations();
@@ -77,26 +85,25 @@ class BottomSheetSlider extends ChangeNotifier {
   void updateHeight(double updateHeight) {
     bottomsheet.previousHeight = bottomsheet.currentHeight;
 
-    if (bottomsheet.currentHeight + updateHeight >= bottomsheet.openedHeight &&
-        bottomsheet.currentHeight + updateHeight <= bottomsheet.closedHeight) {
+    if (bottomsheet.currentHeight + updateHeight <= bottomsheet.openedHeight &&
+        bottomsheet.currentHeight + updateHeight >= bottomsheet.closedHeight) {
       bottomsheet.currentHeight += updateHeight;
     }
-    print(bottomsheet.currentHeight);
     notifyListeners();
   }
 
   void updateOpenState() {
     if (!bottomsheet.isOpen) {
-      if (bottomsheet.currentHeight - bottomsheet.previousHeight < -1.5 ||
-          bottomsheet.currentHeight - bottomsheet.closedHeight < -50) {
+      if (bottomsheet.currentHeight - bottomsheet.previousHeight > 1.5 ||
+          bottomsheet.currentHeight - bottomsheet.closedHeight > 50) {
         bottomsheet.isOpen = true;
         bottomsheet.currentHeight = bottomsheet.openedHeight;
       } else {
         bottomsheet.currentHeight = bottomsheet.closedHeight;
       }
     } else {
-      if (bottomsheet.currentHeight - bottomsheet.previousHeight > 1.5 ||
-          bottomsheet.currentHeight - bottomsheet.openedHeight > 50) {
+      if (bottomsheet.currentHeight - bottomsheet.previousHeight < -1.5 ||
+          bottomsheet.currentHeight - bottomsheet.openedHeight < -50) {
         bottomsheet.isOpen = false;
         bottomsheet.currentHeight = bottomsheet.closedHeight;
       } else {
@@ -165,14 +172,11 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
     if (i == 0) {
       ref
           .watch(bottomSheetSliderChangeNotifierProviedr.notifier)
-          .setBottomSheetSlider(
-              size.height - 225, size.height - 225, size.height * 0.2);
+          .setBottomSheetSlider(0.0, 0.0, size.height * 0.7);
       i++;
     }
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-      ),
+      appBar: AppBar(),
       body: Stack(
         children: [
           InteractiveViewer(
@@ -186,20 +190,20 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
                         .information
                         .receipts
                         .length +
-                    30,
+                    60,
                 (index) {
-                  if (index < 15) {
+                  if (index < 30) {
                     return Positioned(
-                      top: (size.height / 15) * index + 5,
+                      top: 30 * index + 5,
                       child: Container(
                         height: 1,
                         width: size.width,
                         color: Colors.grey[300],
                       ),
                     );
-                  } else if (index < 30) {
+                  } else if (index < 60) {
                     return Positioned(
-                      left: (size.height / 15) * (index - 15) + 5,
+                      left: 30 * (index - 30) + 5,
                       child: Container(
                         height: size.height,
                         width: 1,
@@ -207,7 +211,7 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
                       ),
                     );
                   } else {
-                    return SettlementPageReceipt(index: index - 30);
+                    return SettlementPageReceipt(index: index - 60);
                   }
                 },
               ),
@@ -216,42 +220,41 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
           Positioned(
             top: size.height / 3,
             right: ref.watch(slidableAdderStateNotifierProvider) as double,
-            child: Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                color: colorGrey,
-                borderRadius: BorderRadius.circular(100),
-              ),
-              child: GestureDetector(
-                onHorizontalDragUpdate: (details) {
-                  ref
-                      .watch(slidableAdderStateNotifierProvider.notifier)
-                      .updateState(details.delta.dx);
-                },
-                onHorizontalDragEnd: (details) {
-                  if ((ref.watch(slidableAdderStateNotifierProvider)
-                          as double) >
-                      80) {
+            child: ClipOval(
+              child: Container(
+                width: 50,
+                height: 50,
+                color: Colors.grey,
+                child: GestureDetector(
+                  onHorizontalDragUpdate: (details) {
                     ref
                         .watch(slidableAdderStateNotifierProvider.notifier)
-                        .settingEnd();
-                  } else {
-                    ref
-                        .watch(slidableAdderStateNotifierProvider.notifier)
-                        .settingInit();
-                  }
-                },
-                child: Transform(
-                  transform: Matrix4.identity()
-                    ..setEntry(3, 2, 0.001) // 투시 변환 적용 (원근감 제거)
-                    ..rotateZ(-math.pi /
-                        40 *
-                        ((ref.watch(slidableAdderStateNotifierProvider)
-                                as double) -
-                            5)),
-                  alignment: Alignment.center,
-                  child: const Icon(Icons.add),
+                        .updateState(details.delta.dx);
+                  },
+                  onHorizontalDragEnd: (details) {
+                    if ((ref.watch(slidableAdderStateNotifierProvider)
+                            as double) >
+                        80) {
+                      ref
+                          .watch(slidableAdderStateNotifierProvider.notifier)
+                          .settingEnd();
+                    } else {
+                      ref
+                          .watch(slidableAdderStateNotifierProvider.notifier)
+                          .settingInit();
+                    }
+                  },
+                  child: Transform(
+                    transform: Matrix4.identity()
+                      ..setEntry(3, 2, 0.001) // 투시 변환 적용 (원근감 제거)
+                      ..rotateZ(-math.pi /
+                          40 *
+                          ((ref.watch(slidableAdderStateNotifierProvider)
+                                  as double) -
+                              5)),
+                    alignment: Alignment.center,
+                    child: const Icon(Icons.add),
+                  ),
                 ),
               ),
             ),
@@ -269,7 +272,9 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const SizedBox(height: 20, child: Text("그룹원")),
+                      Container(
+                          padding: const EdgeInsets.all(10),
+                          child: const Text("그룹원")),
                       TextButton(
                           onPressed: () {
                             ref
@@ -288,7 +293,10 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
                                 .information
                                 .members
                                 .length, (index) {
-                      return SettlementPageGroupUser(index: index);
+                      return SettlementPageGroupUser(
+                        index: index,
+                        ovalSize: 50,
+                      );
                     })),
                   ),
                 ],
@@ -296,14 +304,14 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
             ),
           ),
           Positioned(
-            left: 0,
-            top: ref.watch(readMoreStateNotifierProvider) as double,
+            right: 0,
+            bottom: ref.watch(readMoreStateNotifierProvider) as double,
             child: Stack(
               children: [
                 Container(
                   height: size.height,
                   width: size.width,
-                  color: Colors.black12,
+                  color: Colors.transparent,
                   child: GestureDetector(
                     onTap: () {
                       ref
@@ -313,45 +321,75 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
                   ),
                 ),
                 Positioned(
-                  left: 100,
-                  top: 200,
+                  right: 30,
+                  bottom: 100,
                   child: DragTarget(onLeave: (data) {
                     ref
                         .watch(readMoreStateNotifierProvider.notifier)
                         .leaveReadMore();
                   }, builder: (context, cadidateData, rejectedData) {
-                    return Container(
-                      height: 300,
-                      width: 250,
-                      color: Colors.amber,
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      height:
+                          ref.watch(readMoreStateNotifierProvider) as double ==
+                                  0
+                              ? 300
+                              : 10,
+                      width:
+                          ref.watch(readMoreStateNotifierProvider) as double ==
+                                  0
+                              ? size.width * 0.7
+                              : size.width * 0.7,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: const Color(0xFFF0F0F0),
+                      ),
                       child: SingleChildScrollView(
                         child: Column(
-                          children: List.generate(
-                              ref
-                                          .watch(receiptssChangeNotifierProvider
-                                              .notifier)
-                                          .information
-                                          .members
-                                          .length ~/
-                                      3 +
-                                  1, (index) {
-                            return Row(
+                          children: [
+                            Container(
+                              width: size.width * 0.7,
+                              padding: const EdgeInsets.fromLTRB(20, 15, 0, 5),
+                              child: const Text(
+                                "그룹원 목록",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            Column(
                               children: List.generate(
-                                  math.min(
-                                      3,
-                                      -(3 * index) +
-                                          ref
+                                  ref
                                               .watch(
                                                   receiptssChangeNotifierProvider
                                                       .notifier)
                                               .information
                                               .members
-                                              .length), (iindex) {
-                                return SettlementPageGroupUser(
-                                    index: index * 3 + iindex);
+                                              .length ~/
+                                          4 +
+                                      1, (index) {
+                                return Row(
+                                  children: List.generate(
+                                      math.min(
+                                          4,
+                                          -(4 * index) +
+                                              ref
+                                                  .watch(
+                                                      receiptssChangeNotifierProvider
+                                                          .notifier)
+                                                  .information
+                                                  .members
+                                                  .length), (iindex) {
+                                    return SettlementPageGroupUser(
+                                      index: index * 4 + iindex,
+                                      ovalSize: size.width * 0.1,
+                                    );
+                                  }),
+                                );
                               }),
-                            );
-                          }),
+                            ),
+                          ],
                         ),
                       ),
                     );
@@ -360,119 +398,256 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
               ],
             ),
           ),
-          AnimatedPositioned(
-            top: ref
-                .watch(bottomSheetSliderChangeNotifierProviedr.notifier)
-                .bottomsheet
-                .currentHeight,
-            duration: (bottomsheetValue.bottomsheet.currentHeight -
-                            bottomsheetValue.bottomsheet.previousHeight)
-                        .abs() >
-                    3
-                ? const Duration(milliseconds: 250)
-                : const Duration(),
+          Positioned(
+            bottom: 0,
             child: Column(
               children: [
-                Container(
-                  color: colorGrey,
-                  height: 60,
-                  width: size.width,
-                  child: GestureDetector(
-                    onVerticalDragUpdate: (details) {
-                      ref
-                          .watch(
-                              bottomSheetSliderChangeNotifierProviedr.notifier)
-                          .updateHeight(details.delta.dy);
-
-                      // setState(() {});
-                    },
-                    onVerticalDragEnd: (details) {
-                      ref
-                          .watch(
-                              bottomSheetSliderChangeNotifierProviedr.notifier)
-                          .updateOpenState();
-                      // setState(() {});
-                    },
+                GestureDetector(
+                  onVerticalDragUpdate: (details) {
+                    ref
+                        .watch(bottomSheetSliderChangeNotifierProviedr.notifier)
+                        .updateHeight(-details.delta.dy);
+                    setState(() {});
+                  },
+                  onVerticalDragEnd: (details) {
+                    ref
+                        .watch(bottomSheetSliderChangeNotifierProviedr.notifier)
+                        .updateOpenState();
+                    setState(() {});
+                  },
+                  child: Container(
+                    height: 60,
+                    width: size.width,
+                    decoration: const BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          blurRadius: 5.0,
+                          color: Colors.black45,
+                        )
+                      ],
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20.0),
+                          topRight: Radius.circular(20.0)),
+                    ),
+                    child: Stack(
+                      children: [
+                        const Positioned(
+                            top: 20,
+                            left: 20,
+                            child: Text(
+                              "예상 최종 정산서",
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            )),
+                        Align(
+                          alignment: Alignment.topCenter,
+                          child: bottomsheetValue.bottomsheet.isOpen
+                              ? const Icon(Icons.keyboard_arrow_down_outlined)
+                              : const Icon(Icons.keyboard_arrow_up_outlined),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                Container(
-                  height: size.height * 0.6,
-                  width: size.width,
-                  color: Colors.white,
-                  child: Column(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text("에상 최종 정산서"),
-                      ),
-                      Column(
+                GestureDetector(
+                  onVerticalDragUpdate: (details) {
+                    ref
+                        .watch(bottomSheetSliderChangeNotifierProviedr.notifier)
+                        .updateHeight(-details.delta.dy);
+
+                    setState(() {});
+                  },
+                  onVerticalDragEnd: (details) {
+                    ref
+                        .watch(bottomSheetSliderChangeNotifierProviedr.notifier)
+                        .updateOpenState();
+                    setState(() {});
+                  },
+                  child: AnimatedContainer(
+                    duration: (bottomsheetValue.bottomsheet.currentHeight -
+                                    bottomsheetValue.bottomsheet.previousHeight)
+                                .abs() >
+                            3
+                        ? const Duration(milliseconds: 300)
+                        : const Duration(),
+                    curve: Curves.decelerate,
+                    height: bottomsheetValue.bottomsheet.currentHeight,
+                    width: size.width,
+                    color: Colors.white,
+                    child: SingleChildScrollView(
+                      child: Column(
                         children: [
-                          Container(
-                            child: Column(
-                              children: [
-                                const Text("정산서 목록"),
-                                SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: Row(
-                                      children: List.generate(
-                                          10,
-                                          (index) => Column(
+                          Column(
+                            children: [
+                              Container(
+                                height: 2,
+                                width: size.width,
+                                color: Colors.grey[300],
+                              ),
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                color: Colors.grey[200],
+                                child: Column(
+                                  children: [
+                                    SizedBox(
+                                      width: size.width,
+                                      child: const Text(
+                                        "정산서 목록",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                    SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: Row(
+                                          children: List.generate(10, (index) {
+                                            if (index < 1) {
+                                              return Padding(
+                                                padding:
+                                                    const EdgeInsets.fromLTRB(
+                                                        0, 15, 15, 0),
+                                                child: Column(
+                                                  children: [
+                                                    ClipOval(
+                                                      child: Container(
+                                                        height: 50,
+                                                        width: 50,
+                                                        color: color1,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(
+                                                      height: 15,
+                                                    ),
+                                                    const Text("전체 정산서"),
+                                                  ],
+                                                ),
+                                              );
+                                            } else {
+                                              return Column(
                                                 children: [
                                                   Padding(
                                                     padding:
                                                         const EdgeInsets.all(
                                                             15.0),
-                                                    child: Container(
-                                                      height: 50,
-                                                      width: 50,
-                                                      decoration: BoxDecoration(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      100),
-                                                          color:
-                                                              Colors.black54),
+                                                    child: ClipOval(
+                                                      child: Container(
+                                                        height: 50,
+                                                        width: 50,
+                                                        color: Colors.black54,
+                                                      ),
                                                     ),
                                                   ),
                                                   const Text("이름"),
                                                 ],
-                                              )),
-                                    )),
-                              ],
-                            ),
-                          ),
-                          const Text("전체 정산서"),
-                          Container(
-                              height: 300,
-                              width: size.width * 0.9,
-                              color: Colors.pink[50],
-                              child: Column(
-                                children: List.generate(4, (index) {
-                                  return Padding(
-                                    padding: const EdgeInsets.all(15),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: [
-                                        const Text("류지원"),
-                                        Text("짜장면 등 $index 메뉴"),
-                                        const Text("10000원",
-                                            style: TextStyle(
-                                              color: color2,
-                                            ))
-                                      ],
+                                              );
+                                            }
+                                          }),
+                                        )),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                height: 2,
+                                width: size.width,
+                                color: Colors.grey[300],
+                              ),
+                              Container(
+                                width: size.width,
+                                padding:
+                                    const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                                child: const Text(
+                                  "전체 정산서",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                  height: 300,
+                                  width: size.width,
+                                  padding: const EdgeInsets.all(10),
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      children: List.generate(10, (index) {
+                                        return Padding(
+                                          padding: const EdgeInsets.all(15),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              const Text("류지원"),
+                                              Text("짜장면 등 $index 메뉴"),
+                                              const Text("10000원",
+                                                  style: TextStyle(
+                                                    color: color2,
+                                                  ))
+                                            ],
+                                          ),
+                                        );
+                                      }),
                                     ),
-                                  );
-                                }),
-                              ))
+                                  )),
+                              const Divider(
+                                indent: 20,
+                                endIndent: 20,
+                              ),
+                              Container(
+                                child: const Row(
+                                  children: [
+                                    Text("합계금액"),
+                                    Text(" 40,000원"),
+                                  ],
+                                ),
+                              ),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  context.go(
+                                      "/SettlementPage/SettlementFinalCheckPage");
+                                },
+                                child: const Text("정산 완료하기"),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ],
             ),
-          )
+          ),
+          Positioned(
+            left: 100,
+            top: 100,
+            child: Visibility(
+              visible: false,
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                width: size.width - 110,
+                height: size.height * 0.5,
+                color: Colors.pink[100],
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: List.generate(10, (index) {
+                      return DragTarget(
+                        builder: (context, candidateData, rejectedData) {
+                          return const SettlementPageReceiptItem();
+                        },
+                      );
+                    }),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -482,6 +657,64 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
           BottomNavigationBarItem(icon: Icon(Icons.abc_rounded), label: "c"),
         ],
       ),
+    );
+  }
+}
+
+class SettlementPageReceiptItem extends StatefulWidget {
+  const SettlementPageReceiptItem({super.key});
+
+  @override
+  State<SettlementPageReceiptItem> createState() =>
+      _SettlementPageReceiptItemState();
+}
+
+class _SettlementPageReceiptItemState extends State<SettlementPageReceiptItem> {
+  bool selected = false;
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              selected = !selected;
+            });
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 400),
+            height: selected ? 150 : 50,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.amber,
+            ),
+            child: selected
+                ? const Column(
+                    children: [
+                      Row(
+                        children: [
+                          Text("짜장면"),
+                          Text("6000원"),
+                        ],
+                      ),
+                    ],
+                  )
+                : const Column(
+                    children: [
+                      Row(
+                        children: [
+                          Text("짜장면"),
+                          Text("6000원"),
+                        ],
+                      ),
+                    ],
+                  ),
+          ),
+        ),
+        const SizedBox(
+          height: 10,
+        )
+      ],
     );
   }
 }
@@ -668,21 +901,26 @@ class SettlementPageReceipt extends ConsumerWidget {
 }
 
 class SettlementPageGroupUser extends ConsumerWidget {
-  const SettlementPageGroupUser({super.key, required this.index});
+  const SettlementPageGroupUser(
+      {super.key, required this.index, required this.ovalSize});
+  final double ovalSize;
   final int index;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
       child: LongPressDraggable(
+        delay: const Duration(
+          milliseconds: 300,
+        ),
         data: 1,
         childWhenDragging: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(15, 5, 15, 5),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
               child: SizedBox(
-                height: 50,
-                width: 50,
+                height: ovalSize,
+                width: ovalSize,
               ),
             ),
             SizedBox(
@@ -697,8 +935,8 @@ class SettlementPageGroupUser extends ConsumerWidget {
         feedback: Padding(
           padding: const EdgeInsets.fromLTRB(10, 0, 15, 5),
           child: Container(
-            height: 60,
-            width: 60,
+            height: ovalSize * 1.2,
+            width: ovalSize * 1.2,
             decoration: BoxDecoration(
                 color: Colors.grey[800],
                 borderRadius: BorderRadius.circular(100)),
@@ -709,8 +947,8 @@ class SettlementPageGroupUser extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(15, 5, 15, 5),
               child: Container(
-                height: 50,
-                width: 50,
+                height: ovalSize,
+                width: ovalSize,
                 decoration: BoxDecoration(
                     color: Colors.grey[800],
                     borderRadius: BorderRadius.circular(100)),
@@ -726,71 +964,6 @@ class SettlementPageGroupUser extends ConsumerWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class RotationTest extends StatefulWidget {
-  const RotationTest({super.key});
-
-  @override
-  State<RotationTest> createState() => _RotationTestState();
-}
-
-class _RotationTestState extends State<RotationTest> {
-  double angularValueX = 0;
-  double angularValueY = 0;
-  double angularValueZ = 0;
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Transform.translate(
-          offset: const Offset(100, 100),
-          // ref.watch(offsetChangeNotifierProvider.notifier).testOffset,
-          child: Transform(
-            transform: Matrix4.identity()
-              ..setEntry(3, 2, 0.001) // 투시 변환 적용 (원근감 제거)
-              ..rotateX(angularValueX * math.pi / 4)
-              ..rotateY(angularValueY * math.pi / 4),
-            // ..rotateZ(angularValueZ * math.pi / 4),
-            child: Container(
-              height: 100,
-              width: 100,
-              color: Colors.black,
-            ),
-          ),
-        ),
-        Positioned(
-          left: 100,
-          top: 200,
-          child: Draggable(
-            onDragUpdate: (details) {
-              // ref
-              //     .watch(offsetChangeNotifierProvider.notifier)
-              //     .updateOffset(details.delta);
-              setState(() {
-                angularValueX -= 0.01 * details.delta.dy;
-                angularValueY -= 0.01 * details.delta.dx;
-              });
-            },
-            feedback: Container(
-              height: 50,
-              width: 50,
-              color: Colors.blueAccent,
-            ),
-            childWhenDragging: const SizedBox(
-              height: 50,
-              width: 50,
-            ),
-            child: Container(
-              height: 50,
-              width: 50,
-              color: Colors.blueAccent,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }
