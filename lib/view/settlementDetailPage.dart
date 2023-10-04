@@ -514,7 +514,7 @@ class _SettlementDetailPageSettlementerState
                                   ),
                                 ),
                                 const SizedBox(
-                                  width: 50,
+                                  width: 30,
                                 ),
                                 Text(
                                   "${priceToString.format(8000)}원",

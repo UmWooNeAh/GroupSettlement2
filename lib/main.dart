@@ -103,7 +103,7 @@ final GoRouter _router = GoRouter(
         GoRoute(
             path: 'settlementDetailPage',
             builder: (context, state) {
-              return const SettlementDetailPageSettlementer();
+              return const SettlementDetailPageSender();
             }),
         GoRoute(
             path: 'CreateNewSettlementPage',
