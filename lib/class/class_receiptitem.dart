@@ -4,7 +4,7 @@ import '../modeluuid.dart';
 class ReceiptItem {
 
   String? receiptItemId;
-  List<String> serviceUsers = <String> [];
+  Map<String, String> serviceUsers = <String, String> {};
   String? menuName;
   int? menuCount;
   int? menuPrice;
@@ -16,7 +16,7 @@ class ReceiptItem {
 
   ReceiptItem.fromJson(dynamic json) {
     receiptItemId = json['receiptitemid'];
-    serviceUsers = List<String>.from(json["serviceusers"]);
+    serviceUsers =Map<String, String>.from(json["serviceusers"]);
     menuName = json['menuname'];
     menuCount = json['menucount'];
     menuPrice = json['menuprice'];
