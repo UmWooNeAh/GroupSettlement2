@@ -3,9 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:groupsettlement2/design_element.dart';
 import 'dart:math' as math;
-import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
-// import 'package:draggable_bottom_sheet/draggable_bottom_sheet.dart';
-// import 'package:bottom_sheet/bottom_sheet.dart';
+
+import 'shared_basic_widget.dart';
 
 class Informations {
   List<String> receipts = [
@@ -156,11 +155,10 @@ class SettlementPage extends ConsumerStatefulWidget {
   ConsumerState<SettlementPage> createState() => _SettlementPageState();
 }
 
+final bottomSheetSliderChangeNotifierProviedr =
+    ChangeNotifierProvider<BottomSheetSlider>((ref) => BottomSheetSlider());
+
 class _SettlementPageState extends ConsumerState<SettlementPage> {
-  final slidableAdderStateNotifierProvider =
-      StateNotifierProvider((ref) => SlidableAdder());
-  final bottomSheetSliderChangeNotifierProviedr =
-      ChangeNotifierProvider<BottomSheetSlider>((ref) => BottomSheetSlider());
   int i = 0;
 
   @override
@@ -169,139 +167,16 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
     final bottomsheetValue =
         ref.watch(bottomSheetSliderChangeNotifierProviedr.notifier);
     if (i == 0) {
-      ref
-          .watch(bottomSheetSliderChangeNotifierProviedr.notifier)
-          .setBottomSheetSlider(0.0, 0.0, size.height * 0.7);
+      bottomsheetValue.setBottomSheetSlider(0.0, 0.0, size.height * 0.7);
       i++;
     }
     return Scaffold(
       appBar: AppBar(),
       body: Stack(
         children: [
-          InteractiveViewer(
-            minScale: 0.25,
-            maxScale: 10.0,
-            boundaryMargin: const EdgeInsets.all(5),
-            child: Stack(
-              children: List.generate(
-                ref
-                        .watch(receiptssChangeNotifierProvider.notifier)
-                        .information
-                        .receipts
-                        .length +
-                    60,
-                (index) {
-                  if (index < 30) {
-                    return Positioned(
-                      top: 30 * index + 5,
-                      child: Container(
-                        height: 1,
-                        width: size.width,
-                        color: Colors.grey[300],
-                      ),
-                    );
-                  } else if (index < 60) {
-                    return Positioned(
-                      left: 30 * (index - 30) + 5,
-                      child: Container(
-                        height: size.height,
-                        width: 1,
-                        color: Colors.grey[300],
-                      ),
-                    );
-                  } else {
-                    return SettlementPageReceipt(index: index - 60);
-                  }
-                },
-              ),
-            ),
-          ),
-          Positioned(
-            top: size.height / 3,
-            right: ref.watch(slidableAdderStateNotifierProvider) as double,
-            child: ClipOval(
-              child: Container(
-                width: 50,
-                height: 50,
-                color: Colors.grey,
-                child: GestureDetector(
-                  onHorizontalDragUpdate: (details) {
-                    ref
-                        .watch(slidableAdderStateNotifierProvider.notifier)
-                        .updateState(details.delta.dx);
-                  },
-                  onHorizontalDragEnd: (details) {
-                    if ((ref.watch(slidableAdderStateNotifierProvider)
-                            as double) >
-                        80) {
-                      ref
-                          .watch(slidableAdderStateNotifierProvider.notifier)
-                          .settingEnd();
-                    } else {
-                      ref
-                          .watch(slidableAdderStateNotifierProvider.notifier)
-                          .settingInit();
-                    }
-                  },
-                  child: Transform(
-                    transform: Matrix4.identity()
-                      ..setEntry(3, 2, 0.001) // 투시 변환 적용 (원근감 제거)
-                      ..rotateZ(-math.pi /
-                          40 *
-                          ((ref.watch(slidableAdderStateNotifierProvider)
-                                  as double) -
-                              5)),
-                    alignment: Alignment.center,
-                    child: const Icon(Icons.add),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 0,
-            child: Container(
-              color: Colors.grey[200],
-              width: size.width,
-              height: 200,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                          padding: const EdgeInsets.all(10),
-                          child: const Text("그룹원")),
-                      TextButton(
-                          onPressed: () {
-                            ref
-                                .watch(readMoreStateNotifierProvider.notifier)
-                                .clickReadMore();
-                          },
-                          child: const Text("자세히보기")),
-                    ],
-                  ),
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                        children: List.generate(
-                            ref
-                                .watch(receiptssChangeNotifierProvider.notifier)
-                                .information
-                                .members
-                                .length, (index) {
-                      return SettlementPageGroupUser(
-                        index: index,
-                        ovalSize: 50,
-                      );
-                    })),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          SettlementInteractiveViewer(size: size),
+          SlidableAdderWidget(size: size),
+          GroupUserBar(size: size),
           Positioned(
             right: 0,
             bottom: ref.watch(readMoreStateNotifierProvider) as double,
@@ -337,8 +212,8 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
                       width:
                           ref.watch(readMoreStateNotifierProvider) as double ==
                                   0
-                              ? size.width * 0.7
-                              : size.width * 0.7,
+                              ? 300
+                              : 300,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: const Color(0xFFF0F0F0),
@@ -347,7 +222,7 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
                         child: Column(
                           children: [
                             Container(
-                              width: size.width * 0.7,
+                              width: 300,
                               padding: const EdgeInsets.fromLTRB(20, 15, 0, 5),
                               child: const Text(
                                 "그룹원 목록",
@@ -359,34 +234,36 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
                             ),
                             Column(
                               children: List.generate(
-                                  ref
-                                              .watch(
-                                                  receiptssChangeNotifierProvider
-                                                      .notifier)
-                                              .information
-                                              .members
-                                              .length ~/
-                                          4 +
-                                      1, (index) {
-                                return Row(
-                                  children: List.generate(
-                                      math.min(
-                                          4,
-                                          -(4 * index) +
-                                              ref
-                                                  .watch(
-                                                      receiptssChangeNotifierProvider
-                                                          .notifier)
-                                                  .information
-                                                  .members
-                                                  .length), (iindex) {
-                                    return SettlementPageGroupUser(
-                                      index: index * 4 + iindex,
-                                      ovalSize: size.width * 0.1,
-                                    );
-                                  }),
-                                );
-                              }),
+                                ref
+                                            .watch(
+                                                receiptssChangeNotifierProvider
+                                                    .notifier)
+                                            .information
+                                            .members
+                                            .length ~/
+                                        4 +
+                                    1,
+                                (index) {
+                                  return Row(
+                                    children: List.generate(
+                                        math.min(
+                                            4,
+                                            -(4 * index) +
+                                                ref
+                                                    .watch(
+                                                        receiptssChangeNotifierProvider
+                                                            .notifier)
+                                                    .information
+                                                    .members
+                                                    .length), (iindex) {
+                                      return SettlementPageGroupUser(
+                                        index: index * 4 + iindex,
+                                        ovalSize: 45,
+                                      );
+                                    }),
+                                  );
+                                },
+                              ),
                             ),
                           ],
                         ),
@@ -579,8 +456,9 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
                                             children: [
                                               const Text("류지원"),
                                               Text("짜장면 등 $index 메뉴"),
-                                              const Text("10000원",
-                                                  style: TextStyle(
+                                              Text(
+                                                  "${priceToString.format(10000)}원",
+                                                  style: const TextStyle(
                                                     color: color2,
                                                   ))
                                             ],
@@ -594,6 +472,8 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
                                 endIndent: 20,
                               ),
                               Container(
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 10),
                                 child: const Row(
                                   children: [
                                     Text("합계금액"),
@@ -660,6 +540,233 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
   }
 }
 
+class SettlementInteractiveViewer extends ConsumerStatefulWidget {
+  const SettlementInteractiveViewer({super.key, required this.size});
+  final Size size;
+
+  @override
+  ConsumerState<SettlementInteractiveViewer> createState() =>
+      _SettlementInteractiveViewerState();
+}
+
+class _SettlementInteractiveViewerState
+    extends ConsumerState<SettlementInteractiveViewer> {
+  late Size size;
+  @override
+  void initState() {
+    super.initState();
+    size = widget.size;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return InteractiveViewer(
+      minScale: 0.25,
+      maxScale: 20.0,
+      boundaryMargin: const EdgeInsets.all(5),
+      child: Stack(
+        children: [
+          SizedBox(
+            height: size.height,
+            width: size.width,
+            child: Stack(
+              children: List.generate(
+                150,
+                (index) {
+                  int row = 30;
+                  if (index < row) {
+                    return Positioned(
+                      top: 30 * index + 5,
+                      child: Container(
+                        height: 1,
+                        width: size.width,
+                        color: Colors.grey[300],
+                      ),
+                    );
+                  } else {
+                    return Positioned(
+                      left: 30 * (index - row) + 5,
+                      child: Container(
+                        height: size.height,
+                        width: 1,
+                        color: Colors.grey[300],
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
+          ),
+          SizedBox(
+            height: size.height,
+            width: size.width,
+            child: Stack(
+              children: List.generate(
+                  ref
+                      .watch(receiptssChangeNotifierProvider.notifier)
+                      .information
+                      .receipts
+                      .length, (index) {
+                return SettlementPageReceipt(index: index);
+              }),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class GroupUserBar extends ConsumerStatefulWidget {
+  const GroupUserBar({super.key, required this.size});
+  final Size size;
+
+  @override
+  ConsumerState<GroupUserBar> createState() => _GroupUserBarState();
+}
+
+class _GroupUserBarState extends ConsumerState<GroupUserBar> {
+  late Size size;
+  @override
+  void initState() {
+    super.initState();
+    size = widget.size;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      bottom: 40,
+      child: Container(
+        color: Colors.grey[200],
+        width: size.width,
+        height: 160,
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 20,
+                  ),
+                  child: const Text(
+                    "그룹원",
+                    style: TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 5.0,
+                  ),
+                  child: TextButton(
+                    onPressed: () {
+                      ref
+                          .watch(readMoreStateNotifierProvider.notifier)
+                          .clickReadMore();
+                    },
+                    child: const Text(
+                      "자세히보기 >",
+                      style: TextStyle(
+                        fontSize: 17,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: List.generate(
+                  ref
+                      .watch(receiptssChangeNotifierProvider.notifier)
+                      .information
+                      .members
+                      .length,
+                  (index) {
+                    return SettlementPageGroupUser(
+                      index: index,
+                      ovalSize: 50,
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SlidableAdderWidget extends ConsumerStatefulWidget {
+  const SlidableAdderWidget({super.key, required this.size});
+  final Size size;
+
+  @override
+  ConsumerState<SlidableAdderWidget> createState() =>
+      _SlidableAdderWidgetState();
+}
+
+class _SlidableAdderWidgetState extends ConsumerState<SlidableAdderWidget> {
+  final slidableAdderStateNotifierProvider =
+      StateNotifierProvider((ref) => SlidableAdder());
+  late Size size;
+  @override
+  void initState() {
+    super.initState();
+    size = widget.size;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      top: size.height / 3,
+      right: ref.watch(slidableAdderStateNotifierProvider) as double,
+      child: ClipOval(
+        child: Container(
+          width: 50,
+          height: 50,
+          color: Colors.grey,
+          child: GestureDetector(
+            onHorizontalDragUpdate: (details) {
+              ref
+                  .watch(slidableAdderStateNotifierProvider.notifier)
+                  .updateState(details.delta.dx);
+            },
+            onHorizontalDragEnd: (details) {
+              if ((ref.watch(slidableAdderStateNotifierProvider) as double) >
+                  80) {
+                ref
+                    .watch(slidableAdderStateNotifierProvider.notifier)
+                    .settingEnd();
+              } else {
+                ref
+                    .watch(slidableAdderStateNotifierProvider.notifier)
+                    .settingInit();
+              }
+            },
+            child: Transform(
+              transform: Matrix4.identity()
+                ..setEntry(3, 2, 0.001) // 투시 변환 적용 (원근감 제거)
+                ..rotateZ(-math.pi /
+                    40 *
+                    ((ref.watch(slidableAdderStateNotifierProvider) as double) -
+                        5)),
+              alignment: Alignment.center,
+              child: const Icon(Icons.add),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class SettlementPageReceiptItem extends StatefulWidget {
   const SettlementPageReceiptItem({super.key});
 
@@ -721,71 +828,6 @@ class _SettlementPageReceiptItemState extends State<SettlementPageReceiptItem> {
 class SettlementPageReceipt extends ConsumerWidget {
   const SettlementPageReceipt({super.key, required this.index});
   final int index;
-  WoltModalSheetPage page1(
-      BuildContext modalSheetContext, TextTheme textTheme) {
-    return WoltModalSheetPage.withSingleChild(
-      hasSabGradient: false,
-      stickyActionBar: Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(
-          children: [
-            ElevatedButton(
-              onPressed: () => Navigator.of(modalSheetContext).pop(),
-              child: const SizedBox(
-                height: 50,
-                width: double.infinity,
-                child: Center(child: Text('Cancel')),
-              ),
-            ),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: () {},
-              child: const SizedBox(
-                height: 50,
-                width: double.infinity,
-                child: Center(child: Text('Next page')),
-              ),
-            ),
-          ],
-        ),
-      ),
-      topBarTitle: Text('Pagination', style: textTheme.titleSmall),
-      isTopBarLayerAlwaysVisible: true,
-      trailingNavBarWidget: IconButton(
-        padding: const EdgeInsets.all(10),
-        icon: const Icon(Icons.close),
-        onPressed: Navigator.of(modalSheetContext).pop,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(0, 0, 0, 200),
-        child: Column(
-          children: [
-            Draggable(
-                feedback: Container(
-                  height: 40,
-                  width: 40,
-                  color: Colors.yellow,
-                ),
-                child: Container(
-                  height: 40,
-                  width: 40,
-                  color: Colors.blue,
-                )),
-            Container(
-              width: 100,
-              height: 100,
-              color: Colors.amber,
-            ),
-            const Text(
-              '''
-      Pagination involves a sequence of screens the user navigates sequentially. We chose a lateral motion for these transitions. When proceeding forward, the next screen emerges from the right; moving backward, the screen reverts to its original position. We felt that sliding the next screen entirely from the right could be overly distracting. As a result, we decided to move and fade in the next page using 30% of the modal side.
-      ''',
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -808,33 +850,7 @@ class SettlementPageReceipt extends ConsumerWidget {
               .watch(receiptssChangeNotifierProvider.notifier)
               .disableReceiptSelected(index);
         },
-        onTap: () {
-          WoltModalSheet.show<void>(
-            context: context,
-            pageListBuilder: (modalSheetContext) {
-              final textTheme = Theme.of(context).textTheme;
-              return [
-                page1(modalSheetContext, textTheme),
-              ];
-            },
-            modalTypeBuilder: (context) {
-              final size = MediaQuery.of(context).size.width;
-              if (size < 100) {
-                return WoltModalType.bottomSheet;
-              } else {
-                return WoltModalType.dialog;
-              }
-            },
-            onModalDismissedWithBarrierTap: () {
-              debugPrint('Closed modal sheet with barrier tap');
-              Navigator.of(context).pop();
-            },
-            maxDialogWidth: 560,
-            minDialogWidth: 400,
-            minPageHeight: 0.7,
-            maxPageHeight: 0.9,
-          );
-        },
+        onTap: () {},
         child: DragTarget(
           onWillAccept: (data) {
             ref
