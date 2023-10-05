@@ -342,8 +342,12 @@ class _EditReceiptDataRowState extends State<EditReceiptDataRow> {
                 ),
                 onChanged: (value) {
                   setState(() {
-                    _priceController.text =
-                        priceToString.format(priceToString.parse(value));
+                    if (value == '') {
+                      _priceController.text = '0';
+                    } else {
+                      _priceController.text =
+                          priceToString.format(priceToString.parse(value));
+                    }
                   });
                 },
               ),

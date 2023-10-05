@@ -12,6 +12,7 @@ import 'package:groupsettlement2/view/settlementGroupSelectionPage.dart';
 import 'package:groupsettlement2/class/class_settlement.dart';
 import 'package:groupsettlement2/view/settlement_detail_page_sender.dart';
 import 'package:groupsettlement2/view/settlement_final_check.dart';
+import 'package:groupsettlement2/view/total_settlement_details_management.dart';
 import 'package:groupsettlement2/viewmodel/UserViewModel.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
@@ -136,16 +137,15 @@ final GoRouter _router = GoRouter(
             GoRoute(
                 path: 'SettlementFinalCheckPage',
                 builder: (context, state) {
-                  return const SettlementFinalCheckPage();
+                  return const TotalSettlementDetailsManagement();
                 }),
           ],
         ),
         GoRoute(
             path: 'settlementGroupSelectionPage',
-            builder: (context,state) {
+            builder: (context, state) {
               return const settlementGroupSelectionPage();
-            }
-         ),
+            }),
         GoRoute(
           path: "SettlementDetailPageSender",
           builder: (context, state) {
