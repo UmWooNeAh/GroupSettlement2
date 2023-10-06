@@ -13,17 +13,6 @@ import '../class/class_settlement.dart';
 import '../main.dart';
 import '../viewmodel/SettlementViewModel.dart';
 
-final userProvider = ChangeNotifierProvider<UserViewModel>(
-    (ref) => UserViewModel("8dcca5ca-107c-4a12-9d12-f746e2e513b7"));
-final groupProvider = ChangeNotifierProvider<GroupViewModel>(
-    (ref) => GroupViewModel("88f8433b-0af1-44be-95be-608316118fad"));
-final stmProvider = ChangeNotifierProvider<SettlementViewModel>(
-    (ref) => SettlementViewModel("54d974c2-ea2a-4998-89a3-6d9cca52db80"));
-
-/*class uvmChangeNotifier extends ChangeNotifier {
-  UserViewModel uvm = UserViewModel("8dcca5ca-107c-4a12-9d12-f746e2e513b7");
-}*/
-
 class VMTestPage extends ConsumerStatefulWidget {
   const VMTestPage({super.key});
 

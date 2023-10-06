@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../class/class_group.dart';
 import '../class/class_settlement.dart';
 import '../class/class_settlementpaper.dart';
@@ -7,7 +8,9 @@ import '../class/class_user.dart';
 import '../class/class_alarm.dart';
 import '../class/class_receipt.dart';
 import '../common_fireservice.dart';
-import 'package:riverpod/riverpod.dart';
+
+final userProvider = ChangeNotifierProvider<UserViewModel>(
+        (ref) => UserViewModel("8dcca5ca-107c-4a12-9d12-f746e2e513b7"));
 
 class UserViewModel extends ChangeNotifier {
 

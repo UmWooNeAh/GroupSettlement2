@@ -1,11 +1,14 @@
 import 'dart:developer';
-
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
 import '../class/class_group.dart';
 import '../class/class_settlement.dart';
 import '../class/class_user.dart';
+
+final groupProvider = ChangeNotifierProvider<GroupViewModel>(
+        (ref) => GroupViewModel("88f8433b-0af1-44be-95be-608316118fad"));
 
 class GroupViewModel extends ChangeNotifier {
 

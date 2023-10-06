@@ -1,7 +1,11 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
 import '../class/class_settlement.dart';
 import '../class/class_settlementpaper.dart';
+
+final stmCheckProvider = ChangeNotifierProvider<SettlementCheckViewModel>(
+        (ref) => SettlementCheckViewModel("54d974c2-ea2a-4998-89a3-6d9cca52db80","8dcca5ca-107c-4a12-9d12-f746e2e513b7"));
 
 class SettlementCheckViewModel extends ChangeNotifier{
   Settlement      settlement      = Settlement();
