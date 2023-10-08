@@ -35,7 +35,7 @@ class Clova {
 
   getSecretKey() async {
     //secretKey = await File("key.txt").readAsString();
-    secretKey = 'V1J5c1VaWVd5WkpoWmZMU0RNTlNsVnFyb0xkWUdaRXQ=';
+    secretKey = 'T1puY2dSTnVwTHp4YkNqWFdFQnFEdkVxUWdNa2h5bFI=';
   }
 
   getImageByFile(File receipt) {
@@ -77,8 +77,8 @@ class Clova {
 
         // final outputFile = File('./output.json');
         // await outputFile.writeAsString(jsonEncode(res), encoding: utf8);
-        //print(res['images'][0]['receipt']['result']['subResults'][0]);
-        log(res.toString());
+        //print("분석결과: ${res['images'][0]['receipt']['result']['subResults'][0]}");
+        //log(res.toString());
         this.res = res;
         return res;
       } else {

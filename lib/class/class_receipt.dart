@@ -10,12 +10,11 @@ class Receipt {
   List<String> receiptItems = <String> [];
   String? storeName;
   Timestamp? time;
-  int? totalPrice;
+  int totalPrice = 0;
 
   Receipt() {
     ModelUuid uuid = ModelUuid();
     receiptId = uuid.randomId;
-    totalPrice = 0;
   }
 
   Receipt.fromJson(dynamic json) {
