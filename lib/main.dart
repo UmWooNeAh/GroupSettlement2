@@ -3,6 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:groupsettlement2/view/groupMainPage.dart';
+import 'package:groupsettlement2/view/group_create_page.dart';
+import 'package:groupsettlement2/view/group_select_page.dart';
+import 'package:groupsettlement2/view/group_settlement_list_page.dart';
+import 'package:groupsettlement2/view/mypage.dart';
+import 'package:groupsettlement2/view/notification_page.dart';
 import 'package:groupsettlement2/view/settlementDetailPage.dart';
 import 'package:groupsettlement2/view/create_new_settlement.dart';
 import 'package:groupsettlement2/view/edit_receipt.dart';
@@ -150,6 +155,42 @@ final GoRouter _router = GoRouter(
           path: "SettlementDetailPageSender",
           builder: (context, state) {
             return const SettlementDetailPageSender();
+          },
+        ),
+        GoRoute(
+          path: "MyPage",
+          builder: (context, state) {
+            return const myPage();
+          },
+        ),
+        GoRoute(
+          path: "NotificationPage",
+          builder: (context, state) {
+            return const notificationPage();
+          },
+        ),
+        GoRoute(
+          path: "GroupCreatePage",
+          builder: (context, state) {
+            return const groupCreatePage();
+          },
+        ),
+        GoRoute(
+          path: "GroupSelectPage",
+          builder: (context, state) {
+            return const groupSelectPage();
+          },
+        ),
+        GoRoute(
+          path: "GroupSettlementListPage",
+          builder: (context, state) {
+            return const groupSettlementListPage();
+          },
+        ),
+        GoRoute(
+          path: "GroupSettlementListPage",
+          builder: (context, state) {
+            return const groupSettlementListPage();
           },
         ),
       ],

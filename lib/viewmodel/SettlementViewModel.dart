@@ -1,6 +1,6 @@
 import 'dart:developer';
-
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/class/class_group.dart';
 import 'package:groupsettlement2/class/class_user.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
@@ -10,6 +10,9 @@ import '../class/class_receiptitem.dart';
 import '../class/class_settlement.dart';
 import '../class/class_settlementitem.dart';
 import '../class/class_settlementpaper.dart';
+
+final stmProvider = ChangeNotifierProvider<SettlementViewModel>(
+        (ref) => SettlementViewModel("54d974c2-ea2a-4998-89a3-6d9cca52db80"));
 
 class SettlementViewModel extends ChangeNotifier{
   // Information

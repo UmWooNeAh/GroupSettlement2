@@ -1,12 +1,17 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
 import '../class/class_receipt.dart';
 import '../class/class_group.dart';
 import '../class/class_receiptitem.dart';
 import '../class/class_settlement.dart';
 import '../class/class_user.dart';
+
+final stmCreateProvider = ChangeNotifierProvider<SettlementCreateViewModel>(
+        (ref) => SettlementCreateViewModel("88f8433b-0af1-44be-95be-608316118fad","8dcca5ca-107c-4a12-9d12-f746e2e513b7",""));
+
 
 class SettlementCreateViewModel extends ChangeNotifier{
   // 0. Settlement 생성에 필요한 객체들 선언
