@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
@@ -164,6 +164,7 @@ class SettlementCreateViewModel extends ChangeNotifier{
           }
         }
       }
+      settlement.time = Timestamp.now();
       settlement.createSettlement();
       notifyListeners();
     }
