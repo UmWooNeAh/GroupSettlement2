@@ -4,14 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/design_element.dart';
 import 'package:groupsettlement2/view/shared_basic_widget.dart';
 
-class EditReceiptPage extends ConsumerStatefulWidget {
-  const EditReceiptPage({super.key});
+class AddReceiptDirect extends ConsumerStatefulWidget {
+  const AddReceiptDirect({super.key});
 
   @override
-  ConsumerState<EditReceiptPage> createState() => _EditReceiptState();
+  ConsumerState<AddReceiptDirect> createState() => _AddReceiptDirect();
 }
 
-class _EditReceiptState extends ConsumerState<EditReceiptPage> {
+class _AddReceiptDirect extends ConsumerState<AddReceiptDirect> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -342,12 +342,8 @@ class _EditReceiptDataRowState extends State<EditReceiptDataRow> {
                 ),
                 onChanged: (value) {
                   setState(() {
-                    if (value == '') {
-                      _priceController.text = '0';
-                    } else {
-                      _priceController.text =
-                          priceToString.format(priceToString.parse(value));
-                    }
+                    _priceController.text =
+                        priceToString.format(priceToString.parse(value));
                   });
                 },
               ),

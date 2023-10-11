@@ -3,6 +3,7 @@ import 'package:flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/design_element.dart';
 import 'package:groupsettlement2/view/shared_basic_widget.dart';
+import '../viewmodel/SettlementCheckViewModel.dart';
 
 class SettlementDetailPageSender extends ConsumerStatefulWidget {
   const SettlementDetailPageSender({super.key});
@@ -19,6 +20,7 @@ class _SettlementDetailPageSenderState
 
   @override
   Widget build(BuildContext context) {
+    final provider = ref.watch(stmCheckProvider.notifier);
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(),

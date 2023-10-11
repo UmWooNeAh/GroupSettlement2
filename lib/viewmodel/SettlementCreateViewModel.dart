@@ -13,10 +13,10 @@ import '../class/class_user.dart';
 import '../clova/clova.dart';
 
 final stmCreateProvider = ChangeNotifierProvider<SettlementCreateViewModel>(
-        (ref) => SettlementCreateViewModel("88f8433b-0af1-44be-95be-608316118fad","8dcca5ca-107c-4a12-9d12-f746e2e513b7",""));
+    (ref) => SettlementCreateViewModel("88f8433b-0af1-44be-95be-608316118fad",
+        "8dcca5ca-107c-4a12-9d12-f746e2e513b7", ""));
 
-
-class SettlementCreateViewModel extends ChangeNotifier{
+class SettlementCreateViewModel extends ChangeNotifier {
   // 0. Settlement 생성에 필요한 객체들 선언
   Settlement                      settlement    = Settlement();
   Group                           myGroup       = Group();
@@ -26,12 +26,14 @@ class SettlementCreateViewModel extends ChangeNotifier{
   Clova                           clova         = Clova();
 
   // 1. 정산생성 이후에만 나머지 창 을 들어갈 수 있으므로 처음 만들어질 때 객체를 새롭게 생성한다
-  SettlementCreateViewModel(String groupid, String masterid, String accountInfo) {
+  SettlementCreateViewModel(
+      String groupid, String masterid, String accountInfo) {
     _settingSettlementCreateViewModel(groupid, masterid, accountInfo);
   }
 
   // 1-1. Settlement 객체 생성
-  void _settingSettlementCreateViewModel(String groupid, String masterid, String accountInfo) async{
+  void _settingSettlementCreateViewModel(
+      String groupid, String masterid, String accountInfo) async {
     settlement.groupId = groupid;
     settlement.masterUserId = masterid;
     settlement.accountInfo = accountInfo;
@@ -134,7 +136,7 @@ class SettlementCreateViewModel extends ChangeNotifier{
   }
 
   // 영수증 삭제하기
-  void deleteReceipt(String receiptId){
+  void deleteReceipt(String receiptId) {
     settlement.receipts.remove(receiptId);
     receiptItems.remove(receiptId);
     receipts.remove(receiptId);
@@ -143,10 +145,9 @@ class SettlementCreateViewModel extends ChangeNotifier{
 
   // 5. 정산 최종 생성하기, DB 접근이 이루어지는 시점
   void createSettlement(String stmname) async {
-    if(stmname == null) {
+    if (stmname == null) {
       print("정산명을 입력해주세요.");
-    }
-    else {
+    } else {
       settlement.settlementName = stmname;
       myGroup.settlements.add(settlement.settlementId!);
       FireService().updateDoc("grouplist", myGroup.groupId!, myGroup.toJson());
@@ -170,7 +171,4 @@ class SettlementCreateViewModel extends ChangeNotifier{
       notifyListeners();
     }
   }
-
-
-
 }
