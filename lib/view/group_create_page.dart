@@ -46,7 +46,7 @@ class _groupCreatePageState extends State<groupCreatePage> {
                     width: size.width*0.9,
                     child: TextField(
                       decoration: InputDecoration(
-                        hintText: "UWNA",
+                        hintText: "그룹 1",
                         labelStyle: TextStyle(
                             color:Color(0xFF838383)
                         ),
@@ -57,7 +57,6 @@ class _groupCreatePageState extends State<groupCreatePage> {
                 SizedBox(width:double.infinity, height: 50),
                 Container(
                   width: double.infinity,
-                  height: 300,
                   decoration: BoxDecoration(
                     color:Color(0xFFF4F4F4),
                     boxShadow: [
@@ -74,63 +73,70 @@ class _groupCreatePageState extends State<groupCreatePage> {
                     ]
                   ),
                   child:
-                    SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height:20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(left:20),
-                                child: Text("그룹원",
-                                  style:TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600
-                                  )
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(right:20),
-                                child: Text.rich(
-                                  TextSpan(
-                                    children: [
-                                      TextSpan(
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20,10,20,0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children:[
+                          Text("그룹원",
+                              style:TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600
+                              )
+                          ),
+                          Text.rich(
+                              TextSpan(
+                                  children: [
+                                    TextSpan(
                                         text:"8 ",
                                         style: TextStyle(
                                           color: Color(0xFF07BEB8),
                                           fontSize: 20,
                                           fontWeight: FontWeight.w500,
                                         )
-                                      ),
-                                      TextSpan(
-                                          text:"명",
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w500,
-                                          )
-                                      ),
-                                    ]
-                                  )
-                                ),
+                                    ),
+                                    TextSpan(
+                                        text:"명",
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w500,
+                                        )
+                                    ),
+                                  ]
                               )
-                            ],
-                          ),
-                          SizedBox(height:20),
-                          Column(
-                            children: List.generate(3,(index){
-                              return Row(
-                                children: List.generate(4, (innerIndex){
-                                  return um();
-                                }),
-                              );
-                            }),
                           )
-                        ],
+                        ]
                       ),
                     )
+                ),
+                Container(
+                  width: double.infinity,
+                  height: 200,
+                  decoration: BoxDecoration(
+                      color:Color(0xFFF4F4F4)
+                  ),
+                  child: Stack(
+                    children: [
+                      SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height:20),
+                            Column(
+                              children: List.generate(3,(index){
+                                return Row(
+                                  children: List.generate(4, (innerIndex){
+                                    return um(flag:innerIndex % 2 == 0);
+                                  }),
+                                );
+                              }),
+                            )
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 SizedBox(height:10),
                 Container(
@@ -220,7 +226,8 @@ class _groupCreatePageState extends State<groupCreatePage> {
 }
 
 class um extends StatelessWidget {
-  const um({Key? key}) : super(key: key);
+  final bool flag;
+  const um({Key? key, required this.flag}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -244,7 +251,8 @@ class um extends StatelessWidget {
                     fontWeight: FontWeight.w600
                 )
             ),
-            Text("직접 추가함",
+
+            Text(flag ? "직접 추가함" : "",
                 style:TextStyle(
                   fontSize: 12,
                   color: Color(0xFF838383),
