@@ -59,7 +59,8 @@ class _VMTestPageState extends ConsumerState<VMTestPage> {
             ElevatedButton(onPressed: () async {
               var json = await vm.clova.analyze();
               log(json.toString());
-              rcpcontent = vm.createReceiptFromNaverOCR("Demo 영수증", json);
+              rcpcontent = vm.createReceiptFromNaverOCR(json);
+              rcpcontent.receipt!.receiptName = "데모 영수증";
               setState(() {
                 textFlag = true;
               });
@@ -71,22 +72,22 @@ class _VMTestPageState extends ConsumerState<VMTestPage> {
             textFlag ? Text("업체명: ${rcpcontent.receipt!.storeName}",
                 style: const TextStyle(fontSize: 25)): Text(""),
             Expanded(
-              child: textFlag ? ListView.builder(
-                shrinkWrap: true,
-                itemCount: rcpcontent.receiptItems.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(
-                      "메뉴 ${index + 1}: ${rcpcontent.receiptItems[index].menuName}",
-                      style: const TextStyle(fontSize: 25),
-                    ),
-                    subtitle: Text(
-                      " 수량: ${rcpcontent.receiptItems[index].menuCount}, 가격: ${rcpcontent.receiptItems[index].menuPrice}",
-                      style: const TextStyle(fontSize: 25),
-                    ),
-                  );
-                },
-              ) : Text("")
+                child: textFlag ? ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: rcpcontent.receiptItems.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(
+                        "메뉴 ${index + 1}: ${rcpcontent.receiptItems[index].menuName}",
+                        style: const TextStyle(fontSize: 25),
+                      ),
+                      subtitle: Text(
+                        " 수량: ${rcpcontent.receiptItems[index].menuCount}, 가격: ${rcpcontent.receiptItems[index].menuPrice}",
+                        style: const TextStyle(fontSize: 25),
+                      ),
+                    );
+                  },
+                ) : Text("")
             ),
             textFlag ? Text("합계 금액: ${rcpcontent.receipt!.totalPrice}원",
                 style: const TextStyle(fontSize: 25)): Text(""),
