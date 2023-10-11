@@ -1,17 +1,23 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 
-class groupSelectPage extends StatefulWidget {
+import '../class/class_group.dart';
+import '../viewmodel/UserViewModel.dart';
+
+class groupSelectPage extends ConsumerStatefulWidget {
   const groupSelectPage({Key? key}) : super(key: key);
 
   @override
-  State<groupSelectPage> createState() => _groupSelectPage();
+  ConsumerState<groupSelectPage> createState() => _groupSelectPage();
 }
 
-class _groupSelectPage extends State<groupSelectPage> {
+class _groupSelectPage extends ConsumerState<groupSelectPage> {
   @override
   Widget build(BuildContext context) {
+    final uvm = ref.watch(userProvider);
     Size size = MediaQuery.of(context).size;
     return Scaffold(
         appBar:AppBar(),
@@ -77,315 +83,98 @@ class _groupSelectPage extends State<groupSelectPage> {
                     ),
                   ),
                   SizedBox(height:15),
-                  GestureDetector(
-                    onTap:(){
-                      context.push("/groupMainPage");
-                    },
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children:[
-                          Row(
-                              children:[
-                                Container(
-                                  width: 75, height: 75,
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFFFE5F55),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child:Padding(
-                                    padding: const EdgeInsets.only(top:17),
-                                    child: Text(
-                                        "엄",
-                                        textAlign: TextAlign.center,
-                                        style:TextStyle(
-                                          color:Colors.white,
-                                          fontSize: 25,
-                                        )
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left:20),
-                                  child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children:[
-                                        Text(
-                                            "엄우네아",
-                                            style:TextStyle(
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 17
-                                            )
-                                        ),
-                                        SizedBox(height:5),
-                                        Text(
-                                            "진행 중인 정산 : 3 개",
-                                            style: TextStyle(
-                                              color: Color(0xFFFE5F55),
-                                              fontWeight: FontWeight.w500,
-                                            )
-                                        ),
-                                      ]
-                                  ),
-                                ),
-                              ]
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(bottom:25),
-                            child: Text(
-                                "2일 전",
-                                style:TextStyle(
-                                  color:Color(0xFF838383),
-                                )
-                            ),
-                          )
-                        ]
-                    ),
-                  ),
-                  Divider(),
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children:[
-                        Row(
-                            children:[
-                              Container(
-                                width: 75, height: 75,
-                                decoration: BoxDecoration(
-                                  color: Color(0xFFD9D9D9),
-                                  shape: BoxShape.circle,
-                                ),
-                                child:Padding(
-                                  padding: const EdgeInsets.only(top:17),
-                                  child: Text(
-                                      "레",
-                                      textAlign: TextAlign.center,
-                                      style:TextStyle(
-                                        color:Colors.white,
-                                        fontSize: 25,
-                                      )
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left:20),
-                                child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children:[
-                                      Text(
-                                          "레알마드리드",
-                                          style:TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 17
-                                          )
-                                      ),
-                                      SizedBox(height:5),
-                                      Text(
-                                          "진행 중인 정산 : 없음",
-                                          style: TextStyle(
-                                            color: Color(0xFF838383),
-                                            fontWeight: FontWeight.w500,
-                                          )
-                                      ),
-                                    ]
-                                ),
-                              ),
-                            ]
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom:25),
-                          child: Text(
-                              "10개월 전",
-                              style:TextStyle(
-                                color:Color(0xFF838383),
-                              )
-                          ),
-                        )
-                      ]
-                  ),
-                  Divider(),
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children:[
-                        Row(
-                            children:[
-                              Container(
-                                width: 75, height: 75,
-                                decoration: BoxDecoration(
-                                  color: Color(0xFF07BEB8),
-                                  shape: BoxShape.circle,
-                                ),
-                                child:Padding(
-                                  padding: const EdgeInsets.only(top:17),
-                                  child: Text(
-                                      "그",
-                                      textAlign: TextAlign.center,
-                                      style:TextStyle(
-                                        color:Colors.white,
-                                        fontSize: 25,
-                                      )
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left:20),
-                                child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children:[
-                                      Text(
-                                          "그룹이름최대글자수는",
-                                          style:TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 17
-                                          )
-                                      ),
-                                      SizedBox(height:5),
-                                      Text(
-                                          "진행 중인 정산 : 3 개",
-                                          style: TextStyle(
-                                            color: Color(0xFFFE5F55),
-                                            fontWeight: FontWeight.w500,
-                                          )
-                                      ),
-                                    ]
-                                ),
-                              ),
-                            ]
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom:25),
-                          child: Text(
-                              "1년 전",
-                              style:TextStyle(
-                                color:Color(0xFF838383),
-                              )
-                          ),
-                        )
-                      ]
-                  ),
-                  Divider(),
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children:[
-                        Row(
-                            children:[
-                              Container(
-                                width: 75, height: 75,
-                                decoration: BoxDecoration(
-                                  color: Color(0xFFF7E600),
-                                  shape: BoxShape.circle,
-                                ),
-                                child:Padding(
-                                  padding: const EdgeInsets.only(top:17),
-                                  child: Text(
-                                      "한",
-                                      textAlign: TextAlign.center,
-                                      style:TextStyle(
-                                        color:Colors.white,
-                                        fontSize: 25,
-                                      )
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left:20),
-                                child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children:[
-                                      Text(
-                                          "한글10자정도된다",
-                                          style:TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 17
-                                          )
-                                      ),
-                                      SizedBox(height:5),
-                                      Text(
-                                          "진행 중인 정산 : 3 개",
-                                          style: TextStyle(
-                                            color: Color(0xFFFE5F55),
-                                            fontWeight: FontWeight.w500,
-                                          )
-                                      ),
-                                    ]
-                                ),
-                              ),
-                            ]
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom:25),
-                          child: Text(
-                              "2일 전",
-                              style:TextStyle(
-                                color:Color(0xFF838383),
-                              )
-                          ),
-                        )
-                      ]
-                  ),
-                  Divider(),
-                  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children:[
-                        Row(
-                            children:[
-                              Container(
-                                width: 75, height: 75,
-                                decoration: BoxDecoration(
-                                  color: Color(0xFF96A7FF),
-                                  shape: BoxShape.circle,
-                                ),
-                                child:Padding(
-                                  padding: const EdgeInsets.only(top:17),
-                                  child: Text(
-                                      "그",
-                                      textAlign: TextAlign.center,
-                                      style:TextStyle(
-                                        color:Colors.white,
-                                        fontSize: 25,
-                                      )
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left:20),
-                                child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children:[
-                                      Text(
-                                          "그룹 3",
-                                          style:TextStyle(
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 17
-                                          )
-                                      ),
-                                      SizedBox(height:5),
-                                      Text(
-                                          "진행 중인 정산 : 3 개",
-                                          style: TextStyle(
-                                            color: Color(0xFFFE5F55),
-                                            fontWeight: FontWeight.w500,
-                                          )
-                                      ),
-                                    ]
-                                ),
-                              ),
-                            ]
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom:25),
-                          child: Text(
-                              "2일 전",
-                              style:TextStyle(
-                                color:Color(0xFF838383),
-                              )
-                          ),
-                        )
-                      ]
-                  ),
-                  Divider(),
+                  Column(
+                    children: List.generate(uvm.myGroup.length,(index){
+                      return groupOne(group: uvm.myGroup[index]);
+                    })
+                  )
                 ]
             ),
           ),
         )
+    );
+  }
+}
+
+class groupOne extends StatefulWidget {
+  final Group group;
+  const groupOne({Key? key, required this.group}) : super(key: key);
+
+  @override
+  State<groupOne> createState() => _groupOneState();
+}
+
+class _groupOneState extends State<groupOne> {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        GestureDetector(
+          onTap:(){
+            context.push("/groupMainPage");
+          },
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children:[
+                Row(
+                    children:[
+                      Container(
+                        width: 75, height: 75,
+                        decoration: BoxDecoration(
+                          color: Color(0xFFFE5F55),
+                          shape: BoxShape.circle,
+                        ),
+                        child:Padding(
+                          padding: const EdgeInsets.only(top:17),
+                          child: Text(
+                              widget.group.groupName![0],
+                              textAlign: TextAlign.center,
+                              style:TextStyle(
+                                color:Colors.white,
+                                fontSize: 25,
+                              )
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left:20),
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children:[
+                              Text(
+                                  widget.group.groupName!,
+                                  style:TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 17
+                                  )
+                              ),
+                              SizedBox(height:5),
+                              Text(
+                                  "진행 중인 정산 : ${widget.group.settlements.length} 개",
+                                  style: TextStyle(
+                                    color: Color(0xFFFE5F55),
+                                    fontWeight: FontWeight.w500,
+                                  )
+                              ),
+                            ]
+                        ),
+                      ),
+                    ]
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(bottom:25),
+                  child: Text(
+                      "시간",
+                      style:TextStyle(
+                        color:Color(0xFF838383),
+                      )
+                  ),
+                )
+              ]
+          ),
+        ),
+        Divider()
+      ],
     );
   }
 }
