@@ -46,11 +46,10 @@ class SettlementCreateViewModel extends ChangeNotifier{
   }
 
   // Naver OCR 영수증 인식 후 Receipt/List<ReceiptItem> 리턴
-  ReceiptContent createReceiptFromNaverOCR(String receiptName, var json) {
+  ReceiptContent createReceiptFromNaverOCR(var json) {
     Receipt newReceipt = Receipt();
     List<ReceiptItem> newReceiptItems = [];
     int tempTotalPrice = 0;
-    newReceipt.receiptName = receiptName;
     // => json 영수증 양식으로 변환하는 코드 필요
     try {
       newReceipt.storeName =
@@ -93,25 +92,10 @@ class SettlementCreateViewModel extends ChangeNotifier{
   }
 
   //직접 추가 후 Receipt/List<ReceiptItem> 리턴
-  ReceiptContent createReceiptFromTyping(String receiptName, Receipt newReceipt, List<ReceiptItem> newReceiptItems) {
+  ReceiptContent createReceiptFromTyping() {
+    Receipt newReceipt = Receipt();
+    List<ReceiptItem> newReceiptItems = [];
     return ReceiptContent(newReceipt, newReceiptItems);
-  }
-
-  // 영수증/영수증항목 뷰모델에 추가하기
-  void addReceipt(ReceiptContent rcpContent){
-
-    rcpContent.receipt!.settlementId = settlement.settlementId;
-    if(receiptItems != null) {
-      for (var newReceiptItem in rcpContent.receiptItems) {
-        rcpContent.receipt!.receiptItems.add(newReceiptItem.receiptItemId!);
-      }
-    }
-    settlement.receipts.add(rcpContent.receipt!.receiptId!);
-    receipts[rcpContent.receipt!.receiptId!] = rcpContent.receipt!;
-    receiptItems[rcpContent.receipt!.receiptId!] = rcpContent.receiptItems;
-    totalPrice += rcpContent.receipt!.totalPrice;
-    //log("영수증 항목 수: ${receiptItems[newReceipt.receiptId!]!.length}");
-    notifyListeners();
   }
 
   //영수증 항목 추가하기
@@ -130,6 +114,23 @@ class SettlementCreateViewModel extends ChangeNotifier{
   void removeReceiptItem(ReceiptContent rcpContent, String rcpItemId, int index) {
     rcpContent.receipt!.receiptItems.remove(rcpItemId);
     rcpContent.receiptItems.removeAt(index);
+  }
+
+  // 영수증/영수증항목 뷰모델에 추가하기
+  void addReceipt(ReceiptContent rcpContent){
+
+    rcpContent.receipt!.settlementId = settlement.settlementId;
+    if(receiptItems != null) {
+      for (var newReceiptItem in rcpContent.receiptItems) {
+        rcpContent.receipt!.receiptItems.add(newReceiptItem.receiptItemId!);
+      }
+    }
+    settlement.receipts.add(rcpContent.receipt!.receiptId!);
+    receipts[rcpContent.receipt!.receiptId!] = rcpContent.receipt!;
+    receiptItems[rcpContent.receipt!.receiptId!] = rcpContent.receiptItems;
+    totalPrice += rcpContent.receipt!.totalPrice;
+    //log("영수증 항목 수: ${receiptItems[newReceipt.receiptId!]!.length}");
+    notifyListeners();
   }
 
   // 영수증 삭제하기

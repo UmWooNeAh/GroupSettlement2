@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:groupsettlement2/class/class_user.dart';
 import '../modeluuid.dart';
 
 class SettlementPaper {
@@ -6,6 +7,7 @@ class SettlementPaper {
   String? settlementPaperId;
   String? settlementId;
   String? serviceUserId;
+  String? userName;
   String? accountInfo;
   List<String> settlementItems = <String> [];
   double? totalPrice;
@@ -46,6 +48,8 @@ class SettlementPaper {
     List<SettlementPaper> papers = [];
     for(var doc in querySnapshot.docs) {
       SettlementPaper paper = SettlementPaper.fromQuerySnapshot(doc);
+      ServiceUser user = await ServiceUser().getUserByUserId(paper.serviceUserId!);
+      userName = user.name;
       papers.add(paper);
     }
     return papers;
@@ -56,6 +60,8 @@ class SettlementPaper {
     await FirebaseFirestore.instance.collection("settlemntpaperlist")
         .doc(paperid).get();
     SettlementPaper paper = SettlementPaper.fromSnapShot(result);
+    ServiceUser user = await ServiceUser().getUserByUserId(serviceUserId!);
+    userName = user.name;
     return paper;
   }
 
