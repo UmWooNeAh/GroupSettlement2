@@ -8,21 +8,24 @@ import '../class/class_settlement.dart';
 import '../class/class_user.dart';
 
 final groupProvider = ChangeNotifierProvider<GroupViewModel>(
-        (ref) => GroupViewModel("88f8433b-0af1-44be-95be-608316118fad"));
+        (ref) => GroupViewModel("8dcca5ca-107c-4a12-9d12-f746e2e513b7","88f8433b-0af1-44be-95be-608316118fad"));
 
 class GroupViewModel extends ChangeNotifier {
 
+  ServiceUser userData = ServiceUser();
   Group myGroup = Group();
   List<ServiceUser> serviceUsers = <ServiceUser> [];
   List<Settlement> settlementInGroup = <Settlement> [];
   List<Settlement> mergedSettlementInGroup = <Settlement> [];
 
-  GroupViewModel(String groupId) {
-    _settingGroupViewModel(groupId);
+  GroupViewModel(String userId, String groupId) {
+    _settingGroupViewModel(userId, groupId);
   }
 
-  void _settingGroupViewModel(String groupId) async {
+  void _settingGroupViewModel(String userId, String groupId) async {
+    userData = await ServiceUser().getUserByUserId(userId);
     myGroup = await Group().getGroupByGroupId(groupId);
+    notifyListeners();
 
     myGroup.serviceUsers.forEach((userid) async {
       serviceUsers.add(await ServiceUser().getUserByUserId(userid));

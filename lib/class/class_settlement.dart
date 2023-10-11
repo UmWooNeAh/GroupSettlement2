@@ -14,6 +14,7 @@ class Settlement {
   bool? isFinished;
   bool? isMerged;
   List<String> mergedSettlement = <String> [];
+  Timestamp? time;
 
   Settlement() {
     ModelUuid uuid = ModelUuid();
@@ -34,6 +35,7 @@ class Settlement {
     isFinished = json['isfinished'];
     isMerged = json['ismerged'];
     mergedSettlement= List<String>.from(json['mergedsettlement']);
+    time = json['time'];
   }
 
   Map<String, dynamic> toJson() => {
@@ -48,6 +50,7 @@ class Settlement {
     'isfinished' : isFinished,
     'ismerged' : isMerged,
     'mergedsettlement' : mergedSettlement,
+    'time' : time,
   };
 
   void createSettlement() async {
