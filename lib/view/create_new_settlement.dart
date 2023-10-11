@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:groupsettlement2/design_element.dart';
 import 'package:groupsettlement2/view/shared_basic_widget.dart';
+import '../viewmodel/SettlementCreateViewModel.dart';
 
 class CreateNewSettlement extends ConsumerStatefulWidget {
   const CreateNewSettlement({super.key});
@@ -16,6 +17,7 @@ class CreateNewSettlement extends ConsumerStatefulWidget {
 class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
   @override
   Widget build(BuildContext context) {
+    final provider = ref.watch(stmCreateProvider.notifier);
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(),
@@ -27,7 +29,7 @@ class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
               width: size.width,
               margin: const EdgeInsets.fromLTRB(20, 20, 20, 5),
               child: const Text(
-                "UWNA",
+                "UWNA 그룹이름",
                 style: TextStyle(
                   fontSize: 20,
                 ),
@@ -65,22 +67,32 @@ class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
               width: size.width,
               color: Colors.grey[200],
               child: Column(children: [
-                const Padding(
-                  padding: EdgeInsets.all(20.0),
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
+                      const Text(
                         "영수증",
                         style: TextStyle(
                           fontSize: 25,
                         ),
                       ),
-                      Text(
-                        "합계 78000원",
-                        style: TextStyle(
-                          fontSize: 25,
-                        ),
+                      Text.rich(
+                        TextSpan(children: [
+                          const TextSpan(
+                            text: "합계 ",
+                            style: TextStyle(
+                              fontSize: 25,
+                            ),
+                          ),
+                          TextSpan(
+                            text: "${priceToString.format(0)} ",
+                            style: const TextStyle(
+                              fontSize: 25,
+                            ),
+                          ),
+                        ]),
                       ),
                     ],
                   ),
@@ -88,8 +100,12 @@ class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                    children: List.generate(10, (index) {
-                      return CreateNewSettlementReceipt(index: index);
+                    children: List.generate(provider.settlement.receipts.length,
+                        (index) {
+                      // List<String> list = provider.receipts.keys.toList();
+                      // String id = list[index];
+                      return CreateNewSettlementReceipt(
+                          index: provider.settlement.receipts[index]);
                     }),
                   ),
                 )
@@ -195,7 +211,7 @@ class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
 
 class CreateNewSettlementReceipt extends ConsumerStatefulWidget {
   const CreateNewSettlementReceipt({super.key, required this.index});
-  final int index;
+  final String index;
 
   @override
   ConsumerState<CreateNewSettlementReceipt> createState() =>
@@ -207,6 +223,7 @@ class _CreateNewSettlementReceiptState
   bool isTapDown = false;
   @override
   Widget build(BuildContext context) {
+    final provider = ref.watch(stmCreateProvider.notifier);
     return GestureDetector(
       onTapDown: (details) {
         setState(() {
@@ -255,7 +272,7 @@ class _CreateNewSettlementReceiptState
               top: 20,
               left: 10,
               child: Text(
-                "영수증 ${widget.index}",
+                "${provider.receipts}",
                 style: const TextStyle(
                   fontSize: 25,
                 ),
@@ -269,7 +286,8 @@ class _CreateNewSettlementReceiptState
                       style: DefaultTextStyle.of(context).style,
                       children: [
                         TextSpan(
-                          text: "${widget.index}",
+                          text: (provider.receipts[widget.index]?.receiptName ??
+                              "영수증"),
                           style: const TextStyle(
                             fontSize: 17,
                           ),

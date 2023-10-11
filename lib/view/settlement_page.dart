@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:groupsettlement2/design_element.dart';
 import 'dart:math' as math;
-
 import 'shared_basic_widget.dart';
+import '../viewmodel/SettlementViewModel.dart';
 
 class Informations {
   List<String> receipts = [
@@ -72,7 +72,7 @@ class BottomSheetValue {
 }
 
 class BottomSheetSlider extends ChangeNotifier {
-  BottomSheetValue bottomsheet = BottomSheetValue();
+  final BottomSheetValue bottomsheet = BottomSheetValue();
 
   void setBottomSheetSlider(initial, closed, opened) {
     bottomsheet.currentHeight = initial;
@@ -142,6 +142,30 @@ class ReadMore extends StateNotifier<double> {
   }
 }
 
+class Test {
+  Test();
+
+  bool isOpened = false;
+  int receiptIndex = -1;
+}
+
+class IsReceiptOpened extends ChangeNotifier {
+  final Test test = Test();
+
+  void interaction() {
+    test.isOpened = !test.isOpened;
+    notifyListeners();
+  }
+
+  void seletedReceipt(index) {
+    test.receiptIndex = index;
+    notifyListeners();
+  }
+}
+
+final isReceiptOpenedProvider =
+    ChangeNotifierProvider((ref) => IsReceiptOpened());
+
 final readMoreStateNotifierProvider =
     StateNotifierProvider((ref) => ReadMore());
 
@@ -160,12 +184,11 @@ final bottomSheetSliderChangeNotifierProviedr =
 
 class _SettlementPageState extends ConsumerState<SettlementPage> {
   int i = 0;
-
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    final bottomsheetValue =
-        ref.watch(bottomSheetSliderChangeNotifierProviedr.notifier);
+    final bottomsheetValue = ref.watch(bottomSheetSliderChangeNotifierProviedr);
+    final viewmodel = ref.watch(stmProvider);
     if (i == 0) {
       bottomsheetValue.setBottomSheetSlider(0.0, 0.0, size.height * 0.7);
       i++;
@@ -178,362 +201,489 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
           SlidableAdderWidget(size: size),
           GroupUserBar(size: size),
           Positioned(
-            right: 0,
-            bottom: ref.watch(readMoreStateNotifierProvider) as double,
-            child: Stack(
-              children: [
-                Container(
-                  height: size.height,
-                  width: size.width,
-                  color: Colors.transparent,
-                  child: GestureDetector(
-                    onTap: () {
-                      ref
-                          .watch(readMoreStateNotifierProvider.notifier)
-                          .leaveReadMore();
-                    },
-                  ),
-                ),
-                Positioned(
-                  right: 30,
-                  bottom: 100,
-                  child: DragTarget(onLeave: (data) {
-                    ref
-                        .watch(readMoreStateNotifierProvider.notifier)
-                        .leaveReadMore();
-                  }, builder: (context, cadidateData, rejectedData) {
-                    return AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      height:
-                          ref.watch(readMoreStateNotifierProvider) as double ==
-                                  0
-                              ? 300
-                              : 10,
-                      width:
-                          ref.watch(readMoreStateNotifierProvider) as double ==
-                                  0
-                              ? 300
-                              : 300,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: const Color(0xFFF0F0F0),
+            left: 50,
+            top: 100,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              padding: const EdgeInsets.all(20),
+              width: 300,
+              height: ref.watch(isReceiptOpenedProvider).test.isOpened
+                  ? size.height * 0.5
+                  : size.height * 0,
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Container(
+                      width: size.width,
+                      margin: const EdgeInsets.only(left: 10, bottom: 10),
+                      child: Text(
+                        "${viewmodel.receipts[ref.watch(isReceiptOpenedProvider).test.receiptIndex] ?? "Default Receipt Name"}",
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
+                    ),
+                    SizedBox(
+                      width: 400,
+                      height: size.height * 0.5 - 80,
                       child: SingleChildScrollView(
                         child: Column(
-                          children: [
-                            Container(
-                              width: 300,
-                              padding: const EdgeInsets.fromLTRB(20, 15, 0, 5),
-                              child: const Text(
-                                "그룹원 목록",
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            Column(
-                              children: List.generate(
-                                ref
-                                            .watch(
-                                                receiptssChangeNotifierProvider
-                                                    .notifier)
-                                            .information
-                                            .members
-                                            .length ~/
-                                        4 +
-                                    1,
-                                (index) {
-                                  return Row(
-                                    children: List.generate(
-                                        math.min(
-                                            4,
-                                            -(4 * index) +
-                                                ref
-                                                    .watch(
-                                                        receiptssChangeNotifierProvider
-                                                            .notifier)
-                                                    .information
-                                                    .members
-                                                    .length), (iindex) {
-                                      return SettlementPageGroupUser(
-                                        index: index * 4 + iindex,
-                                        ovalSize: 45,
-                                      );
-                                    }),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
+                          children: List.generate(10, (index) {
+                            return DragTarget(
+                              builder: (context, candidateData, rejectedData) {
+                                return SettlementPageReceiptItem(
+                                  receiptId: "awefwaef",
+                                  index: index,
+                                );
+                              },
+                            );
+                          }),
                         ),
                       ),
-                    );
-                  }),
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            bottom: 0,
-            child: Column(
-              children: [
-                GestureDetector(
-                  onVerticalDragUpdate: (details) {
-                    ref
-                        .watch(bottomSheetSliderChangeNotifierProviedr.notifier)
-                        .updateHeight(-details.delta.dy);
-                    setState(() {});
-                  },
-                  onVerticalDragEnd: (details) {
-                    ref
-                        .watch(bottomSheetSliderChangeNotifierProviedr.notifier)
-                        .updateOpenState();
-                    setState(() {});
-                  },
-                  child: Container(
-                    height: 60,
-                    width: size.width,
-                    decoration: const BoxDecoration(
-                      boxShadow: [
-                        BoxShadow(
-                          blurRadius: 5.0,
-                          color: Colors.black45,
-                        )
-                      ],
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(20.0),
-                          topRight: Radius.circular(20.0)),
                     ),
-                    child: Stack(
-                      children: [
-                        const Positioned(
-                            top: 20,
-                            left: 20,
-                            child: Text(
-                              "예상 최종 정산서",
-                              style: TextStyle(
-                                  fontSize: 20, fontWeight: FontWeight.bold),
-                            )),
-                        Align(
-                          alignment: Alignment.topCenter,
-                          child: bottomsheetValue.bottomsheet.isOpen
-                              ? const Icon(Icons.keyboard_arrow_down_outlined)
-                              : const Icon(Icons.keyboard_arrow_up_outlined),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  onVerticalDragUpdate: (details) {
-                    ref
-                        .watch(bottomSheetSliderChangeNotifierProviedr.notifier)
-                        .updateHeight(-details.delta.dy);
-
-                    setState(() {});
-                  },
-                  onVerticalDragEnd: (details) {
-                    ref
-                        .watch(bottomSheetSliderChangeNotifierProviedr.notifier)
-                        .updateOpenState();
-                    setState(() {});
-                  },
-                  child: AnimatedContainer(
-                    duration: (bottomsheetValue.bottomsheet.currentHeight -
-                                    bottomsheetValue.bottomsheet.previousHeight)
-                                .abs() >
-                            3
-                        ? const Duration(milliseconds: 300)
-                        : const Duration(),
-                    curve: Curves.decelerate,
-                    height: bottomsheetValue.bottomsheet.currentHeight,
-                    width: size.width,
-                    color: Colors.white,
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          Column(
-                            children: [
-                              Container(
-                                height: 2,
-                                width: size.width,
-                                color: Colors.grey[300],
-                              ),
-                              Container(
-                                padding: const EdgeInsets.all(10),
-                                color: Colors.grey[200],
-                                child: Column(
-                                  children: [
-                                    SizedBox(
-                                      width: size.width,
-                                      child: const Text(
-                                        "정산서 목록",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                    SingleChildScrollView(
-                                        scrollDirection: Axis.horizontal,
-                                        child: Row(
-                                          children: List.generate(10, (index) {
-                                            if (index < 1) {
-                                              return Padding(
-                                                padding:
-                                                    const EdgeInsets.fromLTRB(
-                                                        0, 15, 15, 0),
-                                                child: Column(
-                                                  children: [
-                                                    ClipOval(
-                                                      child: Container(
-                                                        height: 50,
-                                                        width: 50,
-                                                        color: color1,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(
-                                                      height: 15,
-                                                    ),
-                                                    const Text("전체 정산서"),
-                                                  ],
-                                                ),
-                                              );
-                                            } else {
-                                              return Column(
-                                                children: [
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            15.0),
-                                                    child: ClipOval(
-                                                      child: Container(
-                                                        height: 50,
-                                                        width: 50,
-                                                        color: Colors.black54,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const Text("이름"),
-                                                ],
-                                              );
-                                            }
-                                          }),
-                                        )),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                height: 2,
-                                width: size.width,
-                                color: Colors.grey[300],
-                              ),
-                              Container(
-                                width: size.width,
-                                padding:
-                                    const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                                child: const Text(
-                                  "전체 정산서",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                  height: 300,
-                                  width: size.width,
-                                  padding: const EdgeInsets.all(10),
-                                  child: SingleChildScrollView(
-                                    child: Column(
-                                      children: List.generate(10, (index) {
-                                        return Padding(
-                                          padding: const EdgeInsets.all(15),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              const Text("류지원"),
-                                              Text("짜장면 등 $index 메뉴"),
-                                              Text(
-                                                  "${priceToString.format(10000)}원",
-                                                  style: const TextStyle(
-                                                    color: color2,
-                                                  ))
-                                            ],
-                                          ),
-                                        );
-                                      }),
-                                    ),
-                                  )),
-                              const Divider(
-                                indent: 20,
-                                endIndent: 20,
-                              ),
-                              Container(
-                                margin: const EdgeInsets.symmetric(
-                                    horizontal: 20, vertical: 10),
-                                child: const Row(
-                                  children: [
-                                    Text("합계금액"),
-                                    Text(" 40,000원"),
-                                  ],
-                                ),
-                              ),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                ),
-                                onPressed: () {
-                                  context.go(
-                                      "/SettlementPage/SettlementFinalCheckPage");
-                                },
-                                child: const Text("정산 완료하기"),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            left: 100,
-            top: 100,
-            child: Visibility(
-              visible: false,
-              child: Container(
-                padding: const EdgeInsets.all(20),
-                width: size.width - 110,
-                height: size.height * 0.5,
-                color: Colors.pink[100],
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: List.generate(10, (index) {
-                      return DragTarget(
-                        builder: (context, candidateData, rejectedData) {
-                          return const SettlementPageReceiptItem();
-                        },
-                      );
-                    }),
-                  ),
+                  ],
                 ),
               ),
             ),
           ),
+          ReadMoreWidget(size: size),
+          CustomBottomSheet(size: size),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.abc), label: "a"),
-          BottomNavigationBarItem(icon: Icon(Icons.abc_outlined), label: "b"),
-          BottomNavigationBarItem(icon: Icon(Icons.abc_rounded), label: "c"),
+      bottomNavigationBar: const CustomBottomNavigationBar(
+        index: 0,
+        isIn: false,
+      ),
+    );
+  }
+}
+
+class ReadMoreWidget extends ConsumerStatefulWidget {
+  const ReadMoreWidget({super.key, required this.size});
+  final Size size;
+
+  @override
+  ConsumerState<ReadMoreWidget> createState() => _ReadMoreWidgetState();
+}
+
+class _ReadMoreWidgetState extends ConsumerState<ReadMoreWidget> {
+  late Size size;
+  @override
+  void initState() {
+    super.initState();
+    size = widget.size;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = ref.watch(stmProvider);
+    return Positioned(
+      right: 0,
+      bottom: ref.watch(readMoreStateNotifierProvider) as double,
+      child: Stack(
+        children: [
+          Container(
+            height: size.height,
+            width: size.width,
+            color: Colors.transparent,
+            child: GestureDetector(
+              onTap: () {
+                ref
+                    .watch(readMoreStateNotifierProvider.notifier)
+                    .leaveReadMore();
+              },
+            ),
+          ),
+          Positioned(
+            right: 30,
+            bottom: 100,
+            child: DragTarget(
+              onLeave: (data) {
+                ref
+                    .watch(readMoreStateNotifierProvider.notifier)
+                    .leaveReadMore();
+              },
+              builder: (context, cadidateData, rejectedData) {
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  height:
+                      ref.watch(readMoreStateNotifierProvider) as double == 0
+                          ? 300
+                          : 10,
+                  width: ref.watch(readMoreStateNotifierProvider) as double == 0
+                      ? 300
+                      : 300,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: const Color(0xFFF0F0F0),
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Container(
+                          width: 300,
+                          padding: const EdgeInsets.fromLTRB(20, 15, 0, 5),
+                          child: const Text(
+                            "그룹원 목록",
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        Column(
+                          children: List.generate(
+                            provider.settlementUsers.length ~/ 4 + 1,
+                            (index) {
+                              return Row(
+                                children: List.generate(
+                                  math.min(
+                                      4,
+                                      provider.settlementUsers.length -
+                                          4 * index),
+                                  (iindex) {
+                                    return SettlementPageGroupUser(
+                                      index: index * 4 + iindex,
+                                      ovalSize: 45,
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CustomBottomSheet extends ConsumerStatefulWidget {
+  const CustomBottomSheet({super.key, required this.size});
+  final Size size;
+
+  @override
+  ConsumerState<CustomBottomSheet> createState() => _CustomBottomSheetState();
+}
+
+class _CustomBottomSheetState extends ConsumerState<CustomBottomSheet> {
+  late Size size;
+  @override
+  void initState() {
+    super.initState();
+    size = widget.size;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = ref.watch(stmProvider);
+    final bottomsheetValue = ref.watch(bottomSheetSliderChangeNotifierProviedr);
+    return Positioned(
+      bottom: 0,
+      child: Column(
+        children: [
+          GestureDetector(
+            onVerticalDragUpdate: (details) {
+              ref
+                  .watch(bottomSheetSliderChangeNotifierProviedr.notifier)
+                  .updateHeight(-details.delta.dy);
+            },
+            onVerticalDragEnd: (details) {
+              ref
+                  .watch(bottomSheetSliderChangeNotifierProviedr.notifier)
+                  .updateOpenState();
+            },
+            child: Container(
+              height: 60,
+              width: size.width,
+              decoration: const BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    blurRadius: 5.0,
+                    color: Colors.black45,
+                  )
+                ],
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20.0),
+                    topRight: Radius.circular(20.0)),
+              ),
+              child: Stack(
+                children: [
+                  const Positioned(
+                      top: 20,
+                      left: 20,
+                      child: Text(
+                        "예상 최종 정산서",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      )),
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: bottomsheetValue.bottomsheet.isOpen
+                        ? const Icon(Icons.keyboard_arrow_down_outlined)
+                        : const Icon(Icons.keyboard_arrow_up_outlined),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          GestureDetector(
+            onVerticalDragUpdate: (details) {
+              ref
+                  .watch(bottomSheetSliderChangeNotifierProviedr.notifier)
+                  .updateHeight(-details.delta.dy);
+            },
+            onVerticalDragEnd: (details) {
+              ref
+                  .watch(bottomSheetSliderChangeNotifierProviedr.notifier)
+                  .updateOpenState();
+            },
+            child: AnimatedContainer(
+              duration: (bottomsheetValue.bottomsheet.currentHeight -
+                              bottomsheetValue.bottomsheet.previousHeight)
+                          .abs() >
+                      5
+                  ? const Duration(milliseconds: 400)
+                  : const Duration(milliseconds: 0),
+              curve: Curves.decelerate,
+              height: bottomsheetValue.bottomsheet.currentHeight,
+              width: size.width,
+              color: Colors.white,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Column(
+                      children: [
+                        Container(
+                          height: 2,
+                          width: size.width,
+                          color: Colors.grey[300],
+                        ),
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          color: Colors.grey[200],
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                width: size.width,
+                                child: const Text(
+                                  "정산서 목록",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                              SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  children: List.generate(
+                                      1 + provider.settlementUsers.length,
+                                      (index) {
+                                    if (index < 1) {
+                                      return Padding(
+                                        padding: const EdgeInsets.fromLTRB(
+                                            0, 15, 15, 0),
+                                        child: Column(
+                                          children: [
+                                            ClipOval(
+                                              child: Container(
+                                                height: 50,
+                                                width: 50,
+                                                color: color1,
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              height: 15,
+                                            ),
+                                            const Text("전체 정산서"),
+                                          ],
+                                        ),
+                                      );
+                                    } else {
+                                      return Column(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(15.0),
+                                            child: ClipOval(
+                                              child: Container(
+                                                height: 50,
+                                                width: 50,
+                                                color: Colors.black54,
+                                              ),
+                                            ),
+                                          ),
+                                          Text(
+                                              "${provider.settlementUsers[index - 1].name}"),
+                                        ],
+                                      );
+                                    }
+                                  }),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          height: 2,
+                          width: size.width,
+                          color: Colors.grey[300],
+                        ),
+                        Column(
+                          children: [
+                            Container(
+                              width: size.width,
+                              padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                              child: const Text(
+                                "전체 정산서",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ),
+                            Container(
+                                height: 300,
+                                width: size.width,
+                                padding: const EdgeInsets.all(10),
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    children: List.generate(10, (index) {
+                                      return Padding(
+                                        padding: const EdgeInsets.all(15),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Container(
+                                              margin: const EdgeInsets.only(
+                                                  left: 20),
+                                              width: 80,
+                                              child: const Text(
+                                                "",
+                                                style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
+                                            Text.rich(
+                                              TextSpan(
+                                                children: [
+                                                  const TextSpan(
+                                                    text: "짜장면 ",
+                                                    style: TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                    ),
+                                                  ),
+                                                  TextSpan(
+                                                    text: "등 $index 메뉴",
+                                                    style: const TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: Colors.grey,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Container(
+                                              margin: const EdgeInsets.only(
+                                                  right: 20),
+                                              child: Text(
+                                                "${priceToString.format(10000)}원",
+                                                style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: color2,
+                                                ),
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      );
+                                    }),
+                                  ),
+                                )),
+                          ],
+                        ),
+                        const Divider(
+                          indent: 20,
+                          endIndent: 20,
+                        ),
+                        Container(
+                          margin: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 20),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  "합계금액",
+                                  style: TextStyle(
+                                    fontSize: 23,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                Text(
+                                  "${priceToString.format(40000)}원",
+                                  style: const TextStyle(
+                                    fontSize: 23,
+                                    fontWeight: FontWeight.w500,
+                                    color: color2,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.fromLTRB(20, 10, 20, 40),
+                          height: 60,
+                          width: size.width,
+                          child: OutlinedButton(
+                            onPressed: () {
+                              context.go(
+                                  "/SettlementPage/SettlementFinalCheckPage");
+                            },
+                            style: OutlinedButton.styleFrom(
+                              backgroundColor: color2,
+                              side: const BorderSide(
+                                color: Colors.transparent,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: const Text(
+                              "정산 완료하기",
+                              style:
+                                  TextStyle(fontSize: 20, color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -560,6 +710,7 @@ class _SettlementInteractiveViewerState
 
   @override
   Widget build(BuildContext context) {
+    final provider = ref.watch(stmProvider);
     return InteractiveViewer(
       minScale: 0.25,
       maxScale: 20.0,
@@ -601,13 +752,12 @@ class _SettlementInteractiveViewerState
             height: size.height,
             width: size.width,
             child: Stack(
-              children: List.generate(
-                  ref
-                      .watch(receiptssChangeNotifierProvider.notifier)
-                      .information
-                      .receipts
-                      .length, (index) {
-                return SettlementPageReceipt(index: index);
+              children: List.generate(provider.receipts.length, (index) {
+                String id = provider.receipts.keys.toList()[index];
+                return SettlementPageReceipt(
+                  index: index,
+                  id: id,
+                );
               }),
             ),
           ),
@@ -635,6 +785,7 @@ class _GroupUserBarState extends ConsumerState<GroupUserBar> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = ref.watch(stmProvider.notifier);
     return Positioned(
       bottom: 40,
       child: Container(
@@ -682,11 +833,7 @@ class _GroupUserBarState extends ConsumerState<GroupUserBar> {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: List.generate(
-                  ref
-                      .watch(receiptssChangeNotifierProvider.notifier)
-                      .information
-                      .members
-                      .length,
+                  provider.settlementUsers.length,
                   (index) {
                     return SettlementPageGroupUser(
                       index: index,
@@ -752,7 +899,7 @@ class _SlidableAdderWidgetState extends ConsumerState<SlidableAdderWidget> {
             },
             child: Transform(
               transform: Matrix4.identity()
-                ..setEntry(3, 2, 0.001) // 투시 변환 적용 (원근감 제거)
+                ..setEntry(3, 2, 0.001)
                 ..rotateZ(-math.pi /
                     40 *
                     ((ref.watch(slidableAdderStateNotifierProvider) as double) -
@@ -767,18 +914,24 @@ class _SlidableAdderWidgetState extends ConsumerState<SlidableAdderWidget> {
   }
 }
 
-class SettlementPageReceiptItem extends StatefulWidget {
-  const SettlementPageReceiptItem({super.key});
+class SettlementPageReceiptItem extends ConsumerStatefulWidget {
+  const SettlementPageReceiptItem(
+      {super.key, required this.receiptId, required this.index});
+  final int index;
+  final String receiptId;
 
   @override
-  State<SettlementPageReceiptItem> createState() =>
+  ConsumerState<SettlementPageReceiptItem> createState() =>
       _SettlementPageReceiptItemState();
 }
 
-class _SettlementPageReceiptItemState extends State<SettlementPageReceiptItem> {
+class _SettlementPageReceiptItemState
+    extends ConsumerState<SettlementPageReceiptItem> {
   bool selected = false;
+  PageController pageController = PageController();
   @override
   Widget build(BuildContext context) {
+    final provider = ref.watch(stmProvider.notifier);
     return Column(
       children: [
         GestureDetector(
@@ -789,28 +942,176 @@ class _SettlementPageReceiptItemState extends State<SettlementPageReceiptItem> {
           },
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 400),
-            height: selected ? 150 : 50,
+            height: selected ? 190 : 60,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: Colors.amber,
-            ),
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.white,
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0xFFCCCCCC),
+                    offset: Offset(0, 2),
+                    spreadRadius: 1,
+                    blurRadius: 3,
+                  ),
+                ]),
             child: selected
-                ? const Column(
+                ? SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 5),
+                              child: const Text(
+                                "provider!.receiptItems[widget.receiptId]![widget.index]",
+                                style: TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 5),
+                              child: const Text(
+                                "6000원",
+                                style: TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          height: 160,
+                          padding: const EdgeInsets.all(10),
+                          child: PageView(
+                            controller: pageController,
+                            children: List.generate(4, (ndex) {
+                              return Column(
+                                children: List.generate(2, (index) {
+                                  return Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
+                                    children: List.generate(4, (iindex) {
+                                      return Container(
+                                        margin: const EdgeInsets.fromLTRB(
+                                            10, 0, 10, 10),
+                                        height: 55,
+                                        width: 35,
+                                        child: Stack(
+                                          children: [
+                                            Positioned(
+                                              top: 10,
+                                              child: ClipOval(
+                                                child: Container(
+                                                  height: 30,
+                                                  width: 30,
+                                                  color: Colors.grey,
+                                                ),
+                                              ),
+                                            ),
+                                            Positioned(
+                                              top: 40,
+                                              child: SizedBox(
+                                                width: 30,
+                                                child: Text(
+                                                  "${index * 4 + iindex}",
+                                                  style: const TextStyle(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.w400,
+                                                  ),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ),
+                                            ),
+                                            Positioned(
+                                              left: 20,
+                                              top: 3,
+                                              child: GestureDetector(
+                                                onTap: () {},
+                                                child: const SizedBox(
+                                                  height: 5,
+                                                  width: 5,
+                                                  child: Icon(
+                                                    Icons.close,
+                                                    size: 15,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }),
+                                  );
+                                }),
+                              );
+                            }),
+                          ),
+                        )
+                      ],
+                    ),
+                  )
+                : Column(
                     children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("짜장면"),
-                          Text("6000원"),
+                          Container(
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 5),
+                            child: const Text(
+                              "짜장면",
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 5),
+                            child: const Text(
+                              "6000원",
+                              style: TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
                         ],
                       ),
-                    ],
-                  )
-                : const Column(
-                    children: [
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text("짜장면"),
-                          Text("6000원"),
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Row(
+                              children: List.generate(4, (index) {
+                                return Container(
+                                  margin:
+                                      const EdgeInsets.symmetric(horizontal: 2),
+                                  child: const Text(
+                                    "박건우",
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 10),
+                            child: const Text(
+                              "${3}명",
+                              style: TextStyle(fontSize: 15),
+                            ),
+                          ),
                         ],
                       ),
                     ],
@@ -825,12 +1126,30 @@ class _SettlementPageReceiptItemState extends State<SettlementPageReceiptItem> {
   }
 }
 
-class SettlementPageReceipt extends ConsumerWidget {
-  const SettlementPageReceipt({super.key, required this.index});
+class SettlementPageReceipt extends ConsumerStatefulWidget {
+  const SettlementPageReceipt(
+      {super.key, required this.index, required this.id});
+  final String id;
   final int index;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SettlementPageReceipt> createState() =>
+      _SettlementPageReceiptState();
+}
+
+class _SettlementPageReceiptState extends ConsumerState<SettlementPageReceipt> {
+  late int index;
+  late String id;
+  @override
+  void initState() {
+    super.initState();
+    index = widget.index;
+    id = widget.id;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = ref.watch(stmProvider);
     return Positioned(
       top: 10,
       left: index * 120 + 10,
@@ -844,13 +1163,14 @@ class SettlementPageReceipt extends ConsumerWidget {
           ref
               .watch(receiptssChangeNotifierProvider.notifier)
               .disableReceiptSelected(index);
+          ref.watch(isReceiptOpenedProvider.notifier).interaction();
+          ref.watch(isReceiptOpenedProvider.notifier).seletedReceipt(index);
         },
         onTapCancel: () {
           ref
               .watch(receiptssChangeNotifierProvider.notifier)
               .disableReceiptSelected(index);
         },
-        onTap: () {},
         child: DragTarget(
           onWillAccept: (data) {
             ref
@@ -901,10 +1221,8 @@ class SettlementPageReceipt extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(100),
                     ),
                   ),
-                  Text(ref
-                      .watch(receiptssChangeNotifierProvider.notifier)
-                      .information
-                      .receipts[index]),
+                  Text(provider.receipts[id]?.receiptName ??
+                      "Default Receipt Name"),
                 ],
               ),
             );
@@ -923,6 +1241,7 @@ class SettlementPageGroupUser extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final provider = ref.watch(stmProvider.notifier);
     return GestureDetector(
       child: LongPressDraggable(
         delay: const Duration(
@@ -971,10 +1290,7 @@ class SettlementPageGroupUser extends ConsumerWidget {
             ),
             SizedBox(
               height: 30,
-              child: Text(ref
-                  .watch(receiptssChangeNotifierProvider.notifier)
-                  .information
-                  .members[index]),
+              child: Text(provider.settlementUsers[index].name ?? "그룹원$index"),
             ),
           ],
         ),

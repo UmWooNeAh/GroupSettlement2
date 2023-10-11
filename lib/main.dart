@@ -142,7 +142,7 @@ final GoRouter _router = GoRouter(
             GoRoute(
                 path: 'SettlementFinalCheckPage',
                 builder: (context, state) {
-                  return const TotalSettlementDetailsManagement();
+                  return const SettlementFinalCheckPage();
                 }),
           ],
         ),

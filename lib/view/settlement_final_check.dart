@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/design_element.dart';
 import 'package:groupsettlement2/view/shared_basic_widget.dart';
+import '../viewmodel/SettlementViewModel.dart';
 
 class SettlementFinalCheckPage extends ConsumerStatefulWidget {
   const SettlementFinalCheckPage({super.key});
@@ -15,6 +16,7 @@ class _SettlementFinalCheckPage
     extends ConsumerState<SettlementFinalCheckPage> {
   @override
   Widget build(BuildContext context) {
+    final provider = ref.watch(stmProvider.notifier);
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(),
@@ -23,9 +25,9 @@ class _SettlementFinalCheckPage
           Container(
             width: size.width,
             margin: const EdgeInsets.symmetric(horizontal: 30),
-            child: const Text(
-              "정산 1",
-              style: TextStyle(
+            child: Text(
+              provider.settlement.settlementName ?? "Name",
+              style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w400,
               ),
@@ -48,8 +50,10 @@ class _SettlementFinalCheckPage
           Expanded(
               child: SingleChildScrollView(
             child: Column(
-              children: List.generate(10, (index) {
-                return SettlementFinalCheckUserPanel(index: index);
+              children:
+                  List.generate(provider.settlementPapers.keys.length, (index) {
+                String id = provider.settlementPapers.keys.toList()[index];
+                return SettlementFinalCheckUserPanel(index: id);
               }),
             ),
           )),
@@ -69,7 +73,7 @@ class _SettlementFinalCheckPage
                   ),
                 ),
                 Text(
-                  "${priceToString.format(40000)}원",
+                  "${priceToString.format(provider.receipts.values.toList().map((receipt) => receipt.totalPrice).reduce((value, element) => (value ?? 0) + (element ?? 0)))}원",
                   style: const TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.w700,
@@ -86,12 +90,13 @@ class _SettlementFinalCheckPage
             child: OutlinedButton(
               onPressed: () {},
               style: OutlinedButton.styleFrom(
-                  side: const BorderSide(
-                    color: color2,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  )),
+                side: const BorderSide(
+                  color: color2,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
               child: const Text(
                 "전체 정산서 확인하기",
                 style: TextStyle(color: Colors.black),
@@ -112,15 +117,16 @@ class _SettlementFinalCheckPage
                 child: OutlinedButton(
                   onPressed: () {},
                   style: OutlinedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      side: const BorderSide(
-                        color: Colors.grey,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      )),
+                    backgroundColor: Colors.white,
+                    side: const BorderSide(
+                      color: Colors.grey,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                  ),
                   child: const Text(
-                    "홈으로 이동하기",
+                    "카카오톡으로 정산서 공유하기",
                     style: TextStyle(color: Colors.black),
                   ),
                 ),
@@ -133,20 +139,21 @@ class _SettlementFinalCheckPage
   }
 }
 
-class SettlementFinalCheckUserPanel extends StatefulWidget {
+class SettlementFinalCheckUserPanel extends ConsumerStatefulWidget {
   const SettlementFinalCheckUserPanel({super.key, required this.index});
-  final int index;
+  final String index;
 
   @override
-  State<SettlementFinalCheckUserPanel> createState() =>
+  ConsumerState<SettlementFinalCheckUserPanel> createState() =>
       _SettlementFinalCheckUserPanelState();
 }
 
 class _SettlementFinalCheckUserPanelState
-    extends State<SettlementFinalCheckUserPanel> {
+    extends ConsumerState<SettlementFinalCheckUserPanel> {
   bool selected = false;
   @override
   Widget build(BuildContext context) {
+    final provider = ref.watch(stmProvider.notifier);
     Size size = MediaQuery.of(context).size;
     return Column(
       children: [
@@ -178,7 +185,7 @@ class _SettlementFinalCheckUserPanelState
                         ),
                       ),
                       Text(
-                        "이름 ${widget.index}",
+                        "${(provider.settlementPapers[widget.index]?.totalPrice ?? "그룹원")}",
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w400,
@@ -190,7 +197,7 @@ class _SettlementFinalCheckUserPanelState
                 Padding(
                   padding: const EdgeInsets.all(15.0),
                   child: Text(
-                    "${priceToString.format(widget.index * 10000)}원",
+                    "${priceToString.format(provider.settlementPapers[widget.index]?.totalPrice)}원",
                     style: const TextStyle(
                       fontSize: 23,
                       fontWeight: FontWeight.w700,
