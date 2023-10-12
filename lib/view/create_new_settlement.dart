@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:groupsettlement2/design_element.dart';
@@ -15,10 +14,14 @@ class CreateNewSettlement extends ConsumerStatefulWidget {
 }
 
 class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
+  final TextEditingController _settlementNameController =
+      TextEditingController(text: "asdfasdf");
+  bool isFirstBuild = true;
   @override
   Widget build(BuildContext context) {
-    final provider = ref.watch(stmCreateProvider.notifier);
+    final provider = ref.watch(stmCreateProvider);
     Size size = MediaQuery.of(context).size;
+    _settlementNameController.text = provider.settlement.settlementName ?? "";
     return Scaffold(
       appBar: AppBar(),
       body: SingleChildScrollView(
@@ -28,9 +31,9 @@ class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
             Container(
               width: size.width,
               margin: const EdgeInsets.fromLTRB(20, 20, 20, 5),
-              child: const Text(
-                "UWNA 그룹이름",
-                style: TextStyle(
+              child: Text(
+                provider.myGroup.groupName ?? "Default Group Name",
+                style: const TextStyle(
                   fontSize: 20,
                 ),
               ),
@@ -57,7 +60,12 @@ class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
             Container(
                 margin: const EdgeInsets.fromLTRB(20, 0, 0, 20),
                 width: size.width * 0.8,
-                child: const TextField()),
+                child: TextField(
+                  controller: _settlementNameController,
+                  onChanged: (value) {
+                    provider.settlement.settlementName = value;
+                  },
+                )),
             Container(
               height: 2,
               color: Colors.grey[300],
@@ -87,7 +95,8 @@ class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
                             ),
                           ),
                           TextSpan(
-                            text: "${priceToString.format(0)} ",
+                            text:
+                                "${priceToString.format((provider.receipts.isEmpty) ? 0 : provider.receipts.values.toList().map((receipt) => receipt.totalPrice).reduce((value, element) => value + element))}원",
                             style: const TextStyle(
                               fontSize: 25,
                             ),
@@ -102,10 +111,8 @@ class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
                   child: Row(
                     children: List.generate(provider.settlement.receipts.length,
                         (index) {
-                      // List<String> list = provider.receipts.keys.toList();
-                      // String id = list[index];
                       return CreateNewSettlementReceipt(
-                          index: provider.settlement.receipts[index]);
+                          id: provider.settlement.receipts[index]);
                     }),
                   ),
                 )
@@ -210,8 +217,8 @@ class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
 }
 
 class CreateNewSettlementReceipt extends ConsumerStatefulWidget {
-  const CreateNewSettlementReceipt({super.key, required this.index});
-  final String index;
+  const CreateNewSettlementReceipt({super.key, required this.id});
+  final String id;
 
   @override
   ConsumerState<CreateNewSettlementReceipt> createState() =>
@@ -223,7 +230,7 @@ class _CreateNewSettlementReceiptState
   bool isTapDown = false;
   @override
   Widget build(BuildContext context) {
-    final provider = ref.watch(stmCreateProvider.notifier);
+    final provider = ref.watch(stmCreateProvider);
     return GestureDetector(
       onTapDown: (details) {
         setState(() {
@@ -279,28 +286,30 @@ class _CreateNewSettlementReceiptState
               ),
             ),
             Positioned(
-                top: 80,
-                left: 10,
-                child: RichText(
-                  text: TextSpan(
-                      style: DefaultTextStyle.of(context).style,
-                      children: [
-                        TextSpan(
-                          text: (provider.receipts[widget.index]?.receiptName ??
-                              "영수증"),
-                          style: const TextStyle(
-                            fontSize: 17,
-                          ),
+              top: 80,
+              left: 10,
+              child: RichText(
+                text: TextSpan(
+                    style: DefaultTextStyle.of(context).style,
+                    children: [
+                      TextSpan(
+                        text: (provider.receipts[widget.id]?.receiptName ??
+                            "영수증"),
+                        style: const TextStyle(
+                          fontSize: 17,
                         ),
-                        TextSpan(
-                          text: " 등 ${widget.index} 항목",
-                          style: TextStyle(
-                            fontSize: 17,
-                            color: Colors.grey[600],
-                          ),
-                        )
-                      ]),
-                )),
+                      ),
+                      TextSpan(
+                        text:
+                            " 등 ${provider.receipts[widget.id]?.receiptItems.length ?? "X"} 항목",
+                        style: TextStyle(
+                          fontSize: 17,
+                          color: Colors.grey[600],
+                        ),
+                      )
+                    ]),
+              ),
+            ),
             const Positioned(
                 bottom: 50,
                 right: 10,
@@ -310,12 +319,12 @@ class _CreateNewSettlementReceiptState
                     fontSize: 15,
                   ),
                 )),
-            const Positioned(
+            Positioned(
               bottom: 10,
               right: 10,
               child: Text(
-                "46,000원",
-                style: TextStyle(
+                "${provider.receipts[widget.id]?.totalPrice ?? 0}",
+                style: const TextStyle(
                   color: color1,
                   fontSize: 25,
                 ),

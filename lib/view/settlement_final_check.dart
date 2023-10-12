@@ -73,7 +73,7 @@ class _SettlementFinalCheckPage
                   ),
                 ),
                 Text(
-                  "${priceToString.format(provider.receipts.values.toList().map((receipt) => receipt.totalPrice).reduce((value, element) => (value ?? 0) + (element ?? 0)))}원",
+                  "${priceToString.format(provider.receipts.values.toList().map((receipt) => receipt.totalPrice).reduce((value, element) => value + element))}원",
                   style: const TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.w700,

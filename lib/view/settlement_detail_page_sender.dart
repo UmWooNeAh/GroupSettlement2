@@ -20,7 +20,7 @@ class _SettlementDetailPageSenderState
 
   @override
   Widget build(BuildContext context) {
-    final provider = ref.watch(stmCheckProvider.notifier);
+    final provider = ref.watch(stmCheckProvider);
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(),
