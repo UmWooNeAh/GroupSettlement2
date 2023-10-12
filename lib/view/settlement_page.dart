@@ -595,7 +595,7 @@ class _CustomBottomSheetState extends ConsumerState<CustomBottomSheet> {
                                         onPressed: () {
                                           Navigator.of(context).pop();
                                           context.go(
-                                              "/SettlementPage/SettlementFinalCheckPage");
+                                              "/SettlementPage/CompleteSettlementMatching");
                                         },
                                         style: OutlinedButton.styleFrom(
                                           backgroundColor: color1,
