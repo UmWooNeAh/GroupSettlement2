@@ -6,106 +6,55 @@ import 'dart:math' as math;
 import 'shared_basic_widget.dart';
 import '../viewmodel/SettlementViewModel.dart';
 
-class Informations {
-  List<String> receipts = [
-    "영수증1",
-    "영수증2",
-    "영수증3",
-  ];
-  List<double> receiptSize = [130, 130, 130];
-  List<String> members = [
-    "그룹원1",
-    "그룹원2",
-    "그룹원3",
-    "그룹원4",
-    "그룹원5",
-    "그룹원6",
-    "그룹원7",
-    "그룹원8",
-    "그룹원9",
-    "그룹원10",
-    "그룹원11",
-    "그룹원12",
-    "그룹원13",
-    "그룹원14",
-    "그룹원15",
-    "그룹원16",
-    "그룹원17",
-    "그룹원18",
-    "그룹원19",
-  ];
-  List<bool> receiptSelected = [false, false, false];
-  Informations();
-}
+class CheckSettlementPaper extends ChangeNotifier {
+  String selectedUserId = "default";
+  String selectedUserName = "전체 정산서";
 
-class Receiptss extends ChangeNotifier {
-  Informations information = Informations();
-
-  void selectedReceipt(index) {
-    information.receiptSize[index] = 260;
-    notifyListeners();
-  }
-
-  void disableReceipt(index) {
-    information.receiptSize[index] = 130;
-    notifyListeners();
-  }
-
-  void ableReceiptSelected(index) {
-    information.receiptSelected[index] = true;
-    notifyListeners();
-  }
-
-  void disableReceiptSelected(index) {
-    information.receiptSelected[index] = false;
+  void selectUser(userId, userName) {
+    selectedUserId = userId;
+    selectedUserName = userName;
     notifyListeners();
   }
 }
 
-class BottomSheetValue {
+class BottomSheetSlider extends ChangeNotifier {
   double currentHeight = 600;
   double previousHeight = 0;
   double closedHeight = 600;
   double openedHeight = 200;
   bool isOpen = false;
-  BottomSheetValue();
-}
-
-class BottomSheetSlider extends ChangeNotifier {
-  final BottomSheetValue bottomsheet = BottomSheetValue();
 
   void setBottomSheetSlider(initial, closed, opened) {
-    bottomsheet.currentHeight = initial;
-    bottomsheet.closedHeight = closed;
-    bottomsheet.openedHeight = opened;
+    currentHeight = initial;
+    closedHeight = closed;
+    openedHeight = opened;
   }
 
   void updateHeight(double updateHeight) {
-    bottomsheet.previousHeight = bottomsheet.currentHeight;
-
-    if (bottomsheet.currentHeight + updateHeight <= bottomsheet.openedHeight &&
-        bottomsheet.currentHeight + updateHeight >= bottomsheet.closedHeight) {
-      bottomsheet.currentHeight += updateHeight;
+    previousHeight = currentHeight;
+    if (currentHeight + updateHeight <= openedHeight &&
+        currentHeight + updateHeight >= closedHeight) {
+      currentHeight += updateHeight;
     }
     notifyListeners();
   }
 
   void updateOpenState() {
-    if (!bottomsheet.isOpen) {
-      if (bottomsheet.currentHeight - bottomsheet.previousHeight > 1.5 ||
-          bottomsheet.currentHeight - bottomsheet.closedHeight > 50) {
-        bottomsheet.isOpen = true;
-        bottomsheet.currentHeight = bottomsheet.openedHeight;
+    if (!isOpen) {
+      if (currentHeight - previousHeight > 1.5 ||
+          currentHeight - closedHeight > 50) {
+        isOpen = true;
+        currentHeight = openedHeight;
       } else {
-        bottomsheet.currentHeight = bottomsheet.closedHeight;
+        currentHeight = closedHeight;
       }
     } else {
-      if (bottomsheet.currentHeight - bottomsheet.previousHeight < -1.5 ||
-          bottomsheet.currentHeight - bottomsheet.openedHeight < -50) {
-        bottomsheet.isOpen = false;
-        bottomsheet.currentHeight = bottomsheet.closedHeight;
+      if (currentHeight - previousHeight < -1.5 ||
+          currentHeight - openedHeight < -50) {
+        isOpen = false;
+        currentHeight = closedHeight;
       } else {
-        bottomsheet.currentHeight = bottomsheet.openedHeight;
+        currentHeight = openedHeight;
       }
     }
     notifyListeners();
@@ -142,35 +91,31 @@ class ReadMore extends StateNotifier<double> {
   }
 }
 
-class Test {
-  Test();
-
-  bool isOpened = false;
-  int receiptIndex = -1;
-}
-
 class IsReceiptOpened extends ChangeNotifier {
-  final Test test = Test();
+  bool isOpened = false;
+  String receiptId = "default";
+  int count = 1;
 
-  void interaction() {
-    test.isOpened = !test.isOpened;
-    notifyListeners();
-  }
-
-  void seletedReceipt(index) {
-    test.receiptIndex = index;
+  void openManagement(id) {
+    if (receiptId != id || count.isEven) {
+      isOpened = true;
+      receiptId = id;
+      count = 1;
+    } else {
+      isOpened = false;
+      count++;
+    }
     notifyListeners();
   }
 }
 
+final checkSettlementPaperProvider =
+    ChangeNotifierProvider((ref) => CheckSettlementPaper());
+final bottomSheetSliderProvider =
+    ChangeNotifierProvider<BottomSheetSlider>((ref) => BottomSheetSlider());
+final readMoreProvider = StateNotifierProvider((ref) => ReadMore());
 final isReceiptOpenedProvider =
     ChangeNotifierProvider((ref) => IsReceiptOpened());
-
-final readMoreStateNotifierProvider =
-    StateNotifierProvider((ref) => ReadMore());
-
-final receiptssChangeNotifierProvider =
-    ChangeNotifierProvider((ref) => Receiptss());
 
 class SettlementPage extends ConsumerStatefulWidget {
   const SettlementPage({super.key});
@@ -179,79 +124,36 @@ class SettlementPage extends ConsumerStatefulWidget {
   ConsumerState<SettlementPage> createState() => _SettlementPageState();
 }
 
-final bottomSheetSliderChangeNotifierProviedr =
-    ChangeNotifierProvider<BottomSheetSlider>((ref) => BottomSheetSlider());
-
 class _SettlementPageState extends ConsumerState<SettlementPage> {
-  int i = 0;
+  bool isFirstBuild = true;
+  @override
+  void initState() {
+    super.initState();
+    isFirstBuild = true;
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    final bottomsheetValue = ref.watch(bottomSheetSliderChangeNotifierProviedr);
-    final viewmodel = ref.watch(stmProvider);
-    if (i == 0) {
-      bottomsheetValue.setBottomSheetSlider(0.0, 0.0, size.height * 0.7);
-      i++;
+    final bottomsheetprovider = ref.watch(bottomSheetSliderProvider);
+    // final providerMethod = ref.watch(stmProvider.notifier);
+
+    if (isFirstBuild) {
+      bottomsheetprovider.setBottomSheetSlider(0.0, 0.0, size.height * 0.7);
+      // providerMethod.settingSettlementViewModel("54d974c2-ea2a-4998-89a3-6d9cca52db80");
+      isFirstBuild = false;
     }
+
     return Scaffold(
       appBar: AppBar(),
-      body: Stack(
+      body: const Stack(
         children: [
-          SettlementInteractiveViewer(size: size),
-          SlidableAdderWidget(size: size),
-          GroupUserBar(size: size),
-          Positioned(
-            left: 50,
-            top: 100,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              padding: const EdgeInsets.all(20),
-              width: 300,
-              height: ref.watch(isReceiptOpenedProvider).test.isOpened
-                  ? size.height * 0.5
-                  : size.height * 0,
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Container(
-                      width: size.width,
-                      margin: const EdgeInsets.only(left: 10, bottom: 10),
-                      child: Text(
-                        "${viewmodel.receipts[ref.watch(isReceiptOpenedProvider).test.receiptIndex] ?? "Default Receipt Name"}",
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      width: 400,
-                      height: size.height * 0.5 - 80,
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: List.generate(10, (index) {
-                            return DragTarget(
-                              builder: (context, candidateData, rejectedData) {
-                                return SettlementPageReceiptItem(
-                                  receiptId: "awefwaef",
-                                  index: index,
-                                );
-                              },
-                            );
-                          }),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          ReadMoreWidget(size: size),
-          CustomBottomSheet(size: size),
+          SettlementInteractiveViewer(),
+          SlidableAdderWidget(),
+          GroupUserBar(),
+          ReceiptDetail(),
+          ReadMoreWidget(),
+          CustomBottomSheet(),
         ],
       ),
       bottomNavigationBar: const CustomBottomNavigationBar(
@@ -262,28 +164,91 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
   }
 }
 
+class ReceiptDetail extends ConsumerStatefulWidget {
+  const ReceiptDetail({super.key});
+
+  @override
+  ConsumerState<ReceiptDetail> createState() => _ReceiptDetailState();
+}
+
+class _ReceiptDetailState extends ConsumerState<ReceiptDetail> {
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    final provider = ref.watch(stmProvider);
+
+    return Positioned(
+      left: 50,
+      top: 100,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+        width: 300,
+        height:
+            ref.watch(isReceiptOpenedProvider).isOpened ? 350 : size.height * 0,
+        decoration: BoxDecoration(
+          color: Colors.grey[100],
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                width: size.width,
+                margin: const EdgeInsets.only(left: 10, bottom: 10),
+                child: Text(
+                  provider
+                          .receipts[
+                              ref.watch(isReceiptOpenedProvider).receiptId]
+                          ?.receiptName ??
+                      "Default Receipt Name",
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 300,
+                height: 270,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: List.generate(
+                        provider
+                                .receiptItems[ref
+                                    .watch(isReceiptOpenedProvider)
+                                    .receiptId]
+                                ?.length ??
+                            0, (index) {
+                      return SettlementPageReceiptItem(
+                        index: index,
+                      );
+                    }),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class ReadMoreWidget extends ConsumerStatefulWidget {
-  const ReadMoreWidget({super.key, required this.size});
-  final Size size;
+  const ReadMoreWidget({super.key});
 
   @override
   ConsumerState<ReadMoreWidget> createState() => _ReadMoreWidgetState();
 }
 
 class _ReadMoreWidgetState extends ConsumerState<ReadMoreWidget> {
-  late Size size;
-  @override
-  void initState() {
-    super.initState();
-    size = widget.size;
-  }
-
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     final provider = ref.watch(stmProvider);
     return Positioned(
       right: 0,
-      bottom: ref.watch(readMoreStateNotifierProvider) as double,
+      bottom: ref.watch(readMoreProvider) as double,
       child: Stack(
         children: [
           Container(
@@ -292,9 +257,7 @@ class _ReadMoreWidgetState extends ConsumerState<ReadMoreWidget> {
             color: Colors.transparent,
             child: GestureDetector(
               onTap: () {
-                ref
-                    .watch(readMoreStateNotifierProvider.notifier)
-                    .leaveReadMore();
+                ref.watch(readMoreProvider.notifier).leaveReadMore();
               },
             ),
           ),
@@ -303,20 +266,13 @@ class _ReadMoreWidgetState extends ConsumerState<ReadMoreWidget> {
             bottom: 100,
             child: DragTarget(
               onLeave: (data) {
-                ref
-                    .watch(readMoreStateNotifierProvider.notifier)
-                    .leaveReadMore();
+                ref.watch(readMoreProvider.notifier).leaveReadMore();
               },
               builder: (context, cadidateData, rejectedData) {
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
-                  height:
-                      ref.watch(readMoreStateNotifierProvider) as double == 0
-                          ? 300
-                          : 10,
-                  width: ref.watch(readMoreStateNotifierProvider) as double == 0
-                      ? 300
-                      : 300,
+                  height: ref.watch(readMoreProvider) as double == 0 ? 300 : 10,
+                  width: ref.watch(readMoreProvider) as double == 0 ? 300 : 300,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     color: const Color(0xFFF0F0F0),
@@ -370,39 +326,33 @@ class _ReadMoreWidgetState extends ConsumerState<ReadMoreWidget> {
 }
 
 class CustomBottomSheet extends ConsumerStatefulWidget {
-  const CustomBottomSheet({super.key, required this.size});
-  final Size size;
+  const CustomBottomSheet({super.key});
 
   @override
   ConsumerState<CustomBottomSheet> createState() => _CustomBottomSheetState();
 }
 
 class _CustomBottomSheetState extends ConsumerState<CustomBottomSheet> {
-  late Size size;
-  @override
-  void initState() {
-    super.initState();
-    size = widget.size;
-  }
-
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     final provider = ref.watch(stmProvider);
-    final bottomsheetValue = ref.watch(bottomSheetSliderChangeNotifierProviedr);
+    final bottomsheetprovider = ref.watch(bottomSheetSliderProvider);
+    final bottomsheetproviderMethod =
+        ref.watch(bottomSheetSliderProvider.notifier);
+    final checkprovider = ref.watch(checkSettlementPaperProvider);
+    final checkproviderMethod =
+        ref.watch(checkSettlementPaperProvider.notifier);
     return Positioned(
       bottom: 0,
       child: Column(
         children: [
           GestureDetector(
             onVerticalDragUpdate: (details) {
-              ref
-                  .watch(bottomSheetSliderChangeNotifierProviedr.notifier)
-                  .updateHeight(-details.delta.dy);
+              bottomsheetproviderMethod.updateHeight(-details.delta.dy);
             },
             onVerticalDragEnd: (details) {
-              ref
-                  .watch(bottomSheetSliderChangeNotifierProviedr.notifier)
-                  .updateOpenState();
+              bottomsheetproviderMethod.updateOpenState();
             },
             child: Container(
               height: 60,
@@ -431,7 +381,7 @@ class _CustomBottomSheetState extends ConsumerState<CustomBottomSheet> {
                       )),
                   Align(
                     alignment: Alignment.topCenter,
-                    child: bottomsheetValue.bottomsheet.isOpen
+                    child: bottomsheetprovider.isOpen
                         ? const Icon(Icons.keyboard_arrow_down_outlined)
                         : const Icon(Icons.keyboard_arrow_up_outlined),
                   ),
@@ -441,24 +391,20 @@ class _CustomBottomSheetState extends ConsumerState<CustomBottomSheet> {
           ),
           GestureDetector(
             onVerticalDragUpdate: (details) {
-              ref
-                  .watch(bottomSheetSliderChangeNotifierProviedr.notifier)
-                  .updateHeight(-details.delta.dy);
+              bottomsheetproviderMethod.updateHeight(-details.delta.dy);
             },
             onVerticalDragEnd: (details) {
-              ref
-                  .watch(bottomSheetSliderChangeNotifierProviedr.notifier)
-                  .updateOpenState();
+              bottomsheetproviderMethod.updateOpenState();
             },
             child: AnimatedContainer(
-              duration: (bottomsheetValue.bottomsheet.currentHeight -
-                              bottomsheetValue.bottomsheet.previousHeight)
+              duration: (bottomsheetprovider.currentHeight -
+                              bottomsheetprovider.previousHeight)
                           .abs() >
                       5
                   ? const Duration(milliseconds: 400)
                   : const Duration(milliseconds: 0),
               curve: Curves.decelerate,
-              height: bottomsheetValue.bottomsheet.currentHeight,
+              height: bottomsheetprovider.currentHeight,
               width: size.width,
               color: Colors.white,
               child: SingleChildScrollView(
@@ -492,41 +438,59 @@ class _CustomBottomSheetState extends ConsumerState<CustomBottomSheet> {
                                       1 + provider.settlementUsers.length,
                                       (index) {
                                     if (index < 1) {
-                                      return Padding(
-                                        padding: const EdgeInsets.fromLTRB(
-                                            0, 15, 15, 0),
-                                        child: Column(
-                                          children: [
-                                            ClipOval(
-                                              child: Container(
-                                                height: 50,
-                                                width: 50,
-                                                color: color1,
+                                      return GestureDetector(
+                                        onTap: () {
+                                          checkproviderMethod.selectUser(
+                                              "default", "전체 정산서");
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.fromLTRB(
+                                              0, 15, 15, 0),
+                                          child: Column(
+                                            children: [
+                                              ClipOval(
+                                                child: Container(
+                                                  height: 50,
+                                                  width: 50,
+                                                  color: color1,
+                                                ),
                                               ),
-                                            ),
-                                            const SizedBox(
-                                              height: 15,
-                                            ),
-                                            const Text("전체 정산서"),
-                                          ],
+                                              const SizedBox(
+                                                height: 15,
+                                              ),
+                                              const Text("전체 정산서"),
+                                            ],
+                                          ),
                                         ),
                                       );
                                     } else {
-                                      return Column(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(15.0),
-                                            child: ClipOval(
-                                              child: Container(
-                                                height: 50,
-                                                width: 50,
-                                                color: Colors.black54,
+                                      return GestureDetector(
+                                        onTap: () {
+                                          checkproviderMethod.selectUser(
+                                              provider
+                                                  .settlementUsers[index - 1]
+                                                  .serviceUserId,
+                                              provider
+                                                  .settlementUsers[index - 1]
+                                                  .name);
+                                        },
+                                        child: Column(
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(15.0),
+                                              child: ClipOval(
+                                                child: Container(
+                                                  height: 50,
+                                                  width: 50,
+                                                  color: Colors.black54,
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          Text(
-                                              "${provider.settlementUsers[index - 1].name}"),
-                                        ],
+                                            Text(
+                                                "${provider.settlementUsers[index - 1].name}"),
+                                          ],
+                                        ),
                                       );
                                     }
                                   }),
@@ -545,80 +509,17 @@ class _CustomBottomSheetState extends ConsumerState<CustomBottomSheet> {
                             Container(
                               width: size.width,
                               padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-                              child: const Text(
-                                "전체 정산서",
-                                style: TextStyle(
+                              child: Text(
+                                checkprovider.selectedUserName,
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 20,
                                 ),
                               ),
                             ),
-                            Container(
-                                height: 300,
-                                width: size.width,
-                                padding: const EdgeInsets.all(10),
-                                child: SingleChildScrollView(
-                                  child: Column(
-                                    children: List.generate(10, (index) {
-                                      return Padding(
-                                        padding: const EdgeInsets.all(15),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Container(
-                                              margin: const EdgeInsets.only(
-                                                  left: 20),
-                                              width: 80,
-                                              child: const Text(
-                                                "",
-                                                style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w500,
-                                                ),
-                                              ),
-                                            ),
-                                            Text.rich(
-                                              TextSpan(
-                                                children: [
-                                                  const TextSpan(
-                                                    text: "짜장면 ",
-                                                    style: TextStyle(
-                                                      fontSize: 15,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                    ),
-                                                  ),
-                                                  TextSpan(
-                                                    text: "등 $index 메뉴",
-                                                    style: const TextStyle(
-                                                      fontSize: 15,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Colors.grey,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            Container(
-                                              margin: const EdgeInsets.only(
-                                                  right: 20),
-                                              child: Text(
-                                                "${priceToString.format(10000)}원",
-                                                style: const TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: color2,
-                                                ),
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      );
-                                    }),
-                                  ),
-                                )),
+                            Text(
+                                "${checkprovider.selectedUserId == "default" ? provider.finalSettlement.length : provider.settlementPapers[checkprovider.selectedUserId]?.settlementItems.length ?? "null"}"),
+                            const CheckSettlementPaperWidget(),
                           ],
                         ),
                         const Divider(
@@ -658,8 +559,92 @@ class _CustomBottomSheetState extends ConsumerState<CustomBottomSheet> {
                           width: size.width,
                           child: OutlinedButton(
                             onPressed: () {
-                              context.go(
-                                  "/SettlementPage/SettlementFinalCheckPage");
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) => AlertDialog(
+                                  backgroundColor: Colors.white,
+                                  surfaceTintColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  contentPadding: const EdgeInsets.all(10),
+                                  contentTextStyle: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                  content: const SizedBox(
+                                    height: 50,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text("정산은 이 정산서 대로 저장됩니다."),
+                                        Text("정산을 완료 하시겠습니까?"),
+                                      ],
+                                    ),
+                                  ),
+                                  actionsPadding:
+                                      const EdgeInsets.fromLTRB(10, 0, 10, 10),
+                                  actions: [
+                                    Container(
+                                      margin: const EdgeInsets.only(bottom: 10),
+                                      height: 50,
+                                      width: size.width,
+                                      child: OutlinedButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                          context.go(
+                                              "/SettlementPage/SettlementFinalCheckPage");
+                                        },
+                                        style: OutlinedButton.styleFrom(
+                                          backgroundColor: color1,
+                                          side: const BorderSide(
+                                            color: color1,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                        ),
+                                        child: const Text(
+                                          "정산 완료하기",
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 50,
+                                      width: size.width,
+                                      child: OutlinedButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        style: OutlinedButton.styleFrom(
+                                          backgroundColor: Colors.transparent,
+                                          side: const BorderSide(
+                                            color: Colors.grey,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                        ),
+                                        child: const Text(
+                                          "취소",
+                                          style: TextStyle(
+                                              fontSize: 15,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.black),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
                             },
                             style: OutlinedButton.styleFrom(
                               backgroundColor: color2,
@@ -690,9 +675,113 @@ class _CustomBottomSheetState extends ConsumerState<CustomBottomSheet> {
   }
 }
 
+class CheckSettlementPaperWidget extends ConsumerStatefulWidget {
+  const CheckSettlementPaperWidget({super.key});
+
+  @override
+  ConsumerState<CheckSettlementPaperWidget> createState() =>
+      _CheckSettlementPaperWidgetState();
+}
+
+class _CheckSettlementPaperWidgetState
+    extends ConsumerState<CheckSettlementPaperWidget> {
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    final provider = ref.watch(stmProvider);
+    final checkprovider = ref.watch(checkSettlementPaperProvider);
+    return Container(
+      height: 300,
+      width: size.width,
+      padding: const EdgeInsets.all(10),
+      child: SingleChildScrollView(
+        child: Column(
+          children: List.generate(
+              checkprovider.selectedUserId == "default"
+                  ? provider.finalSettlement.length
+                  : provider.settlementPapers[checkprovider.selectedUserId]
+                          ?.settlementItems.length ??
+                      0, (index) {
+            String userId = provider.finalSettlement[index];
+            return Padding(
+              padding: const EdgeInsets.all(15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    margin: const EdgeInsets.only(left: 20),
+                    width: 80,
+                    child: Text(
+                      checkprovider.selectedUserId == "default"
+                          ? provider.finalSettlement[index]
+                          : provider
+                                  .settlementItems[checkprovider.selectedUserId]
+                                      ?[index]
+                                  .menuName ??
+                              "menu",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: checkprovider.selectedUserId == "default"
+                              ? provider.settlementItems[userId] == null
+                                  ? "menu"
+                                  : provider
+                                      .settlementItems[userId]![0].menuName
+                              : provider
+                                      .settlementItems[
+                                          checkprovider.selectedUserId]?[index]
+                                      .menuName ??
+                                  "menu$index",
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        TextSpan(
+                          text: checkprovider.selectedUserId == "default"
+                              ? "등 ${provider.settlementItems[checkprovider.selectedUserId]?.length ?? 0} 메뉴"
+                              : "",
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.only(right: 20),
+                    child: Text(
+                      checkprovider.selectedUserId == "default"
+                          ? "${priceToString.format(provider.settlementPapers[userId]?.totalPrice ?? 0)}원"
+                          : "${priceToString.format(provider.settlementPapers[userId]?.totalPrice ?? 0)}원",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                        color: color2,
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            );
+          }),
+        ),
+      ),
+    );
+  }
+}
+
 class SettlementInteractiveViewer extends ConsumerStatefulWidget {
-  const SettlementInteractiveViewer({super.key, required this.size});
-  final Size size;
+  const SettlementInteractiveViewer({super.key});
 
   @override
   ConsumerState<SettlementInteractiveViewer> createState() =>
@@ -701,15 +790,9 @@ class SettlementInteractiveViewer extends ConsumerStatefulWidget {
 
 class _SettlementInteractiveViewerState
     extends ConsumerState<SettlementInteractiveViewer> {
-  late Size size;
-  @override
-  void initState() {
-    super.initState();
-    size = widget.size;
-  }
-
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     final provider = ref.watch(stmProvider);
     return InteractiveViewer(
       minScale: 0.25,
@@ -768,24 +851,17 @@ class _SettlementInteractiveViewerState
 }
 
 class GroupUserBar extends ConsumerStatefulWidget {
-  const GroupUserBar({super.key, required this.size});
-  final Size size;
+  const GroupUserBar({super.key});
 
   @override
   ConsumerState<GroupUserBar> createState() => _GroupUserBarState();
 }
 
 class _GroupUserBarState extends ConsumerState<GroupUserBar> {
-  late Size size;
-  @override
-  void initState() {
-    super.initState();
-    size = widget.size;
-  }
-
   @override
   Widget build(BuildContext context) {
-    final provider = ref.watch(stmProvider.notifier);
+    Size size = MediaQuery.of(context).size;
+    final provider = ref.watch(stmProvider);
     return Positioned(
       bottom: 40,
       child: Container(
@@ -815,9 +891,7 @@ class _GroupUserBarState extends ConsumerState<GroupUserBar> {
                   ),
                   child: TextButton(
                     onPressed: () {
-                      ref
-                          .watch(readMoreStateNotifierProvider.notifier)
-                          .clickReadMore();
+                      ref.watch(readMoreProvider.notifier).clickReadMore();
                     },
                     child: const Text(
                       "자세히보기 >",
@@ -851,8 +925,7 @@ class _GroupUserBarState extends ConsumerState<GroupUserBar> {
 }
 
 class SlidableAdderWidget extends ConsumerStatefulWidget {
-  const SlidableAdderWidget({super.key, required this.size});
-  final Size size;
+  const SlidableAdderWidget({super.key});
 
   @override
   ConsumerState<SlidableAdderWidget> createState() =>
@@ -862,15 +935,9 @@ class SlidableAdderWidget extends ConsumerStatefulWidget {
 class _SlidableAdderWidgetState extends ConsumerState<SlidableAdderWidget> {
   final slidableAdderStateNotifierProvider =
       StateNotifierProvider((ref) => SlidableAdder());
-  late Size size;
-  @override
-  void initState() {
-    super.initState();
-    size = widget.size;
-  }
-
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
     return Positioned(
       top: size.height / 3,
       right: ref.watch(slidableAdderStateNotifierProvider) as double,
@@ -915,10 +982,8 @@ class _SlidableAdderWidgetState extends ConsumerState<SlidableAdderWidget> {
 }
 
 class SettlementPageReceiptItem extends ConsumerStatefulWidget {
-  const SettlementPageReceiptItem(
-      {super.key, required this.receiptId, required this.index});
+  const SettlementPageReceiptItem({super.key, required this.index});
   final int index;
-  final String receiptId;
 
   @override
   ConsumerState<SettlementPageReceiptItem> createState() =>
@@ -927,195 +992,311 @@ class SettlementPageReceiptItem extends ConsumerStatefulWidget {
 
 class _SettlementPageReceiptItemState
     extends ConsumerState<SettlementPageReceiptItem> {
-  bool selected = false;
+  bool isSelected = false;
+  bool dragTargeted = false;
   PageController pageController = PageController();
+  late int index;
+  @override
+  void initState() {
+    super.initState();
+    index = widget.index;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final provider = ref.watch(stmProvider.notifier);
+    final provider = ref.watch(stmProvider);
+    final openedprovider = ref.watch(isReceiptOpenedProvider);
     return Column(
       children: [
         GestureDetector(
           onTap: () {
             setState(() {
-              selected = !selected;
+              isSelected = !isSelected;
             });
           },
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 400),
-            height: selected ? 190 : 60,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.white,
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0xFFCCCCCC),
-                    offset: Offset(0, 2),
-                    spreadRadius: 1,
-                    blurRadius: 3,
-                  ),
-                ]),
-            child: selected
-                ? SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 5),
-                              child: const Text(
-                                "provider!.receiptItems[widget.receiptId]![widget.index]",
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 5),
-                              child: const Text(
-                                "6000원",
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Container(
-                          height: 160,
-                          padding: const EdgeInsets.all(10),
-                          child: PageView(
-                            controller: pageController,
-                            children: List.generate(4, (ndex) {
-                              return Column(
-                                children: List.generate(2, (index) {
-                                  return Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    children: List.generate(4, (iindex) {
-                                      return Container(
-                                        margin: const EdgeInsets.fromLTRB(
-                                            10, 0, 10, 10),
-                                        height: 55,
-                                        width: 35,
-                                        child: Stack(
-                                          children: [
-                                            Positioned(
-                                              top: 10,
-                                              child: ClipOval(
-                                                child: Container(
-                                                  height: 30,
-                                                  width: 30,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                            ),
-                                            Positioned(
-                                              top: 40,
-                                              child: SizedBox(
-                                                width: 30,
-                                                child: Text(
-                                                  "${index * 4 + iindex}",
-                                                  style: const TextStyle(
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.w400,
-                                                  ),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                              ),
-                                            ),
-                                            Positioned(
-                                              left: 20,
-                                              top: 3,
-                                              child: GestureDetector(
-                                                onTap: () {},
-                                                child: const SizedBox(
-                                                  height: 5,
-                                                  width: 5,
-                                                  child: Icon(
-                                                    Icons.close,
-                                                    size: 15,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    }),
-                                  );
-                                }),
-                              );
-                            }),
-                          ),
-                        )
-                      ],
+          child: DragTarget(
+            onWillAccept: (data) {
+              dragTargeted = !dragTargeted;
+              return true;
+            },
+            onLeave: (data) {
+              dragTargeted = !dragTargeted;
+            },
+            onAccept: (String data) {
+              dragTargeted = !dragTargeted;
+              provider.addSettlementItem(
+                  openedprovider.receiptId,
+                  index,
+                  provider.receiptItems[openedprovider.receiptId]?[index]
+                          .receiptItemId ??
+                      "default",
+                  data);
+            },
+            builder: (context, candidateData, rejectedData) {
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                height: isSelected ? 190 : 60,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: dragTargeted ? Colors.black26 : Colors.white,
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0xFFCCCCCC),
+                      offset: Offset(0, 2),
+                      spreadRadius: 1,
+                      blurRadius: 3,
                     ),
-                  )
-                : Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 5),
-                            child: const Text(
-                              "짜장면",
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 5),
-                            child: const Text(
-                              "6000원",
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 10),
-                            child: Row(
-                              children: List.generate(4, (index) {
-                                return Container(
-                                  margin:
-                                      const EdgeInsets.symmetric(horizontal: 2),
-                                  child: const Text(
-                                    "박건우",
-                                    style: TextStyle(
-                                      fontSize: 15,
+                  ],
+                ),
+                child: isSelected
+                    ? SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 5),
+                                  child: Text(
+                                    provider
+                                            .receiptItems[openedprovider
+                                                .receiptId]?[index]
+                                            .menuName ??
+                                        "menu",
+                                    style: const TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                                );
-                              }),
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 5),
+                                  child: Text(
+                                    "${priceToString.format(provider.receiptItems[openedprovider.receiptId]?[index].menuPrice ?? 0)} 원",
+                                    style: const TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
+                            Container(
+                              height: 150,
+                              padding: const EdgeInsets.all(5),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: PageView(
+                                      controller: pageController,
+                                      children: List.generate(
+                                        (provider
+                                                        .receiptItems[
+                                                            openedprovider
+                                                                .receiptId]
+                                                            ?[index]
+                                                        .serviceUsers
+                                                        .length ??
+                                                    0 - 1) ~/
+                                                8 +
+                                            1,
+                                        (ndex) {
+                                          return Column(
+                                            children: List.generate(
+                                              math.min(
+                                                  2,
+                                                  (provider
+                                                                  .receiptItems[
+                                                                      openedprovider
+                                                                          .receiptId]
+                                                                      ?[index]
+                                                                  .serviceUsers
+                                                                  .length ??
+                                                              0 -
+                                                                  1 -
+                                                                  ndex * 8) ~/
+                                                          4 +
+                                                      1),
+                                              (index) {
+                                                return Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: List.generate(
+                                                    math.min(
+                                                        4,
+                                                        ((provider
+                                                                .receiptItems[
+                                                                    openedprovider
+                                                                        .receiptId]
+                                                                    ?[index]
+                                                                .serviceUsers
+                                                                .length) ??
+                                                            0 -
+                                                                8 * ndex -
+                                                                4 * index)),
+                                                    (iindex) {
+                                                      return Container(
+                                                        margin: const EdgeInsets
+                                                            .fromLTRB(
+                                                            10, 0, 10, 10),
+                                                        height: 60,
+                                                        width: 35,
+                                                        child: Stack(
+                                                          children: [
+                                                            Positioned(
+                                                              top: 10,
+                                                              child: ClipOval(
+                                                                child:
+                                                                    Container(
+                                                                  height: 30,
+                                                                  width: 30,
+                                                                  color: Colors
+                                                                      .grey,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Positioned(
+                                                              top: 40,
+                                                              child: SizedBox(
+                                                                width: 30,
+                                                                child: Text(
+                                                                  "${ndex * 8 + index * 4 + iindex + 1}",
+                                                                  style:
+                                                                      const TextStyle(
+                                                                    fontSize:
+                                                                        15,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400,
+                                                                  ),
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            Positioned(
+                                                              left: 20,
+                                                              top: 3,
+                                                              child:
+                                                                  GestureDetector(
+                                                                onTap: () {},
+                                                                child:
+                                                                    const SizedBox(
+                                                                  height: 5,
+                                                                  width: 5,
+                                                                  child: Icon(
+                                                                    Icons.close,
+                                                                    size: 15,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      );
+                                                    },
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 30,
+                                    height: 150,
+                                    child: Align(
+                                      alignment: const Alignment(0, 0.3),
+                                      child: Text(
+                                        "${provider.receiptItems[openedprovider.receiptId]?[index].serviceUsers.length ?? 0} 명",
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      )
+                    : Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 5),
+                                child: Text(
+                                  provider
+                                          .receiptItems[
+                                              openedprovider.receiptId]?[index]
+                                          .menuName ??
+                                      "menu",
+                                  style: const TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 5),
+                                child: Text(
+                                  "${priceToString.format(provider.receiptItems[openedprovider.receiptId]?[index].menuPrice ?? 0)} 원",
+                                  style: const TextStyle(
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                          Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 10),
-                            child: const Text(
-                              "${3}명",
-                              style: TextStyle(fontSize: 15),
-                            ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                child: Row(
+                                  children: List.generate(
+                                      provider
+                                              .receiptItems[openedprovider
+                                                  .receiptId]?[index]
+                                              .serviceUsers
+                                              .length ??
+                                          0, (index) {
+                                    return Container(
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 2),
+                                      child: const Text(
+                                        "박건우",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                    );
+                                  }),
+                                ),
+                              ),
+                              Container(
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                child: Text(
+                                  "${provider.receiptItems[openedprovider.receiptId]?[index].serviceUsers.length ?? 0}명",
+                                  style: const TextStyle(fontSize: 15),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ],
-                  ),
+              );
+            },
           ),
         ),
         const SizedBox(
@@ -1138,8 +1319,9 @@ class SettlementPageReceipt extends ConsumerStatefulWidget {
 }
 
 class _SettlementPageReceiptState extends ConsumerState<SettlementPageReceipt> {
-  late int index;
   late String id;
+  late int index;
+  bool isSelected = false;
   @override
   void initState() {
     super.initState();
@@ -1154,54 +1336,27 @@ class _SettlementPageReceiptState extends ConsumerState<SettlementPageReceipt> {
       top: 10,
       left: index * 120 + 10,
       child: GestureDetector(
-        onTapDown: (details) {
-          ref
-              .watch(receiptssChangeNotifierProvider.notifier)
-              .ableReceiptSelected(index);
-        },
-        onTapUp: (details) {
-          ref
-              .watch(receiptssChangeNotifierProvider.notifier)
-              .disableReceiptSelected(index);
-          ref.watch(isReceiptOpenedProvider.notifier).interaction();
-          ref.watch(isReceiptOpenedProvider.notifier).seletedReceipt(index);
-        },
-        onTapCancel: () {
-          ref
-              .watch(receiptssChangeNotifierProvider.notifier)
-              .disableReceiptSelected(index);
+        onTap: () {
+          isSelected = !isSelected;
+          ref.watch(isReceiptOpenedProvider.notifier).openManagement(id);
         },
         child: DragTarget(
           onWillAccept: (data) {
-            ref
-                .watch(receiptssChangeNotifierProvider.notifier)
-                .ableReceiptSelected(index);
+            isSelected = !isSelected;
             return true;
           },
           onLeave: (data) {
-            ref
-                .watch(receiptssChangeNotifierProvider.notifier)
-                .disableReceiptSelected(index);
+            isSelected = !isSelected;
           },
           onAccept: (data) {
-            ref
-                .watch(receiptssChangeNotifierProvider.notifier)
-                .disableReceiptSelected(index);
+            isSelected = !isSelected;
           },
           builder: (context, candidateData, rejectedData) {
             return Container(
               width: 100,
-              height: ref
-                  .watch(receiptssChangeNotifierProvider.notifier)
-                  .information
-                  .receiptSize[index],
+              height: 120,
               decoration: BoxDecoration(
-                color: (ref
-                        .watch(receiptssChangeNotifierProvider)
-                        .information
-                        .receiptSelected[index])
-                    ? Colors.black26
-                    : Colors.white,
+                color: isSelected ? Colors.black26 : Colors.white,
                 boxShadow: const [
                   BoxShadow(
                     color: Colors.grey,
@@ -1221,8 +1376,56 @@ class _SettlementPageReceiptState extends ConsumerState<SettlementPageReceipt> {
                       borderRadius: BorderRadius.circular(100),
                     ),
                   ),
-                  Text(provider.receipts[id]?.receiptName ??
-                      "Default Receipt Name"),
+                  Text(
+                    provider.receipts[id]?.receiptName ??
+                        "Default Receipt Name",
+                  ),
+                  RichText(
+                    text: TextSpan(
+                      style: DefaultTextStyle.of(context).style,
+                      children: [
+                        TextSpan(
+                          text: provider.receiptItems[id]?[0].menuName ?? "영수증",
+                          style: const TextStyle(
+                            fontSize: 9,
+                          ),
+                        ),
+                        TextSpan(
+                          text:
+                              " 등 ${provider.receipts[widget.id]?.receiptItems.length ?? "X"} 항목",
+                          style: TextStyle(
+                            fontSize: 9,
+                            color: Colors.grey[600],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      const Row(),
+                      Text(
+                        " 등 ${provider.receiptItems[id]?[0].serviceUsers.length ?? "X"} 항목",
+                        style: TextStyle(
+                          fontSize: 9,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Text(
+                    "합계 금액",
+                    style: TextStyle(
+                      fontSize: 11,
+                    ),
+                  ),
+                  Text(
+                    "${priceToString.format((provider.receiptItems[id] == null) ? 0 : provider.receiptItems[id]!.map((receiptItem) => receiptItem.menuPrice).reduce((value, element) => (value ?? 0) + (element ?? 0)))}원",
+                    style: const TextStyle(
+                      fontSize: 15,
+                      color: color1,
+                    ),
+                  ),
                 ],
               ),
             );
@@ -1241,13 +1444,13 @@ class SettlementPageGroupUser extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = ref.watch(stmProvider.notifier);
+    final provider = ref.watch(stmProvider);
     return GestureDetector(
       child: LongPressDraggable(
         delay: const Duration(
           milliseconds: 300,
         ),
-        data: 1,
+        data: provider.settlementUsers[index].serviceUserId,
         childWhenDragging: Column(
           children: [
             Padding(
@@ -1259,10 +1462,7 @@ class SettlementPageGroupUser extends ConsumerWidget {
             ),
             SizedBox(
               height: 30,
-              child: Text(ref
-                  .watch(receiptssChangeNotifierProvider.notifier)
-                  .information
-                  .members[index]),
+              child: Text(provider.settlementUsers[index].name ?? "그룹원"),
             ),
           ],
         ),
