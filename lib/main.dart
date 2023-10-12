@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:groupsettlement2/view/complete_settlement_matching.dart';
 import 'package:groupsettlement2/view/groupMainPage.dart';
 import 'package:groupsettlement2/view/group_create_page.dart';
 import 'package:groupsettlement2/view/group_select_page.dart';
@@ -139,6 +140,12 @@ final GoRouter _router = GoRouter(
             return const SettlementPage();
           },
           routes: <RouteBase>[
+            GoRoute(
+              path: 'CompleteSettlementMatching',
+              builder: (context, state) {
+                return const CompleteSettlementMatching();
+              },
+            ),
             GoRoute(
                 path: 'SettlementFinalCheckPage',
                 builder: (context, state) {

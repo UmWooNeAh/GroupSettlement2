@@ -16,6 +16,7 @@ final stmProvider = ChangeNotifierProvider<SettlementViewModel>(
 
 class SettlementViewModel extends ChangeNotifier{
   // Information
+  Group                              group            = Group();
   Settlement                         settlement       = Settlement();
   List<ServiceUser>                  settlementUsers = <ServiceUser> [];
   Map<String, Receipt>               receipts         = <String, Receipt> {};
@@ -33,7 +34,7 @@ class SettlementViewModel extends ChangeNotifier{
 
   void _settingSettlementViewModel(String settlementId) async {
     settlement = await Settlement().getSettlementBySettlementId(settlementId);
-    Group group = await Group().getGroupByGroupId(settlement.groupId!);
+    group = await Group().getGroupByGroupId(settlement.groupId!);
     //log("정산 이름: ${settlement.settlementName}");
     //정산자 제외하고 그룹의 유저 목록 불러오기
 
