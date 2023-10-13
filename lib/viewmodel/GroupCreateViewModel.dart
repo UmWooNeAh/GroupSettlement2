@@ -23,6 +23,7 @@ class GroupCreateViewModel extends ChangeNotifier {
 
   void _settingGroupViewModel(String userId) async {
     userData = await ServiceUser().getUserByUserId(userId);
+    serviceUsers.add(userData);
     notifyListeners();
   }
 
@@ -60,6 +61,7 @@ class GroupCreateViewModel extends ChangeNotifier {
 
   void createGroup(String groupname) async {
     group.groupName = groupname;
+
     for(var user in serviceUsers) {
       group.serviceUsers.add(user.serviceUserId!);
       if(user.kakaoId == null) { // 직접 추가하기로 추가한 그룹원
