@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../class/class_user.dart';
 import '../design_element.dart';
@@ -14,11 +15,11 @@ class groupCreatePage extends ConsumerStatefulWidget {
 }
 
 class _groupCreatePageState extends ConsumerState<groupCreatePage> {
+  String? inputGroupName;
+  String? inputName;
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    String inputName = "";
-    String inputGroupName = "";
     final gvm = ref.watch(groupProvider);
     return Scaffold(
       appBar: AppBar(),
@@ -99,7 +100,7 @@ class _groupCreatePageState extends ConsumerState<groupCreatePage> {
                               TextSpan(
                                   children: [
                                     TextSpan(
-                                        text:"${gvm.group.serviceUsers.length.toString()} ",
+                                        text:"${gvm.serviceUsers.length.toString()} ",
                                         style: TextStyle(
                                           color: Color(0xFF07BEB8),
                                           fontSize: 20,
@@ -139,7 +140,62 @@ class _groupCreatePageState extends ConsumerState<groupCreatePage> {
                                 return Row(
                                   children: List.generate(4, (innerIndex) {
                                     try {
-                                      return oneUser(flag: false,user: gvm.directedUsers[index*4+innerIndex]);
+                                      ServiceUser user = gvm.serviceUsers[index * 4 + innerIndex];
+                                      bool flag = user.kakaoId == null ? true : false;
+
+                                      return Padding(
+                                        padding: const EdgeInsets.only(left:35),
+                                        child: Stack(
+                                          children: [
+                                            SizedBox(
+                                              width: 60,
+                                              height: 122,
+                                              child:
+                                              Column(
+                                                children: [
+                                                  Container(
+                                                    width: 60,
+                                                    height: 60,
+                                                    decoration: ShapeDecoration(
+                                                      color: Color(0xFF838383),
+                                                      shape: OvalBorder(),
+                                                    ),
+                                                  ),
+                                                  SizedBox(height:5),
+                                                  Text(user.name!,
+                                                      style:TextStyle(
+                                                          fontWeight: FontWeight.w600,
+                                                          fontSize: 15
+                                                      )
+                                                  ),
+                                                  Text(flag ? "직접 추가함" : "",
+                                                      style:TextStyle(
+                                                        fontSize: 10,
+                                                        color: Color(0xFF838383),
+                                                      )
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(bottom:20,left:45),
+                                              child: GestureDetector(
+                                                  onTap:(){
+                                                    gvm.serviceUsers.remove(user);
+                                                    setState(() {});
+                                                  },
+                                                  child: Text("X",
+                                                      style: TextStyle(
+                                                          fontSize: 23,
+                                                          fontWeight: FontWeight.w600
+                                                      )
+                                                  )
+                                              ),
+                                            )
+                                          ],
+
+                                        ),
+                                      );
                                     } on RangeError catch (e) {
                                       return SizedBox.shrink();
                                     }
@@ -221,7 +277,17 @@ class _groupCreatePageState extends ConsumerState<groupCreatePage> {
                                           Navigator.of(context).pop();
                                           setState(() {
                                             ServiceUser user = ServiceUser();
-                                            gvm.addByDirect(inputName);
+                                            if(inputName != null) {
+                                              gvm.addByDirect(inputName!);
+                                            } else{
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                //SnackBar 구현하는법 context는 위에 BuildContext에 있는 객체를 그대로 가져오면 됨.
+                                                  SnackBar(
+                                                    content: Text('사용자명은 공백이 될 수 없습니다'), //snack bar의 내용. icon, button같은것도 가능하다.
+                                                    duration: Duration(seconds: 3), //올라와있는 시간
+                                                  )
+                                              );
+                                            }
                                           });
                                         },
                                         style: OutlinedButton.styleFrom(
@@ -298,7 +364,36 @@ class _groupCreatePageState extends ConsumerState<groupCreatePage> {
                             ),
                             child:GestureDetector(
                               onTap: (){
-                                gvm.createGroup(inputGroupName);
+                                if(inputGroupName == null){
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('그룹명은 공백이 될 수 없습니다'),
+                                        duration: Duration(seconds: 3),
+                                      )
+                                  );
+                                } else {
+                                  gvm.createGroup(inputGroupName!);
+                                  showDialog(
+                                      context: context,
+                                      barrierDismissible: false,
+                                      builder: (BuildContext ctx){
+                                        return AlertDialog(
+                                            content: Text("성공적으로 그룹이 생성되었습니다."),
+                                            actions:[
+                                              Center(
+                                                  child: ElevatedButton(
+                                                    child: Text("확인"),
+                                                    onPressed: (){
+                                                      gvm.settingGroupViewModel(gvm.userData.serviceUserId!);
+                                                      context.pushReplacement("/groupSelectPage");
+                                                    },
+                                                  )
+                                              )
+                                            ]
+                                        );
+                                      }
+                                  );
+                                }
                               },
                               child: Center(
                                   child: Text("그룹 생성하기",
@@ -326,8 +421,8 @@ class _groupCreatePageState extends ConsumerState<groupCreatePage> {
 class oneUser extends StatefulWidget {
   final bool flag;
   final ServiceUser user;
-
-  const oneUser({Key? key, required this.flag, required this.user}) : super(key: key);
+  final GroupCreateViewModel gvm;
+  const oneUser({Key? key, required this.flag, required this.user,required this.gvm}) : super(key: key);
 
   @override
   State<oneUser> createState() => _oneUserState();
@@ -338,38 +433,54 @@ class _oneUserState extends State<oneUser> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left:35),
-      child: Container(
-        width: 60,
-        height: 122,
-        child:
-        Column(
-          children: [
-            Container(
-              width: 60,
-              height: 60,
-              decoration: ShapeDecoration(
-                color: Color(0xFF838383),
-                shape: OvalBorder(),
-              ),
-            ),
-            SizedBox(height:5),
-            Text(widget.user.name!,
-                style:TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15
+      child: Stack(
+        children: [
+          Container(
+            width: 60,
+            height: 122,
+            child:
+            Column(
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFF838383),
+                    shape: OvalBorder(),
+                  ),
+                ),
+                SizedBox(height:5),
+                Text(widget.user.name!,
+                    style:TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 15
+                    )
+                ),
+                Text(widget.flag ? "직접 추가함" : "",
+                    style:TextStyle(
+                      fontSize: 10,
+                      color: Color(0xFF838383),
+                    )
                 )
+              ],
             ),
-            Text(widget.flag ? "직접 추가함" : "",
-                style:TextStyle(
-                  fontSize: 10,
-                  color: Color(0xFF838383),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom:20,left:45),
+            child: GestureDetector(
+              onTap:(){
+                widget.gvm.serviceUsers.removeWhere((element) => element.name == widget.user.name);
+              },
+              child: Text("X",
+                style: TextStyle(
+                  fontSize: 23,
+                  fontWeight: FontWeight.w600
                 )
-            )
-          ],
+              )
+            ),
+          )
+        ],
 
-
-
-        ),
       ),
     );
   }
