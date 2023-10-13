@@ -1,7 +1,9 @@
 import 'dart:collection';
 import 'dart:io';
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:groupsettlement2/view/camera_clova_detect_page.dart';
 import 'package:groupsettlement2/view/groupMainPage.dart';
 import 'package:groupsettlement2/view/group_create_page.dart';
 import 'package:groupsettlement2/view/group_select_page.dart';
@@ -45,6 +47,7 @@ import 'Kakao/kakao_login_page.dart';
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("백그라운드 메시지 처리.. ${message.notification!.body!}");
 }
+
 
 void initializeNotification() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -132,6 +135,10 @@ final GoRouter _router = GoRouter(
                   return const EditReceiptPage();
                 },
               ),
+              GoRoute(
+                path: 'cameraDetectPage',
+                builder: (context, state) => cameraDetectPage(camera: state.qu),
+              ),
             ]),
         GoRoute(
           path: "SettlementPage",
@@ -208,7 +215,7 @@ void main() async {
   // KakaoSdk 초기화
   // final nativeKey = await File("./Kakao/kakaoKey.txt").readAsString();
   // final jsKey = await File("./Kakao/kakaoJsKey.txt").readAsString();
-
+  WidgetsFlutterBinding.ensureInitialized();
   KakaoSdk.init(
       nativeAppKey: '00b83bf69fba554145c773d6737772fc',
       javaScriptAppKey: 'aa3a51d84f03c87a103a1a127dfcd8f9');

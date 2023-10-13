@@ -221,11 +221,11 @@ class _MainPageState extends State<MainPage> {
                   },
                 ),
                 ElevatedButton(
-                  child: const Text("Group Main Page"),
+                  child: const Text("Group Select Page"),
                   onPressed: () {
-                    context.push("/groupMainPage");
+                    context.push("/groupSelectPage");
                   },
-                ),
+                )
               ],
             ),
           ],

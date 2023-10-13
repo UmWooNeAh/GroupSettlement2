@@ -184,11 +184,6 @@ class _State extends ConsumerState<groupMainPage> {
                             onChanged: (value) {
                               inputName = value;
                             },
-                            onSubmitted: (value) {
-                              setState(() {
-                                gvm.updateGroupName(gvm.myGroup.groupId!, value);
-                              });
-                            },
                           ),
                           actionsAlignment: MainAxisAlignment.spaceBetween,
                           actions: [

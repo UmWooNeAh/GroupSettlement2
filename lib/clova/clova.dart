@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:camera/camera.dart';
 import 'package:cloud_firestore_platform_interface/src/timestamp.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
@@ -17,7 +18,12 @@ class Clova {
   var res;
   var uuid = Uuid();
   List<ReceiptItem> a = [];
+  var camera;
 
+  getCamera()async{
+    List<CameraDescription> cameras = await availableCameras();
+    this.camera = cameras[1];
+  }
   Map<String, dynamic> requestJSON = {
     'images': [
       {

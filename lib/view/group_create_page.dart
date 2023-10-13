@@ -1,17 +1,25 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class groupCreatePage extends StatefulWidget {
+import '../class/class_user.dart';
+import '../design_element.dart';
+import '../viewmodel/GroupViewModel.dart';
+
+class groupCreatePage extends ConsumerStatefulWidget {
   const groupCreatePage({Key? key}) : super(key: key);
 
   @override
-  State<groupCreatePage> createState() => _groupCreatePageState();
+  ConsumerState<groupCreatePage> createState() => _groupCreatePageState();
 }
 
-class _groupCreatePageState extends State<groupCreatePage> {
+class _groupCreatePageState extends ConsumerState<groupCreatePage> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    String inputName = "";
+    String inputGroupName = "";
+    final gvm = ref.watch(groupProvider);
     return Scaffold(
       appBar: AppBar(),
       body:
@@ -45,6 +53,9 @@ class _groupCreatePageState extends State<groupCreatePage> {
                   child: SizedBox(
                     width: size.width*0.9,
                     child: TextField(
+                      onChanged: (value) {
+                        inputGroupName = value;
+                      },
                       decoration: InputDecoration(
                         hintText: "그룹 1",
                         labelStyle: TextStyle(
@@ -88,7 +99,7 @@ class _groupCreatePageState extends State<groupCreatePage> {
                               TextSpan(
                                   children: [
                                     TextSpan(
-                                        text:"8 ",
+                                        text:"${gvm.myGroup.serviceUsers.length.toString()} ",
                                         style: TextStyle(
                                           color: Color(0xFF07BEB8),
                                           fontSize: 20,
@@ -124,14 +135,19 @@ class _groupCreatePageState extends State<groupCreatePage> {
                           children: [
                             SizedBox(height:20),
                             Column(
-                              children: List.generate(3,(index){
+                              children: List.generate((gvm.serviceUsers.length/4).toInt()+1,(index){
                                 return Row(
                                   children: List.generate(4, (innerIndex){
-                                    return um(flag:innerIndex % 2 == 0);
+                                    try {
+                                      return oneUser(flag: false,user: gvm.serviceUsers[index*4+innerIndex]);
+                                    } on RangeError catch (e) {
+                                      return SizedBox.shrink();
+                                    }
                                   }),
                                 );
                               }),
                             )
+
                           ],
                         ),
                       ),
@@ -175,13 +191,99 @@ class _groupCreatePageState extends State<groupCreatePage> {
                                     borderRadius: BorderRadius.circular(5)
                                 )
                             ),
-                            child:Center(
-                                child: Text("직접 인원 추가",
-                                    style:TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w600
+                            child:GestureDetector(
+                              onTap: () => showDialog(
+                                context: context,
+                                builder: (BuildContext context) => AlertDialog(
+                                  title: const Text("추가할 사용자의 이름을 입력해주세요",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 18
                                     )
-                                )
+                                  ),
+                                  content: TextField(
+                                    decoration: InputDecoration(
+                                      hintText: "사용자 1",
+                                      labelStyle: TextStyle(
+                                          color:Color(0xFF838383)
+                                      ),
+                                    ),
+                                    onChanged: (value) {
+                                      inputName = value;
+                                    },
+                                    onSubmitted: (value) {
+                                      setState(() {
+                                        ServiceUser user = ServiceUser();
+                                        user.name = value;
+                                        user.groups.add(gvm.myGroup.groupId!);
+                                        gvm.addByDirect(user);
+                                      });
+                                    },
+                                  ),
+                                  actionsAlignment: MainAxisAlignment.spaceBetween,
+                                  actions: [
+                                    SizedBox(
+                                      height: 50,
+                                      child: OutlinedButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                          setState(() {
+                                            ServiceUser user = ServiceUser();
+                                            user.name = inputName;
+                                            user.groups.add(gvm.myGroup.groupId!);
+                                            gvm.addByDirect(user);
+                                          });
+                                        },
+                                        style: OutlinedButton.styleFrom(
+                                          backgroundColor: color2,
+                                          side: const BorderSide(
+                                            color: color2,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(5),
+                                          ),
+
+                                        ),
+                                        child: const Text(
+                                          "인원 추가",
+                                          style:
+                                          TextStyle(fontSize: 15, color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 50,
+                                      child: OutlinedButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        style: OutlinedButton.styleFrom(
+                                          backgroundColor: Colors.transparent,
+                                          side: const BorderSide(
+                                            color: Colors.grey,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                        ),
+                                        child: const Text(
+                                          "취소",
+                                          style:
+                                          TextStyle(fontSize: 15, color: Colors.black),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              child: Center(
+                                  child: Text("직접 인원 추가",
+                                      style:TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600
+                                      )
+                                  )
+                              ),
                             )
                         ),
                       ),
@@ -204,14 +306,19 @@ class _groupCreatePageState extends State<groupCreatePage> {
                                     borderRadius: BorderRadius.circular(5)
                                 )
                             ),
-                            child:Center(
-                                child: Text("그룹 생성하기",
-                                    style:TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w600,
-                                        color:Colors.white
-                                    )
-                                )
+                            child:GestureDetector(
+                              onTap: (){
+                                print(inputGroupName);
+                              },
+                              child: Center(
+                                  child: Text("그룹 생성하기",
+                                      style:TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                          color:Colors.white
+                                      )
+                                  )
+                              ),
                             )
                         ),
                       ),
@@ -225,17 +332,27 @@ class _groupCreatePageState extends State<groupCreatePage> {
   }
 }
 
-class um extends StatelessWidget {
+
+class oneUser extends StatefulWidget {
   final bool flag;
-  const um({Key? key, required this.flag}) : super(key: key);
+  final ServiceUser user;
+
+  const oneUser({Key? key, required this.flag, required this.user}) : super(key: key);
+
+  @override
+  State<oneUser> createState() => _oneUserState();
+}
+
+class _oneUserState extends State<oneUser> {
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(left:35),
       child: Container(
         width: 60,
-        height: 120,
-        child: Column(
+        height: 122,
+        child:
+        Column(
           children: [
             Container(
               width: 60,
@@ -246,19 +363,22 @@ class um extends StatelessWidget {
               ),
             ),
             SizedBox(height:5),
-            Text("이름 1",
+            Text(widget.user.name!,
                 style:TextStyle(
-                    fontWeight: FontWeight.w600
+                  fontWeight: FontWeight.w600,
+                  fontSize: 15
                 )
             ),
-
-            Text(flag ? "직접 추가함" : "",
+            Text(widget.flag ? "직접 추가함" : "",
                 style:TextStyle(
-                  fontSize: 12,
+                  fontSize: 10,
                   color: Color(0xFF838383),
                 )
             )
           ],
+
+
+
         ),
       ),
     );
