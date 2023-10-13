@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../class/class_user.dart';
 import '../design_element.dart';
-import '../viewmodel/GroupViewModel.dart';
+import '../viewmodel/GroupCreateViewModel.dart';
 
 class groupCreatePage extends ConsumerStatefulWidget {
   const groupCreatePage({Key? key}) : super(key: key);
@@ -99,7 +99,7 @@ class _groupCreatePageState extends ConsumerState<groupCreatePage> {
                               TextSpan(
                                   children: [
                                     TextSpan(
-                                        text:"${gvm.myGroup.serviceUsers.length.toString()} ",
+                                        text:"${gvm.group.serviceUsers.length.toString()} ",
                                         style: TextStyle(
                                           color: Color(0xFF07BEB8),
                                           fontSize: 20,
@@ -137,9 +137,9 @@ class _groupCreatePageState extends ConsumerState<groupCreatePage> {
                             Column(
                               children: List.generate((gvm.serviceUsers.length/4).toInt()+1,(index){
                                 return Row(
-                                  children: List.generate(4, (innerIndex){
+                                  children: List.generate(4, (innerIndex) {
                                     try {
-                                      return oneUser(flag: false,user: gvm.serviceUsers[index*4+innerIndex]);
+                                      return oneUser(flag: false,user: gvm.directedUsers[index*4+innerIndex]);
                                     } on RangeError catch (e) {
                                       return SizedBox.shrink();
                                     }
@@ -211,14 +211,6 @@ class _groupCreatePageState extends ConsumerState<groupCreatePage> {
                                     onChanged: (value) {
                                       inputName = value;
                                     },
-                                    onSubmitted: (value) {
-                                      setState(() {
-                                        ServiceUser user = ServiceUser();
-                                        user.name = value;
-                                        user.groups.add(gvm.myGroup.groupId!);
-                                        gvm.addByDirect(user);
-                                      });
-                                    },
                                   ),
                                   actionsAlignment: MainAxisAlignment.spaceBetween,
                                   actions: [
@@ -229,9 +221,7 @@ class _groupCreatePageState extends ConsumerState<groupCreatePage> {
                                           Navigator.of(context).pop();
                                           setState(() {
                                             ServiceUser user = ServiceUser();
-                                            user.name = inputName;
-                                            user.groups.add(gvm.myGroup.groupId!);
-                                            gvm.addByDirect(user);
+                                            gvm.addByDirect(inputName);
                                           });
                                         },
                                         style: OutlinedButton.styleFrom(
@@ -308,7 +298,7 @@ class _groupCreatePageState extends ConsumerState<groupCreatePage> {
                             ),
                             child:GestureDetector(
                               onTap: (){
-                                print(inputGroupName);
+                                gvm.createGroup(inputGroupName);
                               },
                               child: Center(
                                   child: Text("그룹 생성하기",

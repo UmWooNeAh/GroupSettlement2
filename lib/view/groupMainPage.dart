@@ -193,7 +193,7 @@ class _State extends ConsumerState<groupMainPage> {
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                   setState(() {
-                                    gvm.updateGroupName(gvm.myGroup.groupId!, inputName);
+                                    gvm.updateGroup(gvm.myGroup.groupId!, inputName);
                                   });
                                 },
                                 style: OutlinedButton.styleFrom(

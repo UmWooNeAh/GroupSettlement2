@@ -135,10 +135,10 @@ final GoRouter _router = GoRouter(
                   return const EditReceiptPage();
                 },
               ),
-              GoRoute(
-                path: 'cameraDetectPage',
-                builder: (context, state) => cameraDetectPage(camera: state.qu),
-              ),
+              // GoRoute(
+              //   path: 'cameraDetectPage',
+              //   builder: (context, state) => cameraDetectPage(camera: state.qu),
+              // ),
             ]),
         GoRoute(
           path: "SettlementPage",
