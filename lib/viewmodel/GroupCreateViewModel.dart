@@ -15,8 +15,7 @@ class GroupCreateViewModel extends ChangeNotifier {
 
   ServiceUser userData = ServiceUser();
   Group group = Group();
-  List<String> serviceUsers = [];
-  List<ServiceUser> directedUsers = []; //DB 등록용 직접 추가 유저들
+  List<ServiceUser> serviceUsers = [];
 
   GroupCreateViewModel(String userId) {
     _settingGroupViewModel(userId);
@@ -24,13 +23,13 @@ class GroupCreateViewModel extends ChangeNotifier {
 
   void _settingGroupViewModel(String userId) async {
     userData = await ServiceUser().getUserByUserId(userId);
+    notifyListeners();
   }
 
   void addByDirect(String userName) {
     ServiceUser user = ServiceUser();
     user.name = userName;
-    serviceUsers.add(user.serviceUserId!);
-    directedUsers.add(user);
+    serviceUsers.add(user);
     notifyListeners();
   }
 
@@ -54,7 +53,7 @@ class GroupCreateViewModel extends ChangeNotifier {
       user.name = kuser.profileNickname;
       user.kakaoId =  kuser.id;
       user.createUser();
-      serviceUsers.add(user.serviceUserId!);
+      serviceUsers.add(user);
     }
     notifyListeners();
   }
@@ -62,10 +61,14 @@ class GroupCreateViewModel extends ChangeNotifier {
   void createGroup(String groupname) async {
     group.groupName = groupname;
     for(var user in serviceUsers) {
-      group.serviceUsers.add(user);
-    }
-    for(var directeduser in directedUsers) {
-      directeduser.createUser();
+      group.serviceUsers.add(user.serviceUserId!);
+      if(user.kakaoId == null) { // 직접 추가하기로 추가한 그룹원
+        user.createUser(); //DB에 올림
+      }
+      else { //예몬 친구로 추가한 그룹원
+        user.groups.add(group.groupId!);
+        FireService().updateDoc("userlist", user.serviceUserId!, user.toJson());
+      }
     }
     group.createGroup();
     notifyListeners();
