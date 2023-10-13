@@ -236,10 +236,10 @@ class SettlementViewModel extends ChangeNotifier{
   }
 
   void completeSettlement() async {
-    // settlement Update
-    FireService().updateDoc("settlementlist", settlement.settlementId!, settlement.toJson());
+
     // SettlementPaper Update
     for(var stmpaper in settlementPapers!.entries) {
+      settlement.totalPrice += stmpaper.value.totalPrice!;
       FireService().updateDoc("settlementpaperlist", stmpaper.key!, stmpaper.value!.toJson());
     }
     // SettlementItem Update
@@ -249,10 +249,11 @@ class SettlementViewModel extends ChangeNotifier{
             "settlementitemlist", stmitemlist.key!, stmitem!.toJson());
       }
     }
+    // settlement Update
+    FireService().updateDoc("settlementlist", settlement.settlementId!, settlement.toJson());
+
     // User Update(송금자만 업데이트)
-
     for(var stmuser in settlementUsers) {
-
       ServiceUser user = await ServiceUser().getUserByUserId(stmuser.serviceUserId!);
       for(var stmpaper in settlementPapers!.entries) {
         user.settlementPapers?.add(stmpaper.value!.settlementPaperId!);
@@ -270,6 +271,7 @@ class SettlementViewModel extends ChangeNotifier{
             "settlementpaperlist", rcpitemlist.key!, rcpitem.toJson());
       }
     }
+
     notifyListeners();
   }
 
