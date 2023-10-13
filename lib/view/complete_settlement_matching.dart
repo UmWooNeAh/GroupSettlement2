@@ -23,7 +23,7 @@ class _CompleteSettlementMatchingState
 
     _animation = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 1),
+      duration: const Duration(milliseconds: 1500),
       lowerBound: 0,
       upperBound: 1,
     )..repeat();
@@ -54,9 +54,11 @@ class _CompleteSettlementMatchingState
               return AnimatedPositioned(
                 curve: curve,
                 duration: duration,
-                bottom: topbottom + _animation.value * speed,
-                left:
-                    leftright - _animation.value * speed * (1 / tan(rotation)),
+                bottom: topbottom + max(_animation.value * 2 - 1, 0) * speed,
+                left: leftright -
+                    max(_animation.value * 2 - 1, 0) *
+                        speed *
+                        (1 / tan(rotation)),
                 child: Transform(
                   transform: Matrix4.rotationZ(rotation),
                   origin: const Offset(0, 300),
@@ -78,9 +80,9 @@ class _CompleteSettlementMatchingState
               return AnimatedPositioned(
                 curve: curve,
                 duration: duration,
-                top: topbottom + _animation.value * speed,
-                right:
-                    leftright - _animation.value * speed * (1 / tan(rotation)),
+                top: topbottom + min(_animation.value * 2, 1) * speed,
+                right: leftright -
+                    min(_animation.value * 2, 1) * speed * (1 / tan(rotation)),
                 child: Transform(
                   transform: Matrix4.rotationZ(rotation),
                   origin: const Offset(800, 0),
@@ -210,7 +212,7 @@ class _CompleteSettlementMatchingState
                   ),
                   TextButton(
                     onPressed: () {
-                      context.go('/SettlementPage/SettlementFinalCheckPage');
+                      context.go('/SettlementFinalCheckPage');
                     },
                     child: const Text(
                       "정산결과확인하기",

@@ -517,8 +517,6 @@ class _CustomBottomSheetState extends ConsumerState<CustomBottomSheet> {
                                 ),
                               ),
                             ),
-                            Text(
-                                "${checkprovider.selectedUserId == "default" ? provider.finalSettlement.length : provider.settlementPapers[checkprovider.selectedUserId]?.settlementItems.length ?? "null"}"),
                             const CheckSettlementPaperWidget(),
                           ],
                         ),
@@ -542,7 +540,9 @@ class _CustomBottomSheetState extends ConsumerState<CustomBottomSheet> {
                                   ),
                                 ),
                                 Text(
-                                  "${priceToString.format(40000)}원",
+                                  checkprovider.selectedUserId == "default"
+                                      ? "${priceToString.format(provider.finalSettlement.isEmpty ? 0 : provider.finalSettlement.map((userId) => provider.settlementPapers[userId]?.totalPrice ?? 0).reduce((value, element) => value + element))} 원"
+                                      : "${priceToString.format(provider.settlementPapers[checkprovider.selectedUserId]?.totalPrice ?? 0)} 원",
                                   style: const TextStyle(
                                     fontSize: 23,
                                     fontWeight: FontWeight.w500,
@@ -702,7 +702,9 @@ class _CheckSettlementPaperWidgetState
                   : provider.settlementPapers[checkprovider.selectedUserId]
                           ?.settlementItems.length ??
                       0, (index) {
-            String userId = provider.finalSettlement[index];
+            String userId = checkprovider.selectedUserId == "default"
+                ? provider.finalSettlement[index]
+                : checkprovider.selectedUserId;
             return Padding(
               padding: const EdgeInsets.all(15),
               child: Row(
@@ -713,7 +715,11 @@ class _CheckSettlementPaperWidgetState
                     width: 80,
                     child: Text(
                       checkprovider.selectedUserId == "default"
-                          ? provider.finalSettlement[index]
+                          ? provider
+                                  .settlementPapers[
+                                      provider.finalSettlement[index]]
+                                  ?.userName ??
+                              "그룹원"
                           : provider
                                   .settlementItems[checkprovider.selectedUserId]
                                       ?[index]
@@ -730,15 +736,13 @@ class _CheckSettlementPaperWidgetState
                       children: [
                         TextSpan(
                           text: checkprovider.selectedUserId == "default"
-                              ? provider.settlementItems[userId] == null
+                              ? provider.settlementPapers[userId]
+                                          ?.settlementItems[0] ==
+                                      null
                                   ? "menu"
                                   : provider
                                       .settlementItems[userId]![0].menuName
-                              : provider
-                                      .settlementItems[
-                                          checkprovider.selectedUserId]?[index]
-                                      .menuName ??
-                                  "menu$index",
+                              : "",
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
@@ -746,7 +750,7 @@ class _CheckSettlementPaperWidgetState
                         ),
                         TextSpan(
                           text: checkprovider.selectedUserId == "default"
-                              ? "등 ${provider.settlementItems[checkprovider.selectedUserId]?.length ?? 0} 메뉴"
+                              ? "등 ${provider.settlementItems[userId]?.length ?? 0} 메뉴"
                               : "",
                           style: const TextStyle(
                             fontSize: 15,
@@ -762,7 +766,7 @@ class _CheckSettlementPaperWidgetState
                     child: Text(
                       checkprovider.selectedUserId == "default"
                           ? "${priceToString.format(provider.settlementPapers[userId]?.totalPrice ?? 0)}원"
-                          : "${priceToString.format(provider.settlementPapers[userId]?.totalPrice ?? 0)}원",
+                          : "${priceToString.format(provider.settlementItems[userId]?[index].price ?? 0)}원",
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w500,
@@ -903,17 +907,20 @@ class _GroupUserBarState extends ConsumerState<GroupUserBar> {
                 ),
               ],
             ),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: List.generate(
-                  provider.settlementUsers.length,
-                  (index) {
-                    return SettlementPageGroupUser(
-                      index: index,
-                      ovalSize: 50,
-                    );
-                  },
+            SizedBox(
+              width: size.width,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: List.generate(
+                    provider.settlementUsers.length,
+                    (index) {
+                      return SettlementPageGroupUser(
+                        index: index,
+                        ovalSize: 50,
+                      );
+                    },
+                  ),
                 ),
               ),
             ),
@@ -995,11 +1002,11 @@ class _SettlementPageReceiptItemState
   bool isSelected = false;
   bool dragTargeted = false;
   PageController pageController = PageController();
-  late int index;
+  late int itemIndex;
   @override
   void initState() {
     super.initState();
-    index = widget.index;
+    itemIndex = widget.index;
   }
 
   @override
@@ -1026,8 +1033,8 @@ class _SettlementPageReceiptItemState
               dragTargeted = !dragTargeted;
               provider.addSettlementItem(
                   openedprovider.receiptId,
-                  index,
-                  provider.receiptItems[openedprovider.receiptId]?[index]
+                  itemIndex,
+                  provider.receiptItems[openedprovider.receiptId]?[itemIndex]
                           .receiptItemId ??
                       "default",
                   data);
@@ -1048,42 +1055,42 @@ class _SettlementPageReceiptItemState
                     ),
                   ],
                 ),
-                child: isSelected
-                    ? SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 5),
-                                  child: Text(
-                                    provider
-                                            .receiptItems[openedprovider
-                                                .receiptId]?[index]
-                                            .menuName ??
-                                        "menu",
-                                    style: const TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 5),
-                                  child: Text(
-                                    "${priceToString.format(provider.receiptItems[openedprovider.receiptId]?[index].menuPrice ?? 0)} 원",
-                                    style: const TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 5),
+                            child: Text(
+                              provider
+                                      .receiptItems[openedprovider.receiptId]
+                                          ?[itemIndex]
+                                      .menuName ??
+                                  "menu",
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                            Container(
+                          ),
+                          Container(
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 5),
+                            child: Text(
+                              "${priceToString.format(provider.receiptItems[openedprovider.receiptId]?[itemIndex].menuPrice ?? 0)} 원",
+                              style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      isSelected
+                          ? Container(
                               height: 150,
                               padding: const EdgeInsets.all(5),
                               child: Row(
@@ -1092,14 +1099,15 @@ class _SettlementPageReceiptItemState
                                     child: PageView(
                                       controller: pageController,
                                       children: List.generate(
-                                        (provider
-                                                        .receiptItems[
-                                                            openedprovider
-                                                                .receiptId]
-                                                            ?[index]
-                                                        .serviceUsers
-                                                        .length ??
-                                                    0 - 1) ~/
+                                        ((provider
+                                                            .receiptItems[
+                                                                openedprovider
+                                                                    .receiptId]
+                                                                ?[itemIndex]
+                                                            .serviceUsers
+                                                            .length ??
+                                                        0) -
+                                                    1) ~/
                                                 8 +
                                             1,
                                         (ndex) {
@@ -1107,16 +1115,17 @@ class _SettlementPageReceiptItemState
                                             children: List.generate(
                                               math.min(
                                                   2,
-                                                  (provider
-                                                                  .receiptItems[
-                                                                      openedprovider
-                                                                          .receiptId]
-                                                                      ?[index]
-                                                                  .serviceUsers
-                                                                  .length ??
-                                                              0 -
-                                                                  1 -
-                                                                  ndex * 8) ~/
+                                                  ((provider
+                                                                      .receiptItems[
+                                                                          openedprovider
+                                                                              .receiptId]
+                                                                          ?[
+                                                                          itemIndex]
+                                                                      .serviceUsers
+                                                                      .length ??
+                                                                  0) -
+                                                              1 -
+                                                              ndex * 8) ~/
                                                           4 +
                                                       1),
                                               (index) {
@@ -1127,15 +1136,16 @@ class _SettlementPageReceiptItemState
                                                     math.min(
                                                         4,
                                                         ((provider
-                                                                .receiptItems[
-                                                                    openedprovider
-                                                                        .receiptId]
-                                                                    ?[index]
-                                                                .serviceUsers
-                                                                .length) ??
-                                                            0 -
-                                                                8 * ndex -
-                                                                4 * index)),
+                                                                    .receiptItems[
+                                                                        openedprovider
+                                                                            .receiptId]
+                                                                        ?[
+                                                                        itemIndex]
+                                                                    .serviceUsers
+                                                                    .length ??
+                                                                0) -
+                                                            8 * ndex -
+                                                            4 * index)),
                                                     (iindex) {
                                                       return Container(
                                                         margin: const EdgeInsets
@@ -1162,11 +1172,11 @@ class _SettlementPageReceiptItemState
                                                               child: SizedBox(
                                                                 width: 30,
                                                                 child: Text(
-                                                                  "${ndex * 8 + index * 4 + iindex + 1}",
+                                                                  "${provider.receiptItems[openedprovider.receiptId]?[itemIndex].serviceUsers.values.toList()[ndex * 8 + index * 4 + iindex]}",
                                                                   style:
                                                                       const TextStyle(
                                                                     fontSize:
-                                                                        15,
+                                                                        10,
                                                                     fontWeight:
                                                                         FontWeight
                                                                             .w400,
@@ -1182,11 +1192,24 @@ class _SettlementPageReceiptItemState
                                                               top: 3,
                                                               child:
                                                                   GestureDetector(
-                                                                onTap: () {},
+                                                                onTap: () {
+                                                                  provider.deleteSettlementItem(
+                                                                      openedprovider
+                                                                          .receiptId,
+                                                                      itemIndex,
+                                                                      provider
+                                                                              .receiptItems[openedprovider.receiptId]?[
+                                                                                  itemIndex]
+                                                                              .serviceUsers
+                                                                              .keys
+                                                                              .toList()[ndex *
+                                                                                  8 +
+                                                                              index * 4 +
+                                                                              iindex] ??
+                                                                          "default");
+                                                                },
                                                                 child:
                                                                     const SizedBox(
-                                                                  height: 5,
-                                                                  width: 5,
                                                                   child: Icon(
                                                                     Icons.close,
                                                                     size: 15,
@@ -1213,88 +1236,55 @@ class _SettlementPageReceiptItemState
                                     child: Align(
                                       alignment: const Alignment(0, 0.3),
                                       child: Text(
-                                        "${provider.receiptItems[openedprovider.receiptId]?[index].serviceUsers.length ?? 0} 명",
+                                        "${provider.receiptItems[openedprovider.receiptId]?[itemIndex].serviceUsers.length ?? 0} 명",
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
                             )
-                          ],
-                        ),
-                      )
-                    : Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                margin: const EdgeInsets.symmetric(
-                                    horizontal: 20, vertical: 5),
-                                child: Text(
-                                  provider
-                                          .receiptItems[
-                                              openedprovider.receiptId]?[index]
-                                          .menuName ??
-                                      "menu",
-                                  style: const TextStyle(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                margin: const EdgeInsets.symmetric(
-                                    horizontal: 20, vertical: 5),
-                                child: Text(
-                                  "${priceToString.format(provider.receiptItems[openedprovider.receiptId]?[index].menuPrice ?? 0)} 원",
-                                  style: const TextStyle(
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 10),
-                                child: Row(
-                                  children: List.generate(
-                                      provider
-                                              .receiptItems[openedprovider
-                                                  .receiptId]?[index]
-                                              .serviceUsers
-                                              .length ??
-                                          0, (index) {
-                                    return Container(
-                                      margin: const EdgeInsets.symmetric(
-                                          horizontal: 2),
-                                      child: const Text(
-                                        "박건우",
-                                        style: TextStyle(
-                                          fontSize: 15,
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 10),
+                                  child: Row(
+                                    children: List.generate(
+                                        math.min(
+                                            provider
+                                                    .receiptItems[openedprovider
+                                                        .receiptId]?[itemIndex]
+                                                    .serviceUsers
+                                                    .length ??
+                                                0,
+                                            4), (index) {
+                                      return Container(
+                                        margin: const EdgeInsets.symmetric(
+                                            horizontal: 2),
+                                        child: Text(
+                                          "${provider.receiptItems[openedprovider.receiptId]?[itemIndex].serviceUsers.values.toList()[index]}",
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                          ),
                                         ),
-                                      ),
-                                    );
-                                  }),
+                                      );
+                                    }),
+                                  ),
                                 ),
-                              ),
-                              Container(
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 10),
-                                child: Text(
-                                  "${provider.receiptItems[openedprovider.receiptId]?[index].serviceUsers.length ?? 0}명",
-                                  style: const TextStyle(fontSize: 15),
+                                Container(
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 10),
+                                  child: Text(
+                                    "${provider.receiptItems[openedprovider.receiptId]?[itemIndex].serviceUsers.length ?? 0}명",
+                                    style: const TextStyle(fontSize: 15),
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                              ],
+                            ),
+                    ],
+                  ),
+                ),
               );
             },
           ),
@@ -1322,6 +1312,7 @@ class _SettlementPageReceiptState extends ConsumerState<SettlementPageReceipt> {
   late String id;
   late int index;
   bool isSelected = false;
+  bool isDragged = false;
   @override
   void initState() {
     super.initState();
@@ -1342,21 +1333,21 @@ class _SettlementPageReceiptState extends ConsumerState<SettlementPageReceipt> {
         },
         child: DragTarget(
           onWillAccept: (data) {
-            isSelected = !isSelected;
+            isDragged = !isDragged;
             return true;
           },
           onLeave: (data) {
-            isSelected = !isSelected;
+            isDragged = !isDragged;
           },
           onAccept: (data) {
-            isSelected = !isSelected;
+            isDragged = !isDragged;
           },
           builder: (context, candidateData, rejectedData) {
             return Container(
               width: 100,
               height: 120,
               decoration: BoxDecoration(
-                color: isSelected ? Colors.black26 : Colors.white,
+                color: isDragged ? Colors.black26 : Colors.white,
                 boxShadow: const [
                   BoxShadow(
                     color: Colors.grey,

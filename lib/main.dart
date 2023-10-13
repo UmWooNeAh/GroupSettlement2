@@ -146,13 +146,13 @@ final GoRouter _router = GoRouter(
                 return const CompleteSettlementMatching();
               },
             ),
-            GoRoute(
-                path: 'SettlementFinalCheckPage',
-                builder: (context, state) {
-                  return const SettlementFinalCheckPage();
-                }),
           ],
         ),
+        GoRoute(
+            path: 'SettlementFinalCheckPage',
+            builder: (context, state) {
+              return const SettlementFinalCheckPage();
+            }),
         GoRoute(
             path: 'settlementGroupSelectionPage',
             builder: (context, state) {
