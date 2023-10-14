@@ -23,10 +23,11 @@ class SettlementCheckViewModel extends ChangeNotifier{
   Map<String, List<ReceiptItem>>      receiptItems      = <String, List<ReceiptItem>> {};
 
   SettlementCheckViewModel(String settlementId, String groupname, String userId) {
-    _settingSettlementCheckViewModel(settlementId, groupname, userId);
+    settlementPapers = {}; settlementItems = {}; receipts = {}; receiptItems = {};
+    settingSettlementCheckViewModel(settlementId, groupname, userId);
   }
 
-  void _settingSettlementCheckViewModel(String settlementId, String groupname, String userId) async {
+  void settingSettlementCheckViewModel(String settlementId, String groupname, String userId) async {
     settlement = await Settlement().getSettlementBySettlementId(settlementId);
     groupName = groupname;
     ServiceUser muser = await ServiceUser().getUserByUserId(settlement.masterUserId!);

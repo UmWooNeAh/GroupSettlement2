@@ -19,6 +19,7 @@ class GroupViewModel extends ChangeNotifier {
   List<Settlement> mergedSettlementInGroup = <Settlement> [];
 
   GroupViewModel(String userId, String groupId) {
+    serviceUsers = []; settlementInGroup = []; mergedSettlementInGroup = [];
     settingGroupViewModel(userId, groupId);
   }
 

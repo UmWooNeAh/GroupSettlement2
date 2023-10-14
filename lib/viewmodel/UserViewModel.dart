@@ -29,6 +29,7 @@ class UserViewModel extends ChangeNotifier {
   }
 
   void settingUserViewModel(String userId) async {
+    myGroup = []; myReceipts = []; mySettlements = []; mySettlementPapers = []; newAlarm = []; receiveStmAlarm = []; sendStmAlarm = []; etcStmAlarm = [];
     fetchUser(userId);
     fetchAlarm(userId);
   }

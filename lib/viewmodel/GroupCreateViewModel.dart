@@ -18,10 +18,11 @@ class GroupCreateViewModel extends ChangeNotifier {
   List<ServiceUser> serviceUsers = [];
 
   GroupCreateViewModel(String userId) {
-    _settingGroupViewModel(userId);
+    serviceUsers = [];
+    settingGroupViewModel(userId);
   }
 
-  void _settingGroupViewModel(String userId) async {
+  void settingGroupViewModel(String userId) async {
     userData = await ServiceUser().getUserByUserId(userId);
     serviceUsers.add(userData);
     notifyListeners();

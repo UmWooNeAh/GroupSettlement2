@@ -28,11 +28,12 @@ class SettlementCreateViewModel extends ChangeNotifier {
   // 1. 정산생성 이후에만 나머지 창 을 들어갈 수 있으므로 처음 만들어질 때 객체를 새롭게 생성한다
   SettlementCreateViewModel(
       String groupid, String masterid, String accountInfo) {
-    _settingSettlementCreateViewModel(groupid, masterid, accountInfo);
+    receipts = {}; receiptItems = {}; totalPrice = 0;
+    settingSettlementCreateViewModel(groupid, masterid, accountInfo);
   }
 
   // 1-1. Settlement 객체 생성
-  void _settingSettlementCreateViewModel(
+  void settingSettlementCreateViewModel(
       String groupid, String masterid, String accountInfo) async {
     settlement.groupId = groupid;
     settlement.masterUserId = masterid;
