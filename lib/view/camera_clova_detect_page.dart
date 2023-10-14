@@ -10,8 +10,8 @@ import 'package:path_provider/path_provider.dart';
 import '../viewmodel/SettlementCreateViewModel.dart';
 
 class cameraDetectPage extends ConsumerStatefulWidget {
-  final CameraDescription camera;
-  const cameraDetectPage({Key? key, required this.camera}) : super(key: key);
+  final Object? extra;
+  const cameraDetectPage({Key? key, required this.extra}) : super(key: key);
 
   @override
   ConsumerState<cameraDetectPage> createState() => _cameraDetectPageState();

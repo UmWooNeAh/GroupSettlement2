@@ -223,7 +223,7 @@ class _MainPageState extends State<MainPage> {
                 ElevatedButton(
                   child: const Text("Group Select Page"),
                   onPressed: () {
-                    context.push("/groupSelectPage");
+                    context.push("/groupSelectPage/8dcca5ca-107c-4a12-9d12-f746e2e513b7");
                   },
                 )
               ],

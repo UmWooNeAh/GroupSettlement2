@@ -114,9 +114,9 @@ final GoRouter _router = GoRouter(
               return const clovaPage();
             }),
         GoRoute(
-            path: 'groupMainPage',
+            path: 'groupMainPage/:groupId',
             builder: (context, state) {
-              return const groupMainPage();
+              return groupMainPage(groupId: state.pathParameters['groupId']!);
             }),
         GoRoute(
             path: 'settlementDetailPage',
@@ -183,9 +183,9 @@ final GoRouter _router = GoRouter(
           },
         ),
         GoRoute(
-          path: "GroupSelectPage",
+          path: "GroupSelectPage/:userId",
           builder: (context, state) {
-            return const groupSelectPage();
+            return groupSelectPage(userId: state.pathParameters["userId"]!);
           },
         ),
         GoRoute(
@@ -195,9 +195,10 @@ final GoRouter _router = GoRouter(
           },
         ),
         GoRoute(
-          path: "GroupSettlementListPage",
+          path: "CameraPage",
           builder: (context, state) {
-            return const groupSettlementListPage();
+            CameraDescription camera = state.extra as CameraDescription;
+            return cameraDetectPage(extra : camera);
           },
         ),
       ],

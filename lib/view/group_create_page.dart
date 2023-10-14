@@ -142,7 +142,9 @@ class _groupCreatePageState extends ConsumerState<groupCreatePage> {
                                     try {
                                       ServiceUser user = gvm.serviceUsers[index * 4 + innerIndex];
                                       bool flag = user.kakaoId == null ? true : false;
-
+                                      //카카오 아이디 존재시 false -> 직접 추가됨
+                                      bool userFlag = user == gvm.userData ? true : false;
+                                      //사용자 본인일시 삭제버튼 무효화
                                       return Padding(
                                         padding: const EdgeInsets.only(left:35),
                                         child: Stack(
@@ -177,7 +179,7 @@ class _groupCreatePageState extends ConsumerState<groupCreatePage> {
                                                 ],
                                               ),
                                             ),
-                                            Padding(
+                                            userFlag == false ? Padding(
                                               padding: const EdgeInsets.only(bottom:20,left:45),
                                               child: GestureDetector(
                                                   onTap:(){
@@ -191,7 +193,7 @@ class _groupCreatePageState extends ConsumerState<groupCreatePage> {
                                                       )
                                                   )
                                               ),
-                                            )
+                                            ) : SizedBox.shrink()
                                           ],
 
                                         ),
@@ -384,8 +386,7 @@ class _groupCreatePageState extends ConsumerState<groupCreatePage> {
                                                   child: ElevatedButton(
                                                     child: Text("확인"),
                                                     onPressed: (){
-                                                      gvm.settingGroupViewModel(gvm.userData.serviceUserId!);
-                                                      context.pushReplacement("/groupSelectPage");
+                                                      context.pushReplacement("/groupSelectPage/${gvm.userData.serviceUserId}");
                                                     },
                                                   )
                                               )

@@ -8,16 +8,22 @@ import '../class/class_group.dart';
 import '../viewmodel/UserViewModel.dart';
 
 class groupSelectPage extends ConsumerStatefulWidget {
-  const groupSelectPage({Key? key}) : super(key: key);
+  final String userId;
+  const groupSelectPage({Key? key, required this.userId}) : super(key: key);
 
   @override
   ConsumerState<groupSelectPage> createState() => _groupSelectPage();
 }
 
 class _groupSelectPage extends ConsumerState<groupSelectPage> {
+
   @override
   Widget build(BuildContext context) {
+    print("********************${widget.userId}*****************");
     final uvm = ref.watch(userProvider);
+
+    uvm.settingUserViewModel(widget.userId);
+
     Size size = MediaQuery.of(context).size;
     return Scaffold(
         appBar:AppBar(),
@@ -111,7 +117,7 @@ class _groupOneState extends State<groupOne> {
       children: [
         GestureDetector(
           onTap:(){
-            context.push("/groupMainPage");
+            context.push("/groupMainPage/${widget.group.groupId}");
           },
           child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

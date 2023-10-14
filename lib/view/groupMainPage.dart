@@ -95,7 +95,8 @@ StateNotifierProvider((ref) => ReadMore());
 
 
 class groupMainPage extends ConsumerStatefulWidget {
-  const groupMainPage({Key? key}) : super(key: key);
+  final String groupId;
+  const groupMainPage({Key? key, required this.groupId}) : super(key: key);
 
   @override
   ConsumerState<groupMainPage> createState() => _State();
@@ -110,6 +111,9 @@ class _State extends ConsumerState<groupMainPage> {
   int i = 0;
   @override
   Widget build(BuildContext context) {
+    final gvm = ref.watch(groupProvider.notifier);
+    gvm.settingGroupViewModel(gvm.userData.serviceUserId!, widget.groupId);
+    print("^^^^^^^^^^^^^^^${gvm.userData.serviceUserId!}+${widget.groupId}^^^^^^^^^^^^^^^^^^^^^");
     final Size size = MediaQuery.of(context).size;
     String commonStmName = "null";
     final bottomsheetValue =
@@ -120,7 +124,7 @@ class _State extends ConsumerState<groupMainPage> {
           .setBottomSheetSlider(0.0, 0.0, size.height * 0.7);
       i++;
     }
-    final gvm = ref.watch(groupProvider);
+
     Map<String,int> countMap = Map<String, int>();
     gvm.settlementInGroup.forEach((settlement) {
       if(countMap.containsKey(settlement.masterUserId)){
