@@ -33,6 +33,18 @@ class SettlementViewModel extends ChangeNotifier {
   }
 
   void settingSettlementViewModel(String settlementId) async {
+    group = Group();
+    settlement = Settlement();
+    settlementUsers = <ServiceUser>[];
+    receipts = <String, Receipt>{};
+    receiptItems = <String, List<ReceiptItem>>{};
+
+    // Management
+    finalSettlement = <String>[];
+    subGroups = <String, List<String>>{};
+    settlementPapers = <String, SettlementPaper>{};
+    settlementItems = <String, List<SettlementItem>>{};
+
     settlement = await Settlement().getSettlementBySettlementId(settlementId);
     group = await Group().getGroupByGroupId(settlement.groupId!);
     //log("정산 이름: ${settlement.settlementName}");
@@ -97,12 +109,7 @@ class SettlementViewModel extends ChangeNotifier {
 
   void addSettlementItemBySubGroup(
       String receiptId, int index, String subGroupId, String subGroupName) {
-    if (receiptItems[receiptId]![index].serviceUsers == null) {
-      receiptItems[receiptId]![index].serviceUsers[subGroupId] = subGroupName;
-      finalSettlement.add(receiptItems[receiptId]![index].receiptItemId!);
-    } else {
-      receiptItems[receiptId]![index].serviceUsers[subGroupId] = subGroupName;
-    }
+    receiptItems[receiptId]![index].serviceUsers[subGroupId] = subGroupName;
 
     for (var userid in subGroups[subGroupId]!) {
       _addItemToSettlementPaper(receiptId, index, userid);
