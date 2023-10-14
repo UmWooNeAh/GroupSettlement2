@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -95,6 +97,30 @@ class IsReceiptOpened extends ChangeNotifier {
   bool isOpened = false;
   String receiptId = "default";
   int count = 1;
+  List<Offset> receiptPosition =
+      List.generate(100, (index) => const Offset(0, 0));
+
+  void initializeReceiptPosition(receiptNum, Size size) {
+    receiptNum = 20;
+    int lineNum = sqrt(receiptNum).ceil();
+    double gridheight = size.height / lineNum;
+    double gridwidth = size.width / lineNum;
+    Random random = Random();
+    for (int i = 0; i < lineNum; i++) {
+      for (int j = 0; j < lineNum; j++) {
+        double randomX = random.nextDouble() * gridwidth + gridwidth * i;
+        double randomY = random.nextDouble() * gridheight + gridheight * j;
+        Offset newOffset = Offset(randomX, randomY);
+        receiptPosition[i * lineNum + j] = newOffset;
+      }
+    }
+    notifyListeners();
+  }
+
+  void updateReceiptPosition(offset, index) {
+    receiptPosition[index] = offset;
+    notifyListeners();
+  }
 
   void openManagement(id) {
     if (id == "default") {
@@ -140,14 +166,21 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
+    final provider = ref.watch(stmProvider);
     final bottomsheetprovider = ref.watch(bottomSheetSliderProvider);
     final providerMethod = ref.watch(stmProvider.notifier);
+    final receiptprovider = ref.watch(isReceiptOpenedProvider);
 
     if (isFirstBuild) {
       bottomsheetprovider.setBottomSheetSlider(0.0, 0.0, size.height * 0.7);
       providerMethod
           .settingSettlementViewModel("54d974c2-ea2a-4998-89a3-6d9cca52db80");
       isFirstBuild = false;
+      // while (provider.receipts.isEmpty) {
+      //   Future.delayed(const Duration(milliseconds: 100));
+      // }
+      Future(() => receiptprovider.initializeReceiptPosition(
+          provider.receipts.length, size));
     }
 
     return Scaffold(
@@ -180,7 +213,6 @@ class ReceiptDetail extends ConsumerStatefulWidget {
 class _ReceiptDetailState extends ConsumerState<ReceiptDetail> {
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
     final provider = ref.watch(stmProvider);
     final openedprovider = ref.watch(isReceiptOpenedProvider);
     return Positioned(
@@ -839,7 +871,7 @@ class _SettlementInteractiveViewerState
     final provider = ref.watch(stmProvider);
     final openedprovider = ref.watch(isReceiptOpenedProvider);
     return InteractiveViewer(
-      minScale: 0.25,
+      minScale: 1.0,
       maxScale: 20.0,
       boundaryMargin: const EdgeInsets.all(5),
       child: Stack(
@@ -1373,10 +1405,14 @@ class _SettlementPageReceiptState extends ConsumerState<SettlementPageReceipt> {
   @override
   Widget build(BuildContext context) {
     final provider = ref.watch(stmProvider);
+    final receiptprovider = ref.watch(isReceiptOpenedProvider);
     return Positioned(
-      top: 10,
-      left: index * 120 + 10,
+      top: receiptprovider.receiptPosition[index].dy,
+      left: receiptprovider.receiptPosition[index].dx,
       child: GestureDetector(
+        onLongPressMoveUpdate: (details) {
+          receiptprovider.updateReceiptPosition(details.localPosition, index);
+        },
         onTap: () {
           isSelected = !isSelected;
           ref.watch(isReceiptOpenedProvider.notifier).openManagement(id);
@@ -1395,7 +1431,7 @@ class _SettlementPageReceiptState extends ConsumerState<SettlementPageReceipt> {
           builder: (context, candidateData, rejectedData) {
             return Container(
               width: 100,
-              height: 120,
+              height: 130,
               decoration: BoxDecoration(
                 color: isDragged ? Colors.black26 : Colors.white,
                 boxShadow: const [
@@ -1406,65 +1442,123 @@ class _SettlementPageReceiptState extends ConsumerState<SettlementPageReceipt> {
                   ),
                 ],
               ),
-              child: Column(
+              child: Stack(
                 children: [
-                  Container(
-                    width: 8,
-                    height: 8,
-                    margin: const EdgeInsets.fromLTRB(0, 5, 0, 2),
-                    decoration: BoxDecoration(
-                      color: color1,
-                      borderRadius: BorderRadius.circular(100),
+                  const SizedBox(
+                    width: 100,
+                    height: 120,
+                  ),
+                  Positioned(
+                    top: 5,
+                    left: 47,
+                    child: Container(
+                      width: 6,
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: color1,
+                        borderRadius: BorderRadius.circular(100),
+                      ),
                     ),
                   ),
-                  Text(
-                    provider.receipts[id]?.receiptName ??
-                        "Default Receipt Name",
+                  Positioned(
+                    top: 15,
+                    left: 5,
+                    child: Text(
+                      provider.receipts[id]?.receiptName ?? "",
+                    ),
                   ),
-                  RichText(
-                    text: TextSpan(
-                      style: DefaultTextStyle.of(context).style,
-                      children: [
-                        TextSpan(
-                          text: provider.receiptItems[id]?[0].menuName ?? "영수증",
-                          style: const TextStyle(
-                            fontSize: 9,
+                  Positioned(
+                    top: 35,
+                    left: 5,
+                    child: RichText(
+                      text: TextSpan(
+                        style: DefaultTextStyle.of(context).style,
+                        children: [
+                          TextSpan(
+                            text: provider.receiptItems[id]?[0].menuName ??
+                                "menu",
+                            style: const TextStyle(
+                              fontSize: 9,
+                            ),
                           ),
+                          TextSpan(
+                            text:
+                                " 등 ${provider.receipts[widget.id]?.receiptItems.length ?? "X"} 항목",
+                            style: TextStyle(
+                              fontSize: 9,
+                              color: Colors.grey[600],
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 60,
+                    left: 5,
+                    child: Row(
+                      children: [
+                        Row(
+                          children: List.generate(
+                              min(
+                                  2,
+                                  provider.receiptItems[id]
+                                          ?.map((receiptItem) => receiptItem
+                                              .serviceUsers.values
+                                              .toSet())
+                                          .reduce((value, element) =>
+                                              value.union(element))
+                                          .length ??
+                                      0), (index) {
+                            return Text(
+                              "${provider.receiptItems[id]?.map((receiptItem) => receiptItem.serviceUsers.values.toSet()).reduce((value, element) => value.union(element)).toList()[index]} ",
+                            );
+                          }),
                         ),
-                        TextSpan(
-                          text:
-                              " 등 ${provider.receipts[widget.id]?.receiptItems.length ?? "X"} 항목",
+                        Text(
+                          (provider.receiptItems[id]
+                                          ?.map((receiptItem) => receiptItem
+                                              .serviceUsers.values
+                                              .toSet())
+                                          .reduce((value, element) =>
+                                              value.union(element))
+                                          .length ??
+                                      0) ==
+                                  0
+                              ? ""
+                              : " 등 ${provider.receiptItems[id]?.map((receiptItem) => receiptItem.serviceUsers.values.toSet()).reduce((value, element) => value.union(element)).length ?? 0} 명",
                           style: TextStyle(
                             fontSize: 9,
                             color: Colors.grey[600],
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
-                  Row(
-                    children: [
-                      const Row(),
-                      Text(
-                        " 등 ${provider.receiptItems[id]?[0].serviceUsers.length ?? "X"} 항목",
-                        style: TextStyle(
-                          fontSize: 9,
-                          color: Colors.grey[600],
-                        ),
+                  Positioned(
+                    bottom: 0,
+                    child: Container(
+                      width: 100,
+                      height: 40,
+                      padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          const Text(
+                            "합계 금액",
+                            style: TextStyle(
+                              fontSize: 11,
+                            ),
+                          ),
+                          Text(
+                            "${priceToString.format((provider.receiptItems[id] == null) ? 0 : provider.receiptItems[id]!.map((receiptItem) => receiptItem.menuPrice).reduce((value, element) => (value ?? 0) + (element ?? 0)))}원",
+                            style: const TextStyle(
+                              fontSize: 15,
+                              color: color1,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  const Text(
-                    "합계 금액",
-                    style: TextStyle(
-                      fontSize: 11,
-                    ),
-                  ),
-                  Text(
-                    "${priceToString.format((provider.receiptItems[id] == null) ? 0 : provider.receiptItems[id]!.map((receiptItem) => receiptItem.menuPrice).reduce((value, element) => (value ?? 0) + (element ?? 0)))}원",
-                    style: const TextStyle(
-                      fontSize: 15,
-                      color: color1,
                     ),
                   ),
                 ],
