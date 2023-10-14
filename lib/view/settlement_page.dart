@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:groupsettlement2/design_element.dart';
 import 'dart:math' as math;
 import 'shared_basic_widget.dart';
-import '../viewmodel/SettlementViewModel.dart';
+import '../viewmodel/settlement_view_model.dart';
 
 class CheckSettlementPaper extends ChangeNotifier {
   String selectedUserId = "default";
@@ -97,13 +97,18 @@ class IsReceiptOpened extends ChangeNotifier {
   int count = 1;
 
   void openManagement(id) {
-    if (receiptId != id || count.isEven) {
-      isOpened = true;
-      receiptId = id;
-      count = 1;
-    } else {
+    if (id == "default") {
+      count = 0;
       isOpened = false;
-      count++;
+    } else {
+      if (receiptId != id || count.isEven) {
+        isOpened = true;
+        receiptId = id;
+        count = 1;
+      } else {
+        isOpened = false;
+        count++;
+      }
     }
     notifyListeners();
   }
@@ -136,11 +141,12 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     final bottomsheetprovider = ref.watch(bottomSheetSliderProvider);
-    // final providerMethod = ref.watch(stmProvider.notifier);
+    final providerMethod = ref.watch(stmProvider.notifier);
 
     if (isFirstBuild) {
       bottomsheetprovider.setBottomSheetSlider(0.0, 0.0, size.height * 0.7);
-      // providerMethod.settingSettlementViewModel("54d974c2-ea2a-4998-89a3-6d9cca52db80");
+      providerMethod
+          .settingSettlementViewModel("54d974c2-ea2a-4998-89a3-6d9cca52db80");
       isFirstBuild = false;
     }
 
@@ -176,57 +182,60 @@ class _ReceiptDetailState extends ConsumerState<ReceiptDetail> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     final provider = ref.watch(stmProvider);
-
+    final openedprovider = ref.watch(isReceiptOpenedProvider);
     return Positioned(
-      left: 50,
+      right: 0,
       top: 100,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-        width: 300,
-        height:
-            ref.watch(isReceiptOpenedProvider).isOpened ? 350 : size.height * 0,
+        curve: Curves.decelerate,
+        duration: const Duration(milliseconds: 400),
+        padding: const EdgeInsets.all(10),
+        width: openedprovider.isOpened ? 300 : 0,
+        height: 350,
         decoration: BoxDecoration(
           color: Colors.grey[100],
+          borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20), bottomLeft: Radius.circular(20)),
         ),
         child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Container(
-                width: size.width,
-                margin: const EdgeInsets.only(left: 10, bottom: 10),
-                child: Text(
-                  provider
-                          .receipts[
-                              ref.watch(isReceiptOpenedProvider).receiptId]
-                          ?.receiptName ??
-                      "Default Receipt Name",
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
+          scrollDirection: Axis.horizontal,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                Container(
+                  width: 270,
+                  height: 30,
+                  margin: const EdgeInsets.only(left: 10, bottom: 10),
+                  child: Text(
+                    provider.receipts[openedprovider.receiptId]?.receiptName ??
+                        "Default Receipt Name",
+                    style: const TextStyle(
+                      fontSize: 23,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(
-                width: 300,
-                height: 270,
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: List.generate(
-                        provider
-                                .receiptItems[ref
-                                    .watch(isReceiptOpenedProvider)
-                                    .receiptId]
-                                ?.length ??
-                            0, (index) {
-                      return SettlementPageReceiptItem(
-                        index: index,
-                      );
-                    }),
+                SizedBox(
+                  width: 280,
+                  height: 290,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: List.generate(
+                          provider
+                                  .receiptItems[ref
+                                      .watch(isReceiptOpenedProvider)
+                                      .receiptId]
+                                  ?.length ??
+                              0, (index) {
+                        return SettlementPageReceiptItem(
+                          index: index,
+                        );
+                      }),
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -434,6 +443,7 @@ class _CustomBottomSheetState extends ConsumerState<CustomBottomSheet> {
                               SingleChildScrollView(
                                 scrollDirection: Axis.horizontal,
                                 child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: List.generate(
                                       1 + provider.settlementUsers.length,
                                       (index) {
@@ -443,9 +453,18 @@ class _CustomBottomSheetState extends ConsumerState<CustomBottomSheet> {
                                           checkproviderMethod.selectUser(
                                               "default", "전체 정산서");
                                         },
-                                        child: Padding(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color:
+                                                checkprovider.selectedUserId ==
+                                                        "default"
+                                                    ? colorGrey
+                                                    : Colors.transparent,
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
                                           padding: const EdgeInsets.fromLTRB(
-                                              0, 15, 15, 0),
+                                              0, 15, 0, 15),
                                           child: Column(
                                             children: [
                                               ClipOval(
@@ -458,7 +477,13 @@ class _CustomBottomSheetState extends ConsumerState<CustomBottomSheet> {
                                               const SizedBox(
                                                 height: 15,
                                               ),
-                                              const Text("전체 정산서"),
+                                              const SizedBox(
+                                                width: 80,
+                                                child: Text(
+                                                  "전체 정산서",
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ),
                                             ],
                                           ),
                                         ),
@@ -474,22 +499,36 @@ class _CustomBottomSheetState extends ConsumerState<CustomBottomSheet> {
                                                   .settlementUsers[index - 1]
                                                   .name);
                                         },
-                                        child: Column(
-                                          children: [
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.all(15.0),
-                                              child: ClipOval(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color:
+                                                checkprovider.selectedUserId ==
+                                                        provider
+                                                            .settlementUsers[
+                                                                index - 1]
+                                                            .serviceUserId
+                                                    ? colorGrey
+                                                    : Colors.transparent,
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          padding: const EdgeInsets.all(15.0),
+                                          child: Column(
+                                            children: [
+                                              ClipOval(
                                                 child: Container(
                                                   height: 50,
                                                   width: 50,
                                                   color: Colors.black54,
                                                 ),
                                               ),
-                                            ),
-                                            Text(
-                                                "${provider.settlementUsers[index - 1].name}"),
-                                          ],
+                                              const SizedBox(
+                                                height: 15,
+                                              ),
+                                              Text(
+                                                  "${provider.settlementUsers[index - 1].name}"),
+                                            ],
+                                          ),
                                         ),
                                       );
                                     }
@@ -798,6 +837,7 @@ class _SettlementInteractiveViewerState
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     final provider = ref.watch(stmProvider);
+    final openedprovider = ref.watch(isReceiptOpenedProvider);
     return InteractiveViewer(
       minScale: 0.25,
       maxScale: 20.0,
@@ -833,6 +873,15 @@ class _SettlementInteractiveViewerState
                   }
                 },
               ),
+            ),
+          ),
+          SizedBox(
+            width: size.width,
+            height: size.height,
+            child: GestureDetector(
+              onTap: () {
+                openedprovider.openManagement("default");
+              },
             ),
           ),
           SizedBox(
@@ -1013,109 +1062,130 @@ class _SettlementPageReceiptItemState
   Widget build(BuildContext context) {
     final provider = ref.watch(stmProvider);
     final openedprovider = ref.watch(isReceiptOpenedProvider);
-    return Column(
-      children: [
-        GestureDetector(
-          onTap: () {
-            setState(() {
-              isSelected = !isSelected;
-            });
-          },
-          child: DragTarget(
-            onWillAccept: (data) {
-              dragTargeted = !dragTargeted;
-              return true;
+    return SizedBox(
+      width: 270,
+      child: Column(
+        children: [
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                isSelected = !isSelected;
+              });
             },
-            onLeave: (data) {
-              dragTargeted = !dragTargeted;
-            },
-            onAccept: (String data) {
-              dragTargeted = !dragTargeted;
-              provider.addSettlementItem(
-                  openedprovider.receiptId,
-                  itemIndex,
-                  provider.receiptItems[openedprovider.receiptId]?[itemIndex]
-                          .receiptItemId ??
-                      "default",
-                  data);
-            },
-            builder: (context, candidateData, rejectedData) {
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                height: isSelected ? 190 : 60,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: dragTargeted ? Colors.black26 : Colors.white,
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0xFFCCCCCC),
-                      offset: Offset(0, 2),
-                      spreadRadius: 1,
-                      blurRadius: 3,
-                    ),
-                  ],
-                ),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 5),
-                            child: Text(
-                              provider
-                                      .receiptItems[openedprovider.receiptId]
-                                          ?[itemIndex]
-                                      .menuName ??
-                                  "menu",
-                              style: const TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 5),
-                            child: Text(
-                              "${priceToString.format(provider.receiptItems[openedprovider.receiptId]?[itemIndex].menuPrice ?? 0)} 원",
-                              style: const TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
+            child: DragTarget(
+              onWillAccept: (data) {
+                dragTargeted = !dragTargeted;
+                return true;
+              },
+              onLeave: (data) {
+                dragTargeted = !dragTargeted;
+              },
+              onAccept: (String data) {
+                dragTargeted = !dragTargeted;
+                provider.addSettlementItem(
+                    openedprovider.receiptId,
+                    itemIndex,
+                    provider.receiptItems[openedprovider.receiptId]?[itemIndex]
+                            .receiptItemId ??
+                        "default",
+                    data);
+              },
+              builder: (context, candidateData, rejectedData) {
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  height: isSelected ? 190 : 60,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: dragTargeted ? Colors.black26 : Colors.white,
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0xFFCCCCCC),
+                        offset: Offset(0, 2),
+                        spreadRadius: 1,
+                        blurRadius: 5,
                       ),
-                      isSelected
-                          ? Container(
-                              height: 150,
-                              padding: const EdgeInsets.all(5),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: PageView(
-                                      controller: pageController,
-                                      children: List.generate(
-                                        ((provider
-                                                            .receiptItems[
-                                                                openedprovider
-                                                                    .receiptId]
-                                                                ?[itemIndex]
-                                                            .serviceUsers
-                                                            .length ??
-                                                        0) -
-                                                    1) ~/
-                                                8 +
-                                            1,
-                                        (ndex) {
-                                          return Column(
-                                            children: List.generate(
-                                              math.min(
-                                                  2,
-                                                  ((provider
+                    ],
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 5),
+                              child: Text(
+                                provider
+                                        .receiptItems[openedprovider.receiptId]
+                                            ?[itemIndex]
+                                        .menuName ??
+                                    "menu",
+                                style: const TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 5),
+                              child: Text(
+                                "${priceToString.format(provider.receiptItems[openedprovider.receiptId]?[itemIndex].menuPrice ?? 0)} 원",
+                                style: const TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        isSelected
+                            ? Container(
+                                height: 150,
+                                padding: const EdgeInsets.all(5),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: PageView(
+                                        controller: pageController,
+                                        children: List.generate(
+                                          ((provider
+                                                              .receiptItems[
+                                                                  openedprovider
+                                                                      .receiptId]
+                                                                  ?[itemIndex]
+                                                              .serviceUsers
+                                                              .length ??
+                                                          0) -
+                                                      1) ~/
+                                                  8 +
+                                              1,
+                                          (ndex) {
+                                            return Column(
+                                              children: List.generate(
+                                                math.min(
+                                                    2,
+                                                    ((provider
+                                                                        .receiptItems[
+                                                                            openedprovider.receiptId]
+                                                                            ?[
+                                                                            itemIndex]
+                                                                        .serviceUsers
+                                                                        .length ??
+                                                                    0) -
+                                                                1 -
+                                                                ndex * 8) ~/
+                                                            4 +
+                                                        1),
+                                                (index) {
+                                                  return Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    children: List.generate(
+                                                      math.min(
+                                                          4,
+                                                          ((provider
                                                                       .receiptItems[
                                                                           openedprovider
                                                                               .receiptId]
@@ -1124,175 +1194,155 @@ class _SettlementPageReceiptItemState
                                                                       .serviceUsers
                                                                       .length ??
                                                                   0) -
-                                                              1 -
-                                                              ndex * 8) ~/
-                                                          4 +
-                                                      1),
-                                              (index) {
-                                                return Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  children: List.generate(
-                                                    math.min(
-                                                        4,
-                                                        ((provider
-                                                                    .receiptItems[
-                                                                        openedprovider
-                                                                            .receiptId]
-                                                                        ?[
-                                                                        itemIndex]
-                                                                    .serviceUsers
-                                                                    .length ??
-                                                                0) -
-                                                            8 * ndex -
-                                                            4 * index)),
-                                                    (iindex) {
-                                                      return Container(
-                                                        margin: const EdgeInsets
-                                                            .fromLTRB(
-                                                            10, 0, 10, 10),
-                                                        height: 60,
-                                                        width: 35,
-                                                        child: Stack(
-                                                          children: [
-                                                            Positioned(
-                                                              top: 10,
-                                                              child: ClipOval(
-                                                                child:
-                                                                    Container(
-                                                                  height: 30,
+                                                              8 * ndex -
+                                                              4 * index)),
+                                                      (iindex) {
+                                                        return Container(
+                                                          margin:
+                                                              const EdgeInsets
+                                                                  .fromLTRB(10,
+                                                                  0, 10, 10),
+                                                          height: 60,
+                                                          width: 35,
+                                                          child: Stack(
+                                                            children: [
+                                                              Positioned(
+                                                                top: 10,
+                                                                child: ClipOval(
+                                                                  child:
+                                                                      Container(
+                                                                    height: 30,
+                                                                    width: 30,
+                                                                    color: Colors
+                                                                        .grey,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              Positioned(
+                                                                top: 40,
+                                                                child: SizedBox(
                                                                   width: 30,
-                                                                  color: Colors
-                                                                      .grey,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Positioned(
-                                                              top: 40,
-                                                              child: SizedBox(
-                                                                width: 30,
-                                                                child: Text(
-                                                                  "${provider.receiptItems[openedprovider.receiptId]?[itemIndex].serviceUsers.values.toList()[ndex * 8 + index * 4 + iindex]}",
-                                                                  style:
-                                                                      const TextStyle(
-                                                                    fontSize:
-                                                                        10,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w400,
+                                                                  child: Text(
+                                                                    "${provider.receiptItems[openedprovider.receiptId]?[itemIndex].serviceUsers.values.toList()[ndex * 8 + index * 4 + iindex]}",
+                                                                    style:
+                                                                        const TextStyle(
+                                                                      fontSize:
+                                                                          10,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w400,
+                                                                    ),
+                                                                    textAlign:
+                                                                        TextAlign
+                                                                            .center,
                                                                   ),
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
                                                                 ),
                                                               ),
-                                                            ),
-                                                            Positioned(
-                                                              left: 20,
-                                                              top: 3,
-                                                              child:
-                                                                  GestureDetector(
-                                                                onTap: () {
-                                                                  provider.deleteSettlementItem(
-                                                                      openedprovider
-                                                                          .receiptId,
-                                                                      itemIndex,
-                                                                      provider
-                                                                              .receiptItems[openedprovider.receiptId]?[
-                                                                                  itemIndex]
-                                                                              .serviceUsers
-                                                                              .keys
-                                                                              .toList()[ndex *
-                                                                                  8 +
-                                                                              index * 4 +
-                                                                              iindex] ??
-                                                                          "default");
-                                                                },
+                                                              Positioned(
+                                                                left: 20,
+                                                                top: 3,
                                                                 child:
-                                                                    const SizedBox(
-                                                                  child: Icon(
-                                                                    Icons.close,
-                                                                    size: 15,
+                                                                    GestureDetector(
+                                                                  onTap: () {
+                                                                    provider.deleteSettlementItem(
+                                                                        openedprovider
+                                                                            .receiptId,
+                                                                        itemIndex,
+                                                                        provider.receiptItems[openedprovider.receiptId]?[itemIndex].serviceUsers.keys.toList()[ndex * 8 +
+                                                                                index * 4 +
+                                                                                iindex] ??
+                                                                            "default");
+                                                                  },
+                                                                  child:
+                                                                      const SizedBox(
+                                                                    child: Icon(
+                                                                      Icons
+                                                                          .close,
+                                                                      size: 15,
+                                                                    ),
                                                                   ),
                                                                 ),
                                                               ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      );
-                                                    },
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          );
-                                        },
+                                                            ],
+                                                          ),
+                                                        );
+                                                      },
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            );
+                                          },
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    width: 30,
-                                    height: 150,
-                                    child: Align(
-                                      alignment: const Alignment(0, 0.3),
-                                      child: Text(
-                                        "${provider.receiptItems[openedprovider.receiptId]?[itemIndex].serviceUsers.length ?? 0} 명",
+                                    SizedBox(
+                                      width: 30,
+                                      height: 150,
+                                      child: Align(
+                                        alignment: const Alignment(0, 0.3),
+                                        child: Text(
+                                          "${provider.receiptItems[openedprovider.receiptId]?[itemIndex].serviceUsers.length ?? 0} 명",
+                                        ),
                                       ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 10),
+                                    child: Row(
+                                      children: List.generate(
+                                          math.min(
+                                              provider
+                                                      .receiptItems[
+                                                          openedprovider
+                                                              .receiptId]
+                                                          ?[itemIndex]
+                                                      .serviceUsers
+                                                      .length ??
+                                                  0,
+                                              4), (index) {
+                                        return Container(
+                                          margin: const EdgeInsets.symmetric(
+                                              horizontal: 2),
+                                          child: Text(
+                                            "${provider.receiptItems[openedprovider.receiptId]?[itemIndex].serviceUsers.values.toList()[index]}",
+                                            style: const TextStyle(
+                                              fontSize: 15,
+                                            ),
+                                          ),
+                                        );
+                                      }),
+                                    ),
+                                  ),
+                                  Container(
+                                    margin: const EdgeInsets.symmetric(
+                                        horizontal: 10),
+                                    child: Text(
+                                      "${provider.receiptItems[openedprovider.receiptId]?[itemIndex].serviceUsers.length ?? 0}명",
+                                      style: const TextStyle(fontSize: 15),
                                     ),
                                   ),
                                 ],
                               ),
-                            )
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 10),
-                                  child: Row(
-                                    children: List.generate(
-                                        math.min(
-                                            provider
-                                                    .receiptItems[openedprovider
-                                                        .receiptId]?[itemIndex]
-                                                    .serviceUsers
-                                                    .length ??
-                                                0,
-                                            4), (index) {
-                                      return Container(
-                                        margin: const EdgeInsets.symmetric(
-                                            horizontal: 2),
-                                        child: Text(
-                                          "${provider.receiptItems[openedprovider.receiptId]?[itemIndex].serviceUsers.values.toList()[index]}",
-                                          style: const TextStyle(
-                                            fontSize: 15,
-                                          ),
-                                        ),
-                                      );
-                                    }),
-                                  ),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 10),
-                                  child: Text(
-                                    "${provider.receiptItems[openedprovider.receiptId]?[itemIndex].serviceUsers.length ?? 0}명",
-                                    style: const TextStyle(fontSize: 15),
-                                  ),
-                                ),
-                              ],
-                            ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
-        ),
-        const SizedBox(
-          height: 10,
-        )
-      ],
+          const SizedBox(
+            height: 10,
+          )
+        ],
+      ),
     );
   }
 }

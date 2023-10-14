@@ -15,7 +15,7 @@ import '../class/class_settlement.dart';
 import '../clova/clova.dart';
 import '../main.dart';
 import '../viewmodel/SettlementCreateViewModel.dart';
-import '../viewmodel/SettlementViewModel.dart';
+import '../viewmodel/settlement_view_model.dart';
 import 'dart:io';
 
 

@@ -1,11 +1,9 @@
-import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/class/class_group.dart';
 import 'package:groupsettlement2/class/class_user.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
 import 'package:groupsettlement2/modeluuid.dart';
-import 'package:uuid/uuid.dart';
 import '../class/class_receipt.dart';
 import '../class/class_receiptitem.dart';
 import '../class/class_settlement.dart';
@@ -31,10 +29,10 @@ class SettlementViewModel extends ChangeNotifier {
       <String, List<SettlementItem>>{};
 
   SettlementViewModel(String settlementId) {
-    _settingSettlementViewModel(settlementId);
+    settingSettlementViewModel(settlementId);
   }
 
-  void _settingSettlementViewModel(String settlementId) async {
+  void settingSettlementViewModel(String settlementId) async {
     settlement = await Settlement().getSettlementBySettlementId(settlementId);
     group = await Group().getGroupByGroupId(settlement.groupId!);
     //log("정산 이름: ${settlement.settlementName}");
@@ -87,12 +85,10 @@ class SettlementViewModel extends ChangeNotifier {
       }
     }
 
-    // if(receiptItems[receiptId]![index].serviceUsers.isEmpty) {
     if (settlementPapers[userId] == null) {
       finalSettlement.add(userId);
     }
     receiptItems[receiptId]![index].serviceUsers[userId] = userName;
-    print(finalSettlement);
 
     _addItemToSettlementPaper(receiptId, index, userId);
     _updateSettlementItemPrice(receiptId, index);
@@ -120,12 +116,11 @@ class SettlementViewModel extends ChangeNotifier {
     // ReceiptItem에 매칭되어있는 user 삭제
     receiptItems[receiptId]![index].serviceUsers.remove(userId);
 
-    if (settlementPapers[userId]!.settlementItems.isEmpty) {
+    if (settlementPapers[userId] == null) {
       finalSettlement.remove(userId);
-    } else {
-      _updateSettlementItemPrice(receiptId, index);
     }
 
+    _updateSettlementItemPrice(receiptId, index);
     if (settlementPapers[userId] != null) {
       settlementPapers[userId]!.totalPrice = 0;
       for (int i = 0;

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:groupsettlement2/design_element.dart';
-import '../viewmodel/SettlementViewModel.dart';
+import '../viewmodel/settlement_view_model.dart';
 import 'dart:math';
 
 class CompleteSettlementMatching extends ConsumerStatefulWidget {
