@@ -28,10 +28,11 @@ class SettlementViewModel extends ChangeNotifier{
   Map<String, List<SettlementItem>>  settlementItems  = <String, List<SettlementItem>> {};
 
   SettlementViewModel(String settlementId){
-    _settingSettlementViewModel(settlementId);
+    settlementUsers = []; receipts = {}; receiptItems = {}; finalSettlement = []; subGroups = {}; settlementPapers = {}; settlementItems = {};
+    settingSettlementViewModel(settlementId);
   }
 
-  void _settingSettlementViewModel(String settlementId) async {
+  void settingSettlementViewModel(String settlementId) async {
     settlement = await Settlement().getSettlementBySettlementId(settlementId);
     Group group = await Group().getGroupByGroupId(settlement.groupId!);
     //log("정산 이름: ${settlement.settlementName}");

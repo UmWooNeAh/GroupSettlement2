@@ -19,10 +19,11 @@ class GroupViewModel extends ChangeNotifier {
   List<Settlement> mergedSettlementInGroup = <Settlement> [];
 
   GroupViewModel(String userId, String groupId) {
-    _settingGroupViewModel(userId, groupId);
+    serviceUsers = []; settlementInGroup = []; mergedSettlementInGroup = [];
+    settingGroupViewModel(userId, groupId);
   }
 
-  void _settingGroupViewModel(String userId, String groupId) async {
+  void settingGroupViewModel(String userId, String groupId) async {
     userData = await ServiceUser().getUserByUserId(userId);
     myGroup = await Group().getGroupByGroupId(groupId);
     notifyListeners();

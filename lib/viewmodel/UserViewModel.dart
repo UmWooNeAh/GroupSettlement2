@@ -25,10 +25,11 @@ class UserViewModel extends ChangeNotifier {
   List<Alarm> etcStmAlarm = <Alarm> [];
 
   UserViewModel(String userId) {
-    _settingUserViewModel(userId);
+    settingUserViewModel(userId);
   }
 
-  void _settingUserViewModel(String userId) async {
+  void settingUserViewModel(String userId) async {
+    myGroup = []; myReceipts = []; mySettlements = []; mySettlementPapers = []; newAlarm = []; receiveStmAlarm = []; sendStmAlarm = []; etcStmAlarm = [];
     fetchUser(userId);
     fetchAlarm(userId);
   }
