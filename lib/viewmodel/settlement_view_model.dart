@@ -10,8 +10,8 @@ import '../class/class_settlement.dart';
 import '../class/class_settlementitem.dart';
 import '../class/class_settlementpaper.dart';
 
-final stmProvider = ChangeNotifierProvider<SettlementViewModel>(
-    (ref) => SettlementViewModel("54d974c2-ea2a-4998-89a3-6d9cca52db80"));
+final stmProvider =
+    ChangeNotifierProvider<SettlementViewModel>((ref) => SettlementViewModel());
 
 class SettlementViewModel extends ChangeNotifier {
   // Information
@@ -28,9 +28,7 @@ class SettlementViewModel extends ChangeNotifier {
   Map<String, List<SettlementItem>> settlementItems =
       <String, List<SettlementItem>>{};
 
-  SettlementViewModel(String settlementId) {
-    settingSettlementViewModel(settlementId);
-  }
+  SettlementViewModel();
 
   void settingSettlementViewModel(String settlementId) async {
     group = Group();
@@ -80,6 +78,7 @@ class SettlementViewModel extends ChangeNotifier {
       });
       notifyListeners();
     });
+    notifyListeners();
   }
 
   void addSettlementItem(

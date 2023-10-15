@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:groupsettlement2/class/class_receipt.dart';
 import 'package:groupsettlement2/design_element.dart';
 import 'dart:math' as math;
 import 'shared_basic_widget.dart';
@@ -99,26 +100,34 @@ class IsReceiptOpened extends ChangeNotifier {
   int count = 1;
   List<Offset> receiptPosition =
       List.generate(100, (index) => const Offset(0, 0));
-
-  void initializeReceiptPosition(receiptNum, Size size) {
-    receiptNum = 20;
-    int lineNum = sqrt(receiptNum).ceil();
-    double gridheight = size.height / lineNum;
+  List<Offset> receiptOriginPosition =
+      List.generate(100, (index) => const Offset(0, 0));
+  List<double> receiptAngle = List.generate(100, (index) => 0);
+  void initializeReceiptPosition(Size size) {
+    int lineNum = 4;
+    double gridheight = (size.height - 300) / lineNum;
     double gridwidth = size.width / lineNum;
     Random random = Random();
-    for (int i = 0; i < lineNum; i++) {
-      for (int j = 0; j < lineNum; j++) {
-        double randomX = random.nextDouble() * gridwidth + gridwidth * i;
-        double randomY = random.nextDouble() * gridheight + gridheight * j;
+    for (int i = 0; i < lineNum * 2.5; i++) {
+      for (int j = 0; j < lineNum * 2.5; j++) {
+        double randomX = random.nextDouble() * gridwidth + gridwidth * (i % 4);
+        double randomY =
+            random.nextDouble() * gridheight + gridheight * (j % 4);
         Offset newOffset = Offset(randomX, randomY);
-        receiptPosition[i * lineNum + j] = newOffset;
+        receiptPosition[i * 10 + j] = newOffset;
+        receiptAngle[i * 10 + j] = (random.nextDouble() - 0.5) * 20;
       }
     }
     notifyListeners();
   }
 
-  void updateReceiptPosition(offset, index) {
-    receiptPosition[index] = offset;
+  void startReceiptMoving(index) {
+    receiptOriginPosition[index] = receiptPosition[index];
+    notifyListeners();
+  }
+
+  void updateReceiptPosition(offsetFromOrigin, index) {
+    receiptPosition[index] = receiptOriginPosition[index] + offsetFromOrigin;
     notifyListeners();
   }
 
@@ -166,7 +175,7 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    final provider = ref.watch(stmProvider);
+    // final provider = ref.watch(stmProvider);
     final bottomsheetprovider = ref.watch(bottomSheetSliderProvider);
     final providerMethod = ref.watch(stmProvider.notifier);
     final receiptprovider = ref.watch(isReceiptOpenedProvider);
@@ -179,8 +188,7 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
       // while (provider.receipts.isEmpty) {
       //   Future.delayed(const Duration(milliseconds: 100));
       // }
-      Future(() => receiptprovider.initializeReceiptPosition(
-          provider.receipts.length, size));
+      Future(() => receiptprovider.initializeReceiptPosition(size));
     }
 
     return Scaffold(
@@ -1409,162 +1417,170 @@ class _SettlementPageReceiptState extends ConsumerState<SettlementPageReceipt> {
     return Positioned(
       top: receiptprovider.receiptPosition[index].dy,
       left: receiptprovider.receiptPosition[index].dx,
-      child: GestureDetector(
-        onLongPressMoveUpdate: (details) {
-          receiptprovider.updateReceiptPosition(details.localPosition, index);
-        },
-        onTap: () {
-          isSelected = !isSelected;
-          ref.watch(isReceiptOpenedProvider.notifier).openManagement(id);
-        },
-        child: DragTarget(
-          onWillAccept: (data) {
-            isDragged = !isDragged;
-            return true;
+      child: Transform(
+        transform:
+            Matrix4.rotationZ(receiptprovider.receiptAngle[index] * pi / 180),
+        child: GestureDetector(
+          onLongPressStart: (details) {
+            receiptprovider.startReceiptMoving(index);
           },
-          onLeave: (data) {
-            isDragged = !isDragged;
+          onLongPressMoveUpdate: (details) {
+            receiptprovider.updateReceiptPosition(
+                details.offsetFromOrigin, index);
           },
-          onAccept: (data) {
-            isDragged = !isDragged;
+          onTap: () {
+            isSelected = !isSelected;
+            ref.watch(isReceiptOpenedProvider.notifier).openManagement(id);
           },
-          builder: (context, candidateData, rejectedData) {
-            return Container(
-              width: 100,
-              height: 130,
-              decoration: BoxDecoration(
-                color: isDragged ? Colors.black26 : Colors.white,
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.grey,
-                    spreadRadius: 1,
-                    blurRadius: 5,
-                  ),
-                ],
-              ),
-              child: Stack(
-                children: [
-                  const SizedBox(
-                    width: 100,
-                    height: 120,
-                  ),
-                  Positioned(
-                    top: 5,
-                    left: 47,
-                    child: Container(
-                      width: 6,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: color1,
-                        borderRadius: BorderRadius.circular(100),
+          child: DragTarget(
+            onWillAccept: (data) {
+              isDragged = !isDragged;
+              return true;
+            },
+            onLeave: (data) {
+              isDragged = !isDragged;
+            },
+            onAccept: (data) {
+              isDragged = !isDragged;
+            },
+            builder: (context, candidateData, rejectedData) {
+              return Container(
+                width: 100,
+                height: 130,
+                decoration: BoxDecoration(
+                  color: isDragged ? Colors.black26 : Colors.white,
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.grey,
+                      spreadRadius: 1,
+                      blurRadius: 5,
+                    ),
+                  ],
+                ),
+                child: Stack(
+                  children: [
+                    const SizedBox(
+                      width: 100,
+                      height: 120,
+                    ),
+                    Positioned(
+                      top: 5,
+                      left: 47,
+                      child: Container(
+                        width: 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          color: color1,
+                          borderRadius: BorderRadius.circular(100),
+                        ),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    top: 15,
-                    left: 5,
-                    child: Text(
-                      provider.receipts[id]?.receiptName ?? "",
+                    Positioned(
+                      top: 15,
+                      left: 5,
+                      child: Text(
+                        provider.receipts[id]?.receiptName ?? "",
+                      ),
                     ),
-                  ),
-                  Positioned(
-                    top: 35,
-                    left: 5,
-                    child: RichText(
-                      text: TextSpan(
-                        style: DefaultTextStyle.of(context).style,
-                        children: [
-                          TextSpan(
-                            text: provider.receiptItems[id]?[0].menuName ??
-                                "menu",
-                            style: const TextStyle(
-                              fontSize: 9,
+                    Positioned(
+                      top: 35,
+                      left: 5,
+                      child: RichText(
+                        text: TextSpan(
+                          style: DefaultTextStyle.of(context).style,
+                          children: [
+                            TextSpan(
+                              text: provider.receiptItems[id]?[0].menuName ??
+                                  "menu",
+                              style: const TextStyle(
+                                fontSize: 9,
+                              ),
                             ),
+                            TextSpan(
+                              text:
+                                  " 등 ${provider.receipts[widget.id]?.receiptItems.length ?? "X"} 항목",
+                              style: TextStyle(
+                                fontSize: 9,
+                                color: Colors.grey[600],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 60,
+                      left: 5,
+                      child: Row(
+                        children: [
+                          Row(
+                            children: List.generate(
+                                min(
+                                    2,
+                                    provider.receiptItems[id]
+                                            ?.map((receiptItem) => receiptItem
+                                                .serviceUsers.values
+                                                .toSet())
+                                            .reduce((value, element) =>
+                                                value.union(element))
+                                            .length ??
+                                        0), (index) {
+                              return Text(
+                                "${provider.receiptItems[id]?.map((receiptItem) => receiptItem.serviceUsers.values.toSet()).reduce((value, element) => value.union(element)).toList()[index]} ",
+                              );
+                            }),
                           ),
-                          TextSpan(
-                            text:
-                                " 등 ${provider.receipts[widget.id]?.receiptItems.length ?? "X"} 항목",
+                          Text(
+                            (provider.receiptItems[id]
+                                            ?.map((receiptItem) => receiptItem
+                                                .serviceUsers.values
+                                                .toSet())
+                                            .reduce((value, element) =>
+                                                value.union(element))
+                                            .length ??
+                                        0) ==
+                                    0
+                                ? ""
+                                : " 등 ${provider.receiptItems[id]?.map((receiptItem) => receiptItem.serviceUsers.values.toSet()).reduce((value, element) => value.union(element)).length ?? 0} 명",
                             style: TextStyle(
                               fontSize: 9,
                               color: Colors.grey[600],
                             ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 60,
-                    left: 5,
-                    child: Row(
-                      children: [
-                        Row(
-                          children: List.generate(
-                              min(
-                                  2,
-                                  provider.receiptItems[id]
-                                          ?.map((receiptItem) => receiptItem
-                                              .serviceUsers.values
-                                              .toSet())
-                                          .reduce((value, element) =>
-                                              value.union(element))
-                                          .length ??
-                                      0), (index) {
-                            return Text(
-                              "${provider.receiptItems[id]?.map((receiptItem) => receiptItem.serviceUsers.values.toSet()).reduce((value, element) => value.union(element)).toList()[index]} ",
-                            );
-                          }),
-                        ),
-                        Text(
-                          (provider.receiptItems[id]
-                                          ?.map((receiptItem) => receiptItem
-                                              .serviceUsers.values
-                                              .toSet())
-                                          .reduce((value, element) =>
-                                              value.union(element))
-                                          .length ??
-                                      0) ==
-                                  0
-                              ? ""
-                              : " 등 ${provider.receiptItems[id]?.map((receiptItem) => receiptItem.serviceUsers.values.toSet()).reduce((value, element) => value.union(element)).length ?? 0} 명",
-                          style: TextStyle(
-                            fontSize: 9,
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    child: Container(
-                      width: 100,
-                      height: 40,
-                      padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          const Text(
-                            "합계 금액",
-                            style: TextStyle(
-                              fontSize: 11,
-                            ),
-                          ),
-                          Text(
-                            "${priceToString.format((provider.receiptItems[id] == null) ? 0 : provider.receiptItems[id]!.map((receiptItem) => receiptItem.menuPrice).reduce((value, element) => (value ?? 0) + (element ?? 0)))}원",
-                            style: const TextStyle(
-                              fontSize: 15,
-                              color: color1,
-                            ),
                           ),
                         ],
                       ),
                     ),
-                  ),
-                ],
-              ),
-            );
-          },
+                    Positioned(
+                      bottom: 0,
+                      child: Container(
+                        width: 100,
+                        height: 40,
+                        padding: const EdgeInsets.fromLTRB(5, 5, 5, 0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            const Text(
+                              "합계 금액",
+                              style: TextStyle(
+                                fontSize: 11,
+                              ),
+                            ),
+                            Text(
+                              "${priceToString.format((provider.receiptItems[id] == null) ? 0 : provider.receiptItems[id]!.map((receiptItem) => receiptItem.menuPrice).reduce((value, element) => (value ?? 0) + (element ?? 0)))}원",
+                              style: const TextStyle(
+                                fontSize: 15,
+                                color: color1,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
