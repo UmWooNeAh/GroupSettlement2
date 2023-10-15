@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,7 +10,7 @@ import '../class/class_receiptContent.dart';
 
 class CheckScannedReceiptPge extends ConsumerStatefulWidget {
   final ReceiptContent receiptContent;
-  const CheckScannedReceiptPge({super.key,required this.receiptContent});
+  const CheckScannedReceiptPge({super.key, required this.receiptContent});
 
   @override
   ConsumerState<CheckScannedReceiptPge> createState() =>
@@ -111,7 +109,8 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
                         horizontal: 20,
                       ),
                       width: size.width,
-                      child: Text("업체명: ${widget.receiptContent.receipt!.storeName}")),
+                      child: Text(
+                          "업체명: ${widget.receiptContent.receipt!.storeName}")),
                   Container(
                     margin: const EdgeInsets.symmetric(
                       horizontal: 20,
@@ -169,7 +168,8 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
                         children: List.generate(
                           widget.receiptContent.receiptItems.length,
                           (index) {
-                            ReceiptItem receiptItem = widget.receiptContent.receiptItems[index];
+                            ReceiptItem receiptItem =
+                                widget.receiptContent.receiptItems[index];
                             return Container(
                               margin: const EdgeInsets.symmetric(
                                 horizontal: 20,
@@ -184,7 +184,7 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
                                       width: 140,
                                       child: Text(
                                         receiptItem.menuName ?? "null",
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w700,
                                         ),
@@ -194,7 +194,9 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
                                     child: Align(
                                       alignment: const Alignment(1, 0),
                                       child: Text(
-                                        receiptItem.menuCount != null ? receiptItem.menuCount.toString() : "null",
+                                        receiptItem.menuCount != null
+                                            ? receiptItem.menuCount.toString()
+                                            : "null",
                                         style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w700,
@@ -207,8 +209,9 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
                                     child: Align(
                                       alignment: const Alignment(1, 0),
                                       child: Text(
-                                        receiptItem.menuPrice != null ?
-                                        "${priceToString.format(receiptItem.menuPrice)}원" : "null",
+                                        receiptItem.menuPrice != null
+                                            ? "${priceToString.format(receiptItem.menuPrice)}원"
+                                            : "null",
                                         style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w700,
@@ -269,7 +272,9 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
                 width: size.width * 0.46,
                 height: 60,
                 child: OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    context.go('/cameraDetectPage');
+                  },
                   style: OutlinedButton.styleFrom(
                     backgroundColor: Colors.white,
                     side: const BorderSide(
@@ -304,8 +309,9 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
                     ),
                   ),
                   child: GestureDetector(
-                    onTap:(){
-                      context.push('/CreateNewSettlementPage/editReceiptPage',extra: widget.receiptContent);
+                    onTap: () {
+                      context.push('/CreateNewSettlementPage/editReceiptPage',
+                          extra: widget.receiptContent);
                     },
                     child: const Text(
                       "직접 수정하기",
@@ -325,6 +331,16 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
             margin: const EdgeInsets.all(10),
             child: OutlinedButton(
               onPressed: () {
+                for (ReceiptItem receiptItem
+                    in widget.receiptContent.receiptItems) {
+                  if (receiptItem.menuCount! < 1) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text('수량을 수정해주세요'),
+                      duration: Duration(seconds: 3),
+                    ));
+                    return;
+                  }
+                }
                 stmvm.addReceipt(widget.receiptContent);
                 context.go('/CreateNewSettlementPage');
               },

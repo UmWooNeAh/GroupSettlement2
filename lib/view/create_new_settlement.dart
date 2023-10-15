@@ -165,9 +165,10 @@ class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
                           ),
                         ),
                         child: GestureDetector(
-                          onTap:(){
-                            availableCameras().then((cameras){
-                              context.push('/cameraDetectPage',extra: cameras[0]);
+                          onTap: () {
+                            availableCameras().then((cameras) {
+                              context.push('/cameraDetectPage',
+                                  extra: cameras[0]);
                             });
                           },
                           child: const Text(
@@ -249,7 +250,10 @@ class _CreateNewSettlementReceiptState
         setState(() {
           isTapDown = !isTapDown;
         });
-        context.push('/CreateNewSettlementPage/EditReceiptPage');
+
+        context.push(
+          '/CreateNewSettlementPage/EditReceiptPage',
+        );
       },
       onTapCancel: () {
         setState(() {

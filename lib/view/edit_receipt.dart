@@ -1,36 +1,47 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:groupsettlement2/design_element.dart';
 import 'package:groupsettlement2/view/shared_basic_widget.dart';
-
 import '../class/class_receiptContent.dart';
 import '../class/class_receiptitem.dart';
 import '../viewmodel/SettlementCreateViewModel.dart';
 
 class EditReceiptPage extends ConsumerStatefulWidget {
   final ReceiptContent receiptContent;
-  const EditReceiptPage({super.key,required this.receiptContent});
+  const EditReceiptPage({super.key, required this.receiptContent});
 
   @override
   ConsumerState<EditReceiptPage> createState() => _EditReceiptState();
 }
 
 class _EditReceiptState extends ConsumerState<EditReceiptPage> {
+  List<TextEditingController> menuController = [];
+  List<TextEditingController> countController = [];
+  List<TextEditingController> priceController = [];
+
+  @override
+  void initState() {
+    super.initState();
+    for (int i = 0; i < widget.receiptContent.receiptItems.length; i++) {
+      ReceiptItem receiptItem = widget.receiptContent.receiptItems[i];
+      menuController.add(TextEditingController(text: receiptItem.menuName));
+      countController
+          .add(TextEditingController(text: receiptItem.menuCount.toString()));
+      priceController.add(TextEditingController(
+          text: priceToString.format(receiptItem.menuPrice ?? 0)));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    final stmvm = ref.watch(stmCreateProvider);
-    List<TextEditingController> _menuController = [];
-    List<TextEditingController> _countController = [];
-    List<TextEditingController> _priceController = [];
 
     return Scaffold(
       appBar: AppBar(),
       resizeToAvoidBottomInset: false,
       body: GestureDetector(
-        onTap:()=>FocusScope.of(context).unfocus(),
+        onTap: () => FocusScope.of(context).unfocus(),
         child: Column(
           children: [
             const Text.rich(
@@ -123,7 +134,8 @@ class _EditReceiptState extends ConsumerState<EditReceiptPage> {
                           horizontal: 20,
                         ),
                         width: size.width,
-                        child: Text("업체명: ${widget.receiptContent.receipt!.storeName}")),
+                        child: Text(
+                            "업체명: ${widget.receiptContent.receipt!.storeName}")),
                     Container(
                       margin: const EdgeInsets.symmetric(
                         horizontal: 20,
@@ -181,10 +193,6 @@ class _EditReceiptState extends ConsumerState<EditReceiptPage> {
                           children: List.generate(
                             widget.receiptContent.receiptItems.length,
                             (index) {
-                              ReceiptItem receiptItem = widget.receiptContent.receiptItems[index];
-                              _menuController[index] = TextEditingController(text: receiptItem.menuName);
-                              _countController[index] = TextEditingController(text: receiptItem.menuCount.toString());
-                              _priceController[index] = TextEditingController(text: receiptItem.menuPrice.toString());
                               return Container(
                                 margin: const EdgeInsets.symmetric(
                                   horizontal: 20,
@@ -192,12 +200,13 @@ class _EditReceiptState extends ConsumerState<EditReceiptPage> {
                                 ),
                                 height: 30,
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     SizedBox(
                                       width: 140,
                                       child: TextField(
-                                        controller: _menuController[index],
+                                        controller: menuController[index],
                                         showCursor: true,
                                         maxLength: 13,
                                         decoration: const InputDecoration(
@@ -212,7 +221,7 @@ class _EditReceiptState extends ConsumerState<EditReceiptPage> {
                                         alignment: const Alignment(1, 0),
                                         child: TextField(
                                           textAlign: TextAlign.end,
-                                          controller: _countController[index],
+                                          controller: countController[index],
                                           showCursor: true,
                                           maxLength: 13,
                                           decoration: const InputDecoration(
@@ -228,7 +237,7 @@ class _EditReceiptState extends ConsumerState<EditReceiptPage> {
                                         alignment: const Alignment(1, 0),
                                         child: TextField(
                                           textAlign: TextAlign.end,
-                                          controller: _priceController[index],
+                                          controller: priceController[index],
                                           showCursor: true,
                                           maxLength: 13,
                                           decoration: const InputDecoration(
@@ -238,10 +247,13 @@ class _EditReceiptState extends ConsumerState<EditReceiptPage> {
                                           onChanged: (value) {
                                             setState(() {
                                               if (value == '') {
-                                                _priceController[index].text = '0';
+                                                priceController[index].text =
+                                                    '0';
                                               } else {
-                                                _priceController[index].text =
-                                                    priceToString.format(priceToString.parse(value));
+                                                priceController[index].text =
+                                                    priceToString.format(
+                                                        priceToString
+                                                            .parse(value));
                                               }
                                             });
                                           },
@@ -323,36 +335,45 @@ class _EditReceiptState extends ConsumerState<EditReceiptPage> {
               margin: const EdgeInsets.all(10),
               child: OutlinedButton(
                 onPressed: () {
-                  Iterable.generate(widget.receiptContent.receiptItems.length).forEach((index) {
-                    widget.receiptContent.receiptItems[index].menuName = _menuController[index].text;
+                  for (var index in Iterable.generate(
+                      widget.receiptContent.receiptItems.length)) {
+                    widget.receiptContent.receiptItems[index].menuName =
+                        menuController[index].text;
                     try {
                       widget.receiptContent.receiptItems[index].menuCount =
-                          int.parse(_countController[index].text);
-                    }catch(e){
-                      print("${index}번 인덱스 수량에 숫자가 아닌 값이 들어감\n ${_menuController[index].text} , ${_countController[index].text} , ${_priceController[index].text}");
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('${index+1}번째 항목의 수량이 잘못되었어요. : ${_countController[index].text}'),
-                            duration: Duration(seconds: 3),
-                          )
-                      );
+                          int.parse(countController[index].text);
+                      if (widget.receiptContent.receiptItems[index].menuCount! <
+                          1) {
+                        return;
+                      }
+                    } catch (e) {
+                      print(
+                          "$index번 인덱스 수량에 숫자가 아닌 값이 들어감\n ${menuController[index].text} , ${countController[index].text} , ${priceController[index].text}");
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text(
+                            '${index + 1}번째 항목의 수량이 잘못되었어요. : ${countController[index].text}'),
+                        duration: const Duration(seconds: 3),
+                      ));
                       return;
                     }
                     try {
                       widget.receiptContent.receiptItems[index].menuPrice =
-                          int.parse(_priceController[index].text);
-                    }catch(e){
-                      print("${index}번 인덱스 가격에 숫자가 아닌 값이 들어감\n ${_menuController[index].text} , ${_countController[index].text} , ${_priceController[index].text}");
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('${index+1}번째 항목의 가격이 잘못되었어요. : ${_priceController[index].text}'),
-                            duration: Duration(seconds: 3),
-                          )
-                      );
+                          priceToString
+                              .parse(priceController[index].text)
+                              .toInt();
+                    } catch (e) {
+                      print(
+                          "$index번 인덱스 가격에 숫자가 아닌 값이 들어감\n ${menuController[index].text} , ${countController[index].text} , ${priceController[index].text}");
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text(
+                            '${index + 1}번째 항목의 가격이 잘못되었어요. : ${priceController[index].text}'),
+                        duration: const Duration(seconds: 3),
+                      ));
                       return;
                     }
-                  });
-                  context.go("/CreateNewSettlementPage",extra: widget.receiptContent);
+                  }
+                  context.go("/scanedRecieptPage",
+                      extra: widget.receiptContent);
                 },
                 style: OutlinedButton.styleFrom(
                   backgroundColor: color2,
@@ -378,4 +399,3 @@ class _EditReceiptState extends ConsumerState<EditReceiptPage> {
     );
   }
 }
-
