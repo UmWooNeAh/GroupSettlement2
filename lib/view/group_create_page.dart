@@ -283,10 +283,9 @@ class _groupCreatePageState extends ConsumerState<groupCreatePage> {
                                               gvm.addByDirect(inputName!);
                                             } else{
                                               ScaffoldMessenger.of(context).showSnackBar(
-                                                //SnackBar 구현하는법 context는 위에 BuildContext에 있는 객체를 그대로 가져오면 됨.
                                                   SnackBar(
-                                                    content: Text('사용자명은 공백이 될 수 없습니다'), //snack bar의 내용. icon, button같은것도 가능하다.
-                                                    duration: Duration(seconds: 3), //올라와있는 시간
+                                                    content: Text('사용자명은 공백이 될 수 없습니다'),
+                                                    duration: Duration(seconds: 3),
                                                   )
                                               );
                                             }

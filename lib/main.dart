@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:groupsettlement2/class/class_receiptContent.dart';
 import 'package:groupsettlement2/view/camera_clova_detect_page.dart';
+import 'package:groupsettlement2/view/check_scanned_receipt.dart';
 import 'package:groupsettlement2/view/groupMainPage.dart';
 import 'package:groupsettlement2/view/group_create_page.dart';
 import 'package:groupsettlement2/view/group_select_page.dart';
@@ -132,7 +134,8 @@ final GoRouter _router = GoRouter(
               GoRoute(
                 path: 'EditReceiptPage',
                 builder: (context, state) {
-                  return const EditReceiptPage();
+                  ReceiptContent content = state.extra as ReceiptContent;
+                  return EditReceiptPage(receiptContent: content,);
                 },
               ),
               // GoRoute(
@@ -195,10 +198,17 @@ final GoRouter _router = GoRouter(
           },
         ),
         GoRoute(
-          path: "CameraPage",
+          path: "cameraDetectPage",
           builder: (context, state) {
             CameraDescription camera = state.extra as CameraDescription;
             return cameraDetectPage(extra : camera);
+          },
+        ),
+        GoRoute(
+          path: "scanedRecieptPage",
+          builder: (context, state) {
+            ReceiptContent content = state.extra as ReceiptContent;
+            return CheckScannedReceiptPge(receiptContent: content);
           },
         ),
       ],

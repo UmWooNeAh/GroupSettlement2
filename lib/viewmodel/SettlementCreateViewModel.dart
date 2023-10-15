@@ -78,11 +78,15 @@ class SettlementCreateViewModel extends ChangeNotifier {
 
         try {
           rcpitem.menuPrice =
-              int.parse(item['price']['price']['formatted']['value']);
+              int.parse(item['price']['unitPrice']['formatted']['value']);
           tempTotalPrice += rcpitem.menuPrice!;
         }catch(e){
-          rcpitem.menuPrice = -1;
-          print("Error occured processing price text : $e");
+          try {
+            rcpitem.menuPrice =
+                int.parse(item['price']['price']['formatted']['value']);
+          } catch(e) {
+            print("Error occured processing price text : $e");
+          }
         }
         newReceiptItems.add(rcpitem);
     }

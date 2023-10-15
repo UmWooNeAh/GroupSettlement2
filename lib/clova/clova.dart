@@ -79,13 +79,9 @@ class Clova {
       final response = await request.send();
       if (response.statusCode == 200) {
         final responseBody = await response.stream.bytesToString();
+        log(responseBody);
         res = jsonDecode(responseBody);
 
-        // final outputFile = File('./output.json');
-        // await outputFile.writeAsString(jsonEncode(res), encoding: utf8);
-        //print("분석결과: ${res['images'][0]['receipt']['result']['subResults'][0]}");
-        //log(res.toString());
-        this.res = res;
         return res;
       } else {
         print('POST failed: ${response.statusCode}');

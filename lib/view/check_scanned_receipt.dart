@@ -1,10 +1,18 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:groupsettlement2/class/class_receiptitem.dart';
 import 'package:groupsettlement2/design_element.dart';
 import 'package:groupsettlement2/view/shared_basic_widget.dart';
+import 'package:groupsettlement2/viewmodel/SettlementCreateViewModel.dart';
+
+import '../class/class_receiptContent.dart';
 
 class CheckScannedReceiptPge extends ConsumerStatefulWidget {
-  const CheckScannedReceiptPge({super.key});
+  final ReceiptContent receiptContent;
+  const CheckScannedReceiptPge({super.key,required this.receiptContent});
 
   @override
   ConsumerState<CheckScannedReceiptPge> createState() =>
@@ -15,6 +23,7 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    final stmvm = ref.watch(stmCreateProvider);
     return Scaffold(
       appBar: AppBar(),
       body: Column(
@@ -102,7 +111,7 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
                         horizontal: 20,
                       ),
                       width: size.width,
-                      child: const Text("업체명: 달빛한모금 경북대점")),
+                      child: Text("업체명: ${widget.receiptContent.receipt!.storeName}")),
                   Container(
                     margin: const EdgeInsets.symmetric(
                       horizontal: 20,
@@ -158,8 +167,9 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
                     child: SingleChildScrollView(
                       child: Column(
                         children: List.generate(
-                          10,
+                          widget.receiptContent.receiptItems.length,
                           (index) {
+                            ReceiptItem receiptItem = widget.receiptContent.receiptItems[index];
                             return Container(
                               margin: const EdgeInsets.symmetric(
                                 horizontal: 20,
@@ -170,10 +180,10 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const SizedBox(
+                                  SizedBox(
                                       width: 140,
                                       child: Text(
-                                        "짜장면",
+                                        receiptItem.menuName ?? "null",
                                         style: TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w700,
@@ -184,7 +194,7 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
                                     child: Align(
                                       alignment: const Alignment(1, 0),
                                       child: Text(
-                                        "$index",
+                                        receiptItem.menuCount != null ? receiptItem.menuCount.toString() : "null",
                                         style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w700,
@@ -197,7 +207,8 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
                                     child: Align(
                                       alignment: const Alignment(1, 0),
                                       child: Text(
-                                        "${priceToString.format(index * 10000)}원",
+                                        receiptItem.menuPrice != null ?
+                                        "${priceToString.format(receiptItem.menuPrice)}원" : "null",
                                         style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w700,
@@ -236,7 +247,7 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
                           ),
                         ),
                         Text(
-                          "${priceToString.format(40000)}원",
+                          "${priceToString.format(widget.receiptContent.receipt!.totalPrice)}원",
                           style: const TextStyle(
                             fontSize: 21,
                             fontWeight: FontWeight.w700,
@@ -292,12 +303,17 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: const Text(
-                    "직접 수정하기",
-                    style: TextStyle(
-                        fontSize: 15,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w700),
+                  child: GestureDetector(
+                    onTap:(){
+                      context.push('/CreateNewSettlementPage/editReceiptPage',extra: widget.receiptContent);
+                    },
+                    child: const Text(
+                      "직접 수정하기",
+                      style: TextStyle(
+                          fontSize: 15,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w700),
+                    ),
                   ),
                 ),
               ),
@@ -308,7 +324,10 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
             height: 60,
             margin: const EdgeInsets.all(10),
             child: OutlinedButton(
-              onPressed: () {},
+              onPressed: () {
+                stmvm.addReceipt(widget.receiptContent);
+                context.go('/CreateNewSettlementPage');
+              },
               style: OutlinedButton.styleFrom(
                 backgroundColor: color2,
                 side: const BorderSide(

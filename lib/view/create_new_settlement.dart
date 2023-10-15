@@ -165,14 +165,10 @@ class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
                           ),
                         ),
                         child: GestureDetector(
-                          onTap:()async{
-                            await availableCameras().then((value){
-                              context.goNamed('/CreateNewSettlementPage/cameraDetectPage',queryParameters: {'camera': value});
+                          onTap:(){
+                            availableCameras().then((cameras){
+                              context.push('/cameraDetectPage',extra: cameras[0]);
                             });
-
-
-
-                            // context.push('/CreateNewSettlementPage/cameraDetectPage');
                           },
                           child: const Text(
                             "새 영수증 추가",
