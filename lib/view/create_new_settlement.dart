@@ -1,3 +1,4 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -163,11 +164,18 @@ class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        child: const Text(
-                          "새 영수증 추가",
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 20,
+                        child: GestureDetector(
+                          onTap:(){
+                            availableCameras().then((cameras){
+                              context.push('/cameraDetectPage',extra: cameras[0]);
+                            });
+                          },
+                          child: const Text(
+                            "새 영수증 추가",
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 20,
+                            ),
                           ),
                         ),
                       ),

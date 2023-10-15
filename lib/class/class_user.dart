@@ -21,6 +21,7 @@ class ServiceUser {
   }
 
   ServiceUser.fromJson(dynamic json) {
+    print("Json : ${json}");
     serviceUserId = json['serviceuserid'];
     name = json['name'];
     kakaoId = json['kakaoid'];
@@ -64,6 +65,7 @@ class ServiceUser {
   Future<ServiceUser> getUserByUserId(String userid) async{
     DocumentSnapshot<Map<String, dynamic>> result =
     await FirebaseFirestore.instance.collection("userlist").doc(userid).get();
+    print("result : ${result}");
     ServiceUser user = ServiceUser.fromSnapShot(result);
     return user;
   }

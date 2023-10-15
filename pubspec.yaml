@@ -57,6 +57,9 @@ dependencies:
   flutter_svg: ^2.0.7
   intl: ^0.18.1
   flutter_inset_box_shadow: ^1.0.8
+  camera: ^0.10.5+5
+  path_provider: ^2.1.1
+  path: ^1.8.3
 
 dev_dependencies:
   flutter_test:

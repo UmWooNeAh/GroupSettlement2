@@ -19,10 +19,11 @@ class GroupViewModel extends ChangeNotifier {
   List<Settlement> mergedSettlementInGroup = <Settlement> [];
 
   GroupViewModel(String userId, String groupId) {
-    _settingGroupViewModel(userId, groupId);
+    serviceUsers = []; settlementInGroup = []; mergedSettlementInGroup = [];
+    settingGroupViewModel(userId, groupId);
   }
 
-  void _settingGroupViewModel(String userId, String groupId) async {
+  void settingGroupViewModel(String userId, String groupId) async {
     userData = await ServiceUser().getUserByUserId(userId);
     myGroup = await Group().getGroupByGroupId(groupId);
     notifyListeners();
@@ -54,9 +55,11 @@ class GroupViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addByDirect(ServiceUser user) {
-    serviceUsers.add(user);
+  void addByDirect(String userName) {
+    ServiceUser user = ServiceUser();
+    user.name = userName;
     user.createUser();
+    serviceUsers.add(user);
     notifyListeners();
   }
 
@@ -90,8 +93,10 @@ class GroupViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateGroupName(String GroupId, String name){
-    myGroup.groupName = name;
+  void updateGroup(String GroupId, String name){
+    if(name != null ) {
+      myGroup.groupName = name;
+    }
     FireService().updateDoc("grouplist", myGroup.groupId!, myGroup.toJson());
     notifyListeners();
   }
@@ -107,15 +112,6 @@ class GroupViewModel extends ChangeNotifier {
     else {
       print("카카오톡으로 추가한 유저의 이름은 변경할 수 없습니다.");
     }
-    notifyListeners();
-  }
-
-  void createGroup(String groupname) async {
-    myGroup.groupName = groupname;
-    for(var user in serviceUsers) {
-          myGroup.serviceUsers.add(user.serviceUserId!);
-    }
-    myGroup.createGroup();
     notifyListeners();
   }
 

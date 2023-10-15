@@ -1,8 +1,12 @@
 import 'dart:collection';
 import 'dart:io';
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:groupsettlement2/view/complete_settlement_matching.dart';
+import 'package:groupsettlement2/class/class_receiptContent.dart';
+import 'package:groupsettlement2/view/camera_clova_detect_page.dart';
+import 'package:groupsettlement2/view/check_scanned_receipt.dart';
 import 'package:groupsettlement2/view/groupMainPage.dart';
 import 'package:groupsettlement2/view/group_create_page.dart';
 import 'package:groupsettlement2/view/group_select_page.dart';
@@ -112,9 +116,9 @@ final GoRouter _router = GoRouter(
               return const clovaPage();
             }),
         GoRoute(
-            path: 'groupMainPage',
+            path: 'groupMainPage/:groupId',
             builder: (context, state) {
-              return const groupMainPage();
+              return groupMainPage(groupId: state.pathParameters['groupId']!);
             }),
         GoRoute(
             path: 'settlementDetailPage',
@@ -130,9 +134,16 @@ final GoRouter _router = GoRouter(
               GoRoute(
                 path: 'EditReceiptPage',
                 builder: (context, state) {
-                  return const EditReceiptPage();
+                  ReceiptContent content = state.extra as ReceiptContent;
+                  return EditReceiptPage(
+                    receiptContent: content,
+                  );
                 },
               ),
+              // GoRoute(
+              //   path: 'cameraDetectPage',
+              //   builder: (context, state) => cameraDetectPage(camera: state.qu),
+              // ),
             ]),
         GoRoute(
           path: "SettlementPage",
@@ -183,9 +194,9 @@ final GoRouter _router = GoRouter(
           },
         ),
         GoRoute(
-          path: "GroupSelectPage",
+          path: "GroupSelectPage/:userId",
           builder: (context, state) {
-            return const groupSelectPage();
+            return groupSelectPage(userId: state.pathParameters["userId"]!);
           },
         ),
         GoRoute(
@@ -195,9 +206,17 @@ final GoRouter _router = GoRouter(
           },
         ),
         GoRoute(
-          path: "GroupSettlementListPage",
+          path: "cameraDetectPage",
           builder: (context, state) {
-            return const groupSettlementListPage();
+            CameraDescription camera = state.extra as CameraDescription;
+            return cameraDetectPage(extra: camera);
+          },
+        ),
+        GoRoute(
+          path: "scanedRecieptPage",
+          builder: (context, state) {
+            ReceiptContent content = state.extra as ReceiptContent;
+            return CheckScannedReceiptPge(receiptContent: content);
           },
         ),
       ],
@@ -215,7 +234,7 @@ void main() async {
   // KakaoSdk 초기화
   // final nativeKey = await File("./Kakao/kakaoKey.txt").readAsString();
   // final jsKey = await File("./Kakao/kakaoJsKey.txt").readAsString();
-
+  WidgetsFlutterBinding.ensureInitialized();
   KakaoSdk.init(
       nativeAppKey: '00b83bf69fba554145c773d6737772fc',
       javaScriptAppKey: 'aa3a51d84f03c87a103a1a127dfcd8f9');

@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../modeluuid.dart';
 
@@ -14,6 +16,7 @@ class Settlement {
   bool? isFinished;
   bool? isMerged;
   List<String> mergedSettlement = <String> [];
+  double totalPrice = 0;
   Timestamp? time;
 
   Settlement() {
@@ -35,6 +38,7 @@ class Settlement {
     isFinished = json['isfinished'];
     isMerged = json['ismerged'];
     mergedSettlement= List<String>.from(json['mergedsettlement']);
+    totalPrice = json['totalprice'];
     time = json['time'];
   }
 
@@ -50,6 +54,7 @@ class Settlement {
     'isfinished' : isFinished,
     'ismerged' : isMerged,
     'mergedsettlement' : mergedSettlement,
+    'totalprice' : totalPrice,
     'time' : time,
   };
 

@@ -221,11 +221,17 @@ class _MainPageState extends State<MainPage> {
                   },
                 ),
                 ElevatedButton(
-                  child: const Text("Group Main Page"),
+                  child: const Text("Group Select Page"),
                   onPressed: () {
-                    context.push("/groupMainPage");
+                    context.push("/groupSelectPage/8dcca5ca-107c-4a12-9d12-f746e2e513b7");
                   },
                 ),
+                ElevatedButton(
+                  child: const Text("Scanned Page"),
+                  onPressed: () {
+                    context.push("/scanedRecieptPage");
+                  },
+                )
               ],
             ),
           ],
