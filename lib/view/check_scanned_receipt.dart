@@ -1,3 +1,4 @@
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -250,7 +251,7 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
                           ),
                         ),
                         Text(
-                          "${priceToString.format(widget.receiptContent.receipt!.totalPrice)}원",
+                          "${priceToString.format(widget.receiptContent.receiptItems)}원",
                           style: const TextStyle(
                             fontSize: 21,
                             fontWeight: FontWeight.w700,
@@ -272,8 +273,9 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
                 width: size.width * 0.46,
                 height: 60,
                 child: OutlinedButton(
-                  onPressed: () {
-                    context.go('/cameraDetectPage');
+                  onPressed: ()async{
+                    final cameras = await availableCameras();
+                    context.go('/cameraDetectPage',extra:cameras[1]);
                   },
                   style: OutlinedButton.styleFrom(
                     backgroundColor: Colors.white,
@@ -310,7 +312,7 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
                   ),
                   child: GestureDetector(
                     onTap: () {
-                      context.push('/CreateNewSettlementPage/editReceiptPage',
+                      context.push('/CreateNewSettlementPage/editReceiptPage/false',
                           extra: widget.receiptContent);
                     },
                     child: const Text(

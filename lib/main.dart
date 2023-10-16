@@ -132,11 +132,12 @@ final GoRouter _router = GoRouter(
             },
             routes: [
               GoRoute(
-                path: 'EditReceiptPage',
+                path: 'EditReceiptPage/:modifyFlag',
                 builder: (context, state) {
                   ReceiptContent content = state.extra as ReceiptContent;
                   return EditReceiptPage(
                     receiptContent: content,
+                    modifyFlag: state.pathParameters["modifyFlag"]!,
                   );
                 },
               ),
@@ -216,7 +217,7 @@ final GoRouter _router = GoRouter(
           path: "scanedRecieptPage",
           builder: (context, state) {
             ReceiptContent content = state.extra as ReceiptContent;
-            return CheckScannedReceiptPge(receiptContent: content);
+            return CheckScannedReceiptPge(receiptContent: content,);
           },
         ),
       ],

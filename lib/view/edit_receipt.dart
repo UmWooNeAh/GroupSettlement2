@@ -9,7 +9,8 @@ import '../viewmodel/SettlementCreateViewModel.dart';
 
 class EditReceiptPage extends ConsumerStatefulWidget {
   final ReceiptContent receiptContent;
-  const EditReceiptPage({super.key, required this.receiptContent});
+  final String modifyFlag;
+  const EditReceiptPage({super.key, required this.receiptContent, required this.modifyFlag});
 
   @override
   ConsumerState<EditReceiptPage> createState() => _EditReceiptState();
@@ -19,10 +20,11 @@ class _EditReceiptState extends ConsumerState<EditReceiptPage> {
   List<TextEditingController> menuController = [];
   List<TextEditingController> countController = [];
   List<TextEditingController> priceController = [];
-
+  late bool modifyFlag;
   @override
   void initState() {
     super.initState();
+    modifyFlag = widget.modifyFlag == "false" ? false : true;
     for (int i = 0; i < widget.receiptContent.receiptItems.length; i++) {
       ReceiptItem receiptItem = widget.receiptContent.receiptItems[i];
       menuController.add(TextEditingController(text: receiptItem.menuName));
@@ -36,7 +38,7 @@ class _EditReceiptState extends ConsumerState<EditReceiptPage> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-
+    final stmvm = ref.watch(stmCreateProvider);
     return Scaffold(
       appBar: AppBar(),
       resizeToAvoidBottomInset: false,
@@ -291,7 +293,7 @@ class _EditReceiptState extends ConsumerState<EditReceiptPage> {
                             ),
                           ),
                           Text(
-                            "${priceToString.format(widget.receiptContent.receipt!.totalPrice)}원",
+                            "${priceToString.format(priceController.map((price) => priceToString.parse(price.text)).reduce((value, element) => value + element))}원",
                             style: const TextStyle(
                               fontSize: 21,
                               fontWeight: FontWeight.w700,
@@ -335,6 +337,7 @@ class _EditReceiptState extends ConsumerState<EditReceiptPage> {
               margin: const EdgeInsets.all(10),
               child: OutlinedButton(
                 onPressed: () {
+                  widget.receiptContent.receipt!.totalPrice = priceController.map((price) => priceToString.parse(price.text)).reduce((value, element) => value + element).toInt();
                   for (var index in Iterable.generate(
                       widget.receiptContent.receiptItems.length)) {
                     widget.receiptContent.receiptItems[index].menuName =
@@ -372,8 +375,15 @@ class _EditReceiptState extends ConsumerState<EditReceiptPage> {
                       return;
                     }
                   }
-                  context.go("/scanedRecieptPage",
-                      extra: widget.receiptContent);
+                  if(modifyFlag == true){
+
+                    stmvm.receipts[widget.modifyFlag] = widget.receiptContent.receipt!;
+                    stmvm.receiptItems[widget.modifyFlag] = widget.receiptContent.receiptItems;
+                    context.go("/CreateNewSettlementPage");
+                  } else {
+                    context.go("/scanedRecieptPage",
+                        extra: widget.receiptContent);
+                  }
                 },
                 style: OutlinedButton.styleFrom(
                   backgroundColor: color2,

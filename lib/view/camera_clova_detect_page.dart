@@ -66,6 +66,7 @@ class _cameraDetectPageState extends ConsumerState<cameraDetectPage> {
               child: Align(
                 alignment: Alignment.bottomLeft,
                 child: FloatingActionButton(
+                  heroTag: null,
                   child: Icon(Icons.image),
                   onPressed: () async{
                     try {
@@ -86,6 +87,7 @@ class _cameraDetectPageState extends ConsumerState<cameraDetectPage> {
               child: Align(
                 alignment: Alignment.bottomRight,
                 child: FloatingActionButton(
+                  heroTag: null,
                   child: Icon(Icons.camera_alt),
                   onPressed: () async{
                     try {
