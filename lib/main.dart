@@ -147,9 +147,11 @@ final GoRouter _router = GoRouter(
               // ),
             ]),
         GoRoute(
-          path: "SettlementPage",
+          path: "SettlementPage/:settlementId",
           builder: (context, state) {
-            return const SettlementPage();
+            return SettlementPage(
+              settlementId: state.pathParameters["settlementId"]!,
+            );
           },
           routes: <RouteBase>[
             GoRoute(
@@ -217,7 +219,9 @@ final GoRouter _router = GoRouter(
           path: "scanedRecieptPage",
           builder: (context, state) {
             ReceiptContent content = state.extra as ReceiptContent;
-            return CheckScannedReceiptPge(receiptContent: content,);
+            return CheckScannedReceiptPge(
+              receiptContent: content,
+            );
           },
         ),
       ],

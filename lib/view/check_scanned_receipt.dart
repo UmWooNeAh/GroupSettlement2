@@ -251,7 +251,7 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
                           ),
                         ),
                         Text(
-                          "${priceToString.format(widget.receiptContent.receiptItems)}원",
+                          "${priceToString.format(widget.receiptContent.receipt?.totalPrice ?? 0)}원",
                           style: const TextStyle(
                             fontSize: 21,
                             fontWeight: FontWeight.w700,
@@ -273,9 +273,9 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
                 width: size.width * 0.46,
                 height: 60,
                 child: OutlinedButton(
-                  onPressed: ()async{
+                  onPressed: () async {
                     final cameras = await availableCameras();
-                    context.go('/cameraDetectPage',extra:cameras[1]);
+                    context.go('/cameraDetectPage', extra: cameras[1]);
                   },
                   style: OutlinedButton.styleFrom(
                     backgroundColor: Colors.white,
@@ -312,7 +312,8 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
                   ),
                   child: GestureDetector(
                     onTap: () {
-                      context.push('/CreateNewSettlementPage/editReceiptPage/false',
+                      context.push(
+                          '/CreateNewSettlementPage/editReceiptPage/false',
                           extra: widget.receiptContent);
                     },
                     child: const Text(

@@ -10,7 +10,8 @@ import '../viewmodel/SettlementCreateViewModel.dart';
 class EditReceiptPage extends ConsumerStatefulWidget {
   final ReceiptContent receiptContent;
   final String modifyFlag;
-  const EditReceiptPage({super.key, required this.receiptContent, required this.modifyFlag});
+  const EditReceiptPage(
+      {super.key, required this.receiptContent, required this.modifyFlag});
 
   @override
   ConsumerState<EditReceiptPage> createState() => _EditReceiptState();
@@ -337,7 +338,10 @@ class _EditReceiptState extends ConsumerState<EditReceiptPage> {
               margin: const EdgeInsets.all(10),
               child: OutlinedButton(
                 onPressed: () {
-                  widget.receiptContent.receipt!.totalPrice = priceController.map((price) => priceToString.parse(price.text)).reduce((value, element) => value + element).toInt();
+                  widget.receiptContent.receipt!.totalPrice = priceController
+                      .map((price) => priceToString.parse(price.text))
+                      .reduce((value, element) => value + element)
+                      .toInt();
                   for (var index in Iterable.generate(
                       widget.receiptContent.receiptItems.length)) {
                     widget.receiptContent.receiptItems[index].menuName =
@@ -375,10 +379,12 @@ class _EditReceiptState extends ConsumerState<EditReceiptPage> {
                       return;
                     }
                   }
-                  if(modifyFlag == true){
-
-                    stmvm.receipts[widget.modifyFlag] = widget.receiptContent.receipt!;
-                    stmvm.receiptItems[widget.modifyFlag] = widget.receiptContent.receiptItems;
+                  if (modifyFlag == true) {
+                    stmvm.receipts[widget.modifyFlag] =
+                        widget.receiptContent.receipt!;
+                    stmvm.receiptItems[widget.modifyFlag] =
+                        widget.receiptContent.receiptItems;
+                    stmvm.notifyListeners();
                     context.go("/CreateNewSettlementPage");
                   } else {
                     context.go("/scanedRecieptPage",

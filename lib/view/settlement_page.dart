@@ -158,7 +158,8 @@ final isReceiptOpenedProvider =
     ChangeNotifierProvider((ref) => IsReceiptOpened());
 
 class SettlementPage extends ConsumerStatefulWidget {
-  const SettlementPage({super.key});
+  const SettlementPage({super.key, required this.settlementId});
+  final String settlementId;
 
   @override
   ConsumerState<SettlementPage> createState() => _SettlementPageState();
@@ -182,8 +183,7 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
 
     if (isFirstBuild) {
       bottomsheetprovider.setBottomSheetSlider(0.0, 0.0, size.height * 0.7);
-      providerMethod
-          .settingSettlementViewModel("54d974c2-ea2a-4998-89a3-6d9cca52db80");
+      providerMethod.settingSettlementViewModel(widget.settlementId);
       isFirstBuild = false;
       // while (provider.receipts.isEmpty) {
       //   Future.delayed(const Duration(milliseconds: 100));
@@ -672,6 +672,7 @@ class _CustomBottomSheetState extends ConsumerState<CustomBottomSheet> {
                                       width: size.width,
                                       child: OutlinedButton(
                                         onPressed: () {
+                                          provider.completeSettlement();
                                           Navigator.of(context).pop();
                                           context.go(
                                               "/SettlementPage/CompleteSettlementMatching");

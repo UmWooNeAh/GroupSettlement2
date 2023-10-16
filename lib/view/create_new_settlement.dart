@@ -113,16 +113,15 @@ class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
                   ),
                   Container(
                     width: size.width,
-                    margin: EdgeInsets.symmetric(horizontal: 10),
+                    margin: const EdgeInsets.symmetric(horizontal: 10),
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
-
-                        children: List.generate(provider.settlement.receipts.length,
-                            (index) {
+                        children: List.generate(
+                            provider.settlement.receipts.length, (index) {
                           return CreateNewSettlementReceipt(
-                              id: provider.settlement.receipts[index],
-                              index: (index+1).toString(),
+                            id: provider.settlement.receipts[index],
+                            index: (index + 1).toString(),
                           );
                         }),
                       ),
@@ -167,11 +166,11 @@ class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
                         height: 60,
                         margin: const EdgeInsets.fromLTRB(20, 0, 0, 0),
                         child: OutlinedButton(
-                          onPressed: ()async{
+                          onPressed: () async {
                             final cameras = await availableCameras();
 
-                            context.push('/cameraDetectPage',extra: cameras[0]);
-
+                            context.push('/cameraDetectPage',
+                                extra: cameras[0]);
                           },
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(
@@ -205,8 +204,14 @@ class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
                 margin: const EdgeInsets.all(10),
                 width: double.infinity,
                 child: OutlinedButton(
-                  onPressed: () {
-                    context.go('/SettlementPage');
+                  onPressed: () async {
+                    if (provider.receipts.isEmpty) {
+                      return;
+                    }
+                    provider.createSettlement(_settlementNameController.text).then((value) {
+                      context.go(
+                        '/SettlementPage/$value');
+                    });
                   },
                   style: OutlinedButton.styleFrom(
                     backgroundColor: color1,
@@ -217,9 +222,13 @@ class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     "정산 생성하기",
-                    style: TextStyle(fontSize: 20, color: Colors.white54),
+                    style: TextStyle(
+                        fontSize: 20,
+                        color: provider.receipts.isEmpty
+                            ? Colors.white54
+                            : Colors.white),
                   ),
                 ),
               ),
@@ -236,7 +245,8 @@ class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
 }
 
 class CreateNewSettlementReceipt extends ConsumerStatefulWidget {
-  const CreateNewSettlementReceipt({super.key, required this.id,required this.index});
+  const CreateNewSettlementReceipt(
+      {super.key, required this.id, required this.index});
   final String id;
   final String index;
 
@@ -262,11 +272,10 @@ class _CreateNewSettlementReceiptState
         setState(() {
           isTapDown = !isTapDown;
         });
-        ReceiptContent receiptContent = ReceiptContent(provider.receipts[widget.id]!,provider.receiptItems[widget.id]!);
-        context.push(
-          '/CreateNewSettlementPage/EditReceiptPage/${widget.id}',
-          extra: receiptContent
-        );
+        ReceiptContent receiptContent = ReceiptContent(
+            provider.receipts[widget.id]!, provider.receiptItems[widget.id]!);
+        context.push('/CreateNewSettlementPage/EditReceiptPage/${widget.id}',
+            extra: receiptContent);
       },
       onTapCancel: () {
         setState(() {
@@ -293,7 +302,7 @@ class _CreateNewSettlementReceiptState
               top: 5,
               right: 5,
               child: GestureDetector(
-                onTap:(){
+                onTap: () {
                   provider.deleteReceipt(widget.id);
                 },
                 child: const Icon(
@@ -321,15 +330,15 @@ class _CreateNewSettlementReceiptState
                     style: DefaultTextStyle.of(context).style,
                     children: [
                       TextSpan(
-                        text: (provider.receiptItems[widget.id]?.first.menuName ??
-                            "영수증"),
+                        text:
+                            (provider.receiptItems[widget.id]?.first.menuName ??
+                                "영수증"),
                         style: const TextStyle(
                           fontSize: 17,
                         ),
                       ),
                       TextSpan(
-                        text:
-                            " 등 ${receipt?.receiptItems.length ?? "X"} 항목",
+                        text: " 등 ${receipt?.receiptItems.length ?? "X"} 항목",
                         style: TextStyle(
                           fontSize: 17,
                           color: Colors.grey[600],
@@ -351,7 +360,8 @@ class _CreateNewSettlementReceiptState
               bottom: 10,
               right: 10,
               child: Text(
-                priceToString.format(provider.receipts[widget.id]?.totalPrice ?? 0),
+                priceToString
+                    .format(provider.receipts[widget.id]?.totalPrice ?? 0),
                 style: const TextStyle(
                   color: color1,
                   fontSize: 25,

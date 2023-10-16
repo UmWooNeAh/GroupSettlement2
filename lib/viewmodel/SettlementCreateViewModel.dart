@@ -149,9 +149,10 @@ class SettlementCreateViewModel extends ChangeNotifier {
   }
 
   // 5. 정산 최종 생성하기, DB 접근이 이루어지는 시점
-  void createSettlement(String stmname) async {
+  Future<String> createSettlement(String stmname) async {
     if (stmname == null) {
       print("정산명을 입력해주세요.");
+      return "error";
     } else {
       settlement.settlementName = stmname;
       myGroup.settlements.add(settlement.settlementId!);
@@ -174,6 +175,7 @@ class SettlementCreateViewModel extends ChangeNotifier {
       settlement.time = Timestamp.now();
       settlement.createSettlement();
       notifyListeners();
+      return settlement.settlementId ?? "error";
     }
   }
 }
