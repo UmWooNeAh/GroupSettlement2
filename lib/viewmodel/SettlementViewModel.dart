@@ -238,16 +238,15 @@ class SettlementViewModel extends ChangeNotifier{
 
   void completeSettlement() async {
 
-    // SettlementPaper Update
+    // SettlementPaper Create
     for(var stmpaper in settlementPapers!.entries) {
       settlement.totalPrice += stmpaper.value.totalPrice!;
-      FireService().updateDoc("settlementpaperlist", stmpaper.key!, stmpaper.value!.toJson());
+      stmpaper.value.createSettlementPaper();
     }
-    // SettlementItem Update
+    // SettlementItem Create
     for(var stmitemlist in settlementItems!.entries) {
       for(var stmitem in stmitemlist.value) {
-        FireService().updateDoc(
-            "settlementitemlist", stmitemlist.key!, stmitem!.toJson());
+        stmitem.createSettlementItem();
       }
     }
     // settlement Update
@@ -263,13 +262,13 @@ class SettlementViewModel extends ChangeNotifier{
     }
     // Receipt Update
     for(var rcp in receipts!.entries) {
-      FireService().updateDoc("settlementpaperlist", rcp.key!, rcp.value!.toJson());
+      FireService().updateDoc("receiptlist", rcp.key!, rcp.value!.toJson());
     }
     // ReceiptItem Update
     for(var rcpitemlist in receiptItems!.entries) {
       for(var rcpitem in rcpitemlist.value) {
         FireService().updateDoc(
-            "settlementpaperlist", rcpitemlist.key!, rcpitem.toJson());
+            "receiptitemlist", rcpitemlist.key!, rcpitem.toJson());
       }
     }
 
