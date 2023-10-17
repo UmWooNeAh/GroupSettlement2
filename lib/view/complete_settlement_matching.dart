@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:groupsettlement2/design_element.dart';
 import 'package:groupsettlement2/view/shared_basic_widget.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
-import '../viewmodel/settlement_view_model.dart';
+import '../viewmodel/SettlementViewModel.dart';
 import 'dart:math';
 
 class CompleteSettlementMatching extends ConsumerStatefulWidget {

@@ -7,7 +7,7 @@ import 'package:groupsettlement2/class/class_receipt.dart';
 import 'package:groupsettlement2/design_element.dart';
 import 'dart:math' as math;
 import 'shared_basic_widget.dart';
-import '../viewmodel/settlement_view_model.dart';
+import '../viewmodel/SettlementViewModel.dart';
 
 class CheckSettlementPaper extends ChangeNotifier {
   String selectedUserId = "default";
