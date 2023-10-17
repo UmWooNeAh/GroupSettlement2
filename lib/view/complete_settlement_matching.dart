@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:groupsettlement2/design_element.dart';
+import 'package:groupsettlement2/view/shared_basic_widget.dart';
+import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import '../viewmodel/settlement_view_model.dart';
 import 'dart:math';
 
@@ -165,7 +167,62 @@ class _CompleteSettlementMatchingState
                     width: size.width,
                     height: 55,
                     child: OutlinedButton(
-                      onPressed: () {},
+                      onPressed: () async{
+                        await UserApi.instance.loginWithNewScopes(["friends","talk_message"]);
+
+                        try {
+                          List<ItemInfo> itemList = [];
+                          provider.settlementPapers.values.forEach((element) {
+                            itemList.add(ItemInfo(item:element.userName!, itemOp: priceToString.format(element.totalPrice)));
+                          });
+                          Uri shareUrl = await WebSharerClient.instance.makeDefaultUrl(template:
+                          FeedTemplate(
+                            content: Content(
+                              title: '${provider.settlementUsers[0].name}님이 정산 요청을 보냈어요.\n내역을 확인한 후 송금해주세요',
+                              description: "",
+                              imageUrl: Uri.parse(
+                                  ''),
+                              link: Link(
+                                  webUrl: Uri.parse('https://fir-df691.web.app/#/'),
+                                  mobileWebUrl: Uri.parse('https://fir-df691.web.app/#/')),
+                            ),
+                            itemContent: ItemContent(
+                              profileText: "Yemon",
+                              profileImageUrl: Uri.parse(
+                                  'https://engineering.linecorp.com/wp-content/uploads/2019/08/flutter1.png'),
+                              titleImageUrl: Uri.parse(
+                                  'https://engineering.linecorp.com/wp-content/uploads/2019/08/flutter1.png'),
+                              titleImageText: provider.settlement.settlementName,
+                              titleImageCategory: provider.receipts.values.first.receiptName,
+                              items: itemList,
+                              sum: 'total',
+                              sumOp: priceToString.format(provider.settlement.totalPrice),
+                            ),
+                            buttons: [
+                              Button(
+                                title: '정산서 보기',
+                                link: Link(
+                                  webUrl: Uri.parse('https://fir-df691.web.app/#/'),
+                                  mobileWebUrl: Uri.parse('https://fir-df691.web.app/#/'),
+                                ),
+                              ),
+                              Button(
+                                title: '앱으로보기',
+                                link: Link(
+                                  androidExecutionParams: {'key1': 'value1', 'key2': 'value2'},
+                                  iosExecutionParams: {'key1': 'value1', 'key2': 'value2'},
+                                ),
+                              ),
+                            ],
+                          )
+                          );
+                          await launchBrowserTab(shareUrl, popupOpen: true);
+                        } catch (error) {
+                          print('카카오톡 공유 실패 $error');
+                        }
+                        print('친구 선택 성공');
+                        setState(() {});
+                      },
                       style: OutlinedButton.styleFrom(
                         backgroundColor: color3,
                         side: const BorderSide(

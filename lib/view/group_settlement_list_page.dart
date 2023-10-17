@@ -27,90 +27,92 @@ class _groupSettlementListPageState extends ConsumerState<groupSettlementListPag
         backgroundColor: Colors.transparent,
         elevation:0.0,
       ),
-      body: Column(
-        children: [
-          Row(
-            children: [
-              SizedBox(width:size.width * 0.05),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children:[
-                  Text(gvm.myGroup.groupName ?? "NULL",
-                    style:TextStyle(
-
-                    ),
-                  ),
-                  Text("정산 목록",
-                    style:TextStyle(
-                      fontSize:20,
-                      fontWeight: FontWeight.w700
-                    )
-                  ),
-                ]
-              ),
-              SizedBox(width: size.width * 0.35),
-              GestureDetector(
-                onTap:(){
-                  setState((){
-                    flag = !flag;
-                  });
-                },
-                child: Container(
-                  width: size.width * 0.35, height: 55,
-                  decoration: ShapeDecoration(
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(width: 1.2, color:Color(0xFFD9D9D9)),
-                      borderRadius: BorderRadius.circular(5)
-                    )
-                  ),
-                  child:Center(
-                    child: Text("정산 합치기",
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Row(
+              children: [
+                SizedBox(width:size.width * 0.05),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children:[
+                    Text(gvm.myGroup.groupName ?? "NULL",
                       style:TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600
-                      )
-                    )
-                  )
-                ),
-              ),
-              SizedBox(width:size.width * 0.05)
-            ],
-          ),
-          SizedBox(width: double.infinity,height: 30),
-          Align(
-            alignment: Alignment(0.8,1),
-            child: GestureDetector(
-              child:Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(
-                      text: "이름순",
-                      style: TextStyle(
-                        //fontSize:20,
-                        color: Color(0xFF838383)
+
+                      ),
+                    ),
+                    Text("정산 목록",
+                      style:TextStyle(
+                        fontSize:20,
+                        fontWeight: FontWeight.w700
                       )
                     ),
-                    TextSpan(
-                      text: "▼",
-                      style: TextStyle(
-                        fontSize:15,
-                        color: Color(0xFF838383),
+                  ]
+                ),
+                SizedBox(width: size.width * 0.35),
+                GestureDetector(
+                  onTap:(){
+                    setState((){
+                      flag = !flag;
+                    });
+                  },
+                  child: Container(
+                    width: size.width * 0.35, height: 55,
+                    decoration: ShapeDecoration(
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(width: 1.2, color:Color(0xFFD9D9D9)),
+                        borderRadius: BorderRadius.circular(5)
+                      )
+                    ),
+                    child:Center(
+                      child: Text("정산 합치기",
+                        style:TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600
+                        )
                       )
                     )
-                  ]
-                )
-              )
+                  ),
+                ),
+                SizedBox(width:size.width * 0.05)
+              ],
             ),
-          ),
-          Column(
-            children:List.generate(gvm.settlementInGroup.length, (index){
-              Settlement settlement = gvm.settlementInGroup[index];
-              bool masterFlag = gvm.userData.serviceUserId == settlement.masterUserId;
-              return settlement.isMerged! ? multipleSettlement(containerWidth: _containerWidth, size: size, masterFlag : masterFlag, settlement: settlement)
-              :oneSettlement(containerWidth: _containerWidth, size: size, masterFlag: masterFlag, settlement: settlement);
-            })
-          )
-        ],
+            SizedBox(width: double.infinity,height: 30),
+            Align(
+              alignment: Alignment(0.8,1),
+              child: GestureDetector(
+                child:Text.rich(
+                  TextSpan(
+                    children: [
+                      TextSpan(
+                        text: "이름순",
+                        style: TextStyle(
+                          //fontSize:20,
+                          color: Color(0xFF838383)
+                        )
+                      ),
+                      TextSpan(
+                        text: "▼",
+                        style: TextStyle(
+                          fontSize:15,
+                          color: Color(0xFF838383),
+                        )
+                      )
+                    ]
+                  )
+                )
+              ),
+            ),
+            Column(
+              children:List.generate(gvm.settlementInGroup.length, (index){
+                Settlement settlement = gvm.settlementInGroup[index];
+                bool masterFlag = gvm.userData.serviceUserId == settlement.masterUserId;
+                return settlement.isMerged! ? multipleSettlement(containerWidth: _containerWidth, size: size, masterFlag : masterFlag, settlement: settlement)
+                :oneSettlement(containerWidth: _containerWidth, size: size, masterFlag: masterFlag, settlement: settlement);
+              })
+            )
+          ],
+        ),
       )
     );
   }

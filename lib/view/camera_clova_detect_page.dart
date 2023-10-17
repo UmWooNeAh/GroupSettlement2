@@ -40,7 +40,7 @@ class _cameraDetectPageState extends ConsumerState<cameraDetectPage> {
   Widget build(BuildContext context) {
     final stmcvm = ref.watch(stmCreateProvider);
     final CameraDescription camera = widget.extra as CameraDescription;
-    _controller = CameraController(camera, ResolutionPreset.medium);
+    _controller = CameraController(camera, ResolutionPreset.medium,imageFormatGroup: ImageFormatGroup.yuv420);
     _initializeControllerFuture = _controller.initialize();
 
     return Scaffold(
@@ -70,6 +70,7 @@ class _cameraDetectPageState extends ConsumerState<cameraDetectPage> {
                   child: Icon(Icons.image),
                   onPressed: () async{
                     try {
+                      _controller.dispose();
                       await stmcvm.clova.pickPicture();
                       final analyzeResult = await stmcvm.clova.analyze();
                       ReceiptContent receiptContent = stmcvm.createReceiptFromNaverOCR(analyzeResult);
@@ -91,6 +92,7 @@ class _cameraDetectPageState extends ConsumerState<cameraDetectPage> {
                   child: Icon(Icons.camera_alt),
                   onPressed: () async{
                     try {
+                      _controller.dispose();
                       await _initializeControllerFuture;
 
                       final image = await _controller.takePicture();

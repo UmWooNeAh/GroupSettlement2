@@ -671,11 +671,11 @@ class _CustomBottomSheetState extends ConsumerState<CustomBottomSheet> {
                                       height: 50,
                                       width: size.width,
                                       child: OutlinedButton(
-                                        onPressed: () {
-                                          provider.completeSettlement();
+                                        onPressed: ()async{
+                                          await provider.completeSettlement();
                                           Navigator.of(context).pop();
                                           context.go(
-                                              "/SettlementPage/CompleteSettlementMatching");
+                                              "/SettlementPage/:settlementId/CompleteSettlementMatching");
                                         },
                                         style: OutlinedButton.styleFrom(
                                           backgroundColor: color1,

@@ -385,7 +385,7 @@ class _EditReceiptState extends ConsumerState<EditReceiptPage> {
                     stmvm.receiptItems[widget.modifyFlag] =
                         widget.receiptContent.receiptItems;
                     stmvm.notifyListeners();
-                    context.go("/CreateNewSettlementPage");
+                    context.go("/CreateNewSettlementPage/null/null/null");
                   } else {
                     context.go("/scanedRecieptPage",
                         extra: widget.receiptContent);

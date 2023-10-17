@@ -9,7 +9,10 @@ import '../class/class_receipt.dart';
 import '../viewmodel/SettlementCreateViewModel.dart';
 
 class CreateNewSettlement extends ConsumerStatefulWidget {
-  const CreateNewSettlement({super.key});
+  String groupId;
+  String masterId;
+  String accountInfo;
+  CreateNewSettlement({super.key,required this.groupId,required this.masterId, required this.accountInfo});
 
   @override
   ConsumerState<CreateNewSettlement> createState() =>
@@ -20,9 +23,17 @@ class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
   final TextEditingController _settlementNameController =
       TextEditingController(text: "asdfasdf");
   bool isFirstBuild = true;
+
   @override
   Widget build(BuildContext context) {
     final provider = ref.watch(stmCreateProvider);
+    if(widget.groupId != "null" && isFirstBuild){
+      print("-- first initial --");
+      isFirstBuild = false;
+      provider.settingSettlementCreateViewModel(widget.groupId, widget.masterId, widget.accountInfo);
+    } else{
+      print("-- load data -- ");
+    }
     Size size = MediaQuery.of(context).size;
     _settlementNameController.text = provider.settlement.settlementName ?? "";
     return Scaffold(
@@ -249,7 +260,6 @@ class CreateNewSettlementReceipt extends ConsumerStatefulWidget {
       {super.key, required this.id, required this.index});
   final String id;
   final String index;
-
   @override
   ConsumerState<CreateNewSettlementReceipt> createState() =>
       _CreateNewSettlementReceiptState();
@@ -274,7 +284,7 @@ class _CreateNewSettlementReceiptState
         });
         ReceiptContent receiptContent = ReceiptContent(
             provider.receipts[widget.id]!, provider.receiptItems[widget.id]!);
-        context.push('/CreateNewSettlementPage/EditReceiptPage/${widget.id}',
+        context.push('/CreateNewSettlementPage/null/null/null/EditReceiptPage/${widget.id}',
             extra: receiptContent);
       },
       onTapCancel: () {

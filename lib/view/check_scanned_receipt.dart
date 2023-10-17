@@ -313,7 +313,7 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
                   child: GestureDetector(
                     onTap: () {
                       context.push(
-                          '/CreateNewSettlementPage/editReceiptPage/false',
+                          '/CreateNewSettlementPage/null/null/null/editReceiptPage/false',
                           extra: widget.receiptContent);
                     },
                     child: const Text(
@@ -345,7 +345,7 @@ class _CheckScannedReceiptPge extends ConsumerState<CheckScannedReceiptPge> {
                   }
                 }
                 stmvm.addReceipt(widget.receiptContent);
-                context.go('/CreateNewSettlementPage');
+                context.go('/CreateNewSettlementPage/null/null/null');
               },
               style: OutlinedButton.styleFrom(
                 backgroundColor: color2,
