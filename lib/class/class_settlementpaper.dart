@@ -57,7 +57,7 @@ class SettlementPaper {
 
   Future<SettlementPaper> getSettlementPaperByPaperId(String paperid) async{
     DocumentSnapshot<Map<String, dynamic>> result =
-    await FirebaseFirestore.instance.collection("settlemntpaperlist")
+    await FirebaseFirestore.instance.collection("settlementpaperlist")
         .doc(paperid).get();
     SettlementPaper paper = SettlementPaper.fromSnapShot(result);
     ServiceUser user = await ServiceUser().getUserByUserId(serviceUserId!);

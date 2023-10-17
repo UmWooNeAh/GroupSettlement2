@@ -151,6 +151,8 @@ class SettlementViewModel extends ChangeNotifier{
     if(!settlementPapers.containsKey(userId)) {
       SettlementPaper newSettlementPaper = SettlementPaper();
       newSettlementPaper.serviceUserId = userId;
+      newSettlementPaper.accountInfo = settlement.accountInfo;
+      newSettlementPaper.settlementId = settlement.settlementId;
       settlementPapers[userId] = newSettlementPaper;
       settlement.settlementPapers[userId] = newSettlementPaper.settlementPaperId!;
     }
@@ -161,6 +163,7 @@ class SettlementViewModel extends ChangeNotifier{
     newSettlementItem.menuName         = receiptItems[receiptId]![index].menuName;
     newSettlementItem.menuCount        = receiptItems[receiptId]![index].serviceUsers.length;
     newSettlementItem.price            = (receiptItems[receiptId]![index].menuPrice!.toDouble() / newSettlementItem.menuCount!.toDouble());
+    newSettlementItem.receiptId = receiptId;
 
     if(settlementPapers[userId]!.settlementItems == null) {
       settlementPapers[userId]!.settlementItems = [newSettlementItem.settlementItemId!];

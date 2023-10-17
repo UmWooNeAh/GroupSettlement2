@@ -18,6 +18,9 @@ class ServiceUser {
   ServiceUser () {
     ModelUuid uuid = ModelUuid();
     serviceUserId = uuid.randomId;
+    kakaoId = "";
+    fcmToken = "";
+    tokenTimestamp = 0;
   }
 
   ServiceUser.fromJson(dynamic json) {
