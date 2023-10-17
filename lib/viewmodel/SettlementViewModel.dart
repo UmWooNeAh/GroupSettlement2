@@ -166,9 +166,9 @@ class SettlementViewModel extends ChangeNotifier {
       // newSettlementPaper.settlementPaperId =
       newSettlementPaper.userName =
           receiptItems[receiptId]![index].serviceUsers[userId];
+      newSettlementPaper.serviceUserId = userId;
       newSettlementPaper.accountInfo = settlement.accountInfo;
       newSettlementPaper.settlementId = settlement.settlementId;
-      newSettlementPaper.serviceUserId = userId;
       settlementPapers[userId] = newSettlementPaper;
       settlement.settlementPapers[userId] =
           newSettlementPaper.settlementPaperId!;
@@ -265,14 +265,13 @@ class SettlementViewModel extends ChangeNotifier {
         "settlementlist", settlement.settlementId!, settlement.toJson());
 
     // SettlementPaper Create
-    for (var stmpaper in settlementPapers.entries) {
+    for(var stmpaper in settlementPapers!.entries) {
       settlement.totalPrice += stmpaper.value.totalPrice!;
       stmpaper.value.createSettlementPaper();
     }
-
     // SettlementItem Create
-    for (var stmitemlist in settlementItems.entries) {
-      for (var stmitem in stmitemlist.value) {
+    for(var stmitemlist in settlementItems!.entries) {
+      for(var stmitem in stmitemlist.value) {
         stmitem.createSettlementItem();
       }
     }

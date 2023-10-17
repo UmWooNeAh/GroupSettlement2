@@ -22,6 +22,7 @@ class Settlement {
   Settlement() {
     ModelUuid uuid = ModelUuid();
     settlementId = uuid.randomId;
+    accountInfo = "";
     isFinished = false;
     isMerged = false;
   }

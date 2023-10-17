@@ -24,17 +24,19 @@ class _State extends ConsumerState<groupMainPage> {
   final bottomSheetSliderChangeNotifierProvider =
   ChangeNotifierProvider<BottomSheetSlider>((ref) => BottomSheetSlider());
 
-
+  bool isFirst = true;
 
   int i = 0;
   @override
   Widget build(BuildContext context) {
     final gvm = ref.watch(groupProvider);
 
-    Future<void> refreshing() async {
-      await gvm.settingGroupViewModel(gvm.userData.serviceUserId!, gvm.myGroup.groupId!);
-      print("Refreshing");
-      return Future<void>.value();
+    Future<bool> refreshing() async {
+      if(isFirst) {
+        isFirst = false;
+        await gvm.settingGroupViewModel(gvm.userData.serviceUserId!, widget.groupId!);
+      }
+      return true;
     }
 
     final Size size = MediaQuery.of(context).size;
@@ -76,7 +78,13 @@ class _State extends ConsumerState<groupMainPage> {
     return Scaffold(
         appBar: AppBar(),
         body:
-        Stack(
+        FutureBuilder(
+          future: refreshing(),
+          builder: (context, snapshot) {
+            if(snapshot.hasData == false){
+              return Center(child: CircularProgressIndicator());
+            } else {
+              return Stack(
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(left: 15),
@@ -548,94 +556,132 @@ class _State extends ConsumerState<groupMainPage> {
                                                     )
                                                 ),
                                                 child: GestureDetector(
-                                                  onTap: () => showDialog(
-                                                    context: context,
-                                                    builder: (BuildContext context) => AlertDialog(
-                                                      title: const Text("추가할 사용자의 이름을 입력해주세요",
-                                                          style: TextStyle(
-                                                              fontWeight: FontWeight.w600,
-                                                              fontSize: 18
-                                                          )
-                                                      ),
-                                                      content: TextField(
-                                                        decoration: InputDecoration(
-                                                          hintText: "사용자 1",
-                                                          labelStyle: TextStyle(
-                                                              color:Color(0xFF838383)
-                                                          ),
-                                                        ),
-                                                        onChanged: (value) {
-                                                          inputName = value;
-                                                        },
-                                                      ),
-                                                      actionsAlignment: MainAxisAlignment.spaceBetween,
-                                                      actions: [
-                                                        SizedBox(
-                                                          height: 50,
-                                                          child: OutlinedButton(
-                                                            onPressed: () {
-                                                              Navigator.of(context).pop();
-                                                              setState(() {
-                                                                ServiceUser user = ServiceUser();
-                                                                if(inputName != null) {
-                                                                  gvm.addByDirect(inputName!);
-                                                                } else{
-                                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                                      SnackBar(
-                                                                        content: Text('사용자명은 공백이 될 수 없습니다'),
-                                                                        duration: Duration(seconds: 3),
-                                                                      )
-                                                                  );
-                                                                }
-                                                              });
-                                                            },
-                                                            style: OutlinedButton.styleFrom(
-                                                              backgroundColor: color2,
-                                                              side: const BorderSide(
-                                                                color: color2,
+                                                  onTap: () =>
+                                                      showDialog(
+                                                        context: context,
+                                                        builder: (
+                                                            BuildContext context) =>
+                                                            AlertDialog(
+                                                              title: const Text(
+                                                                  "추가할 사용자의 이름을 입력해주세요",
+                                                                  style: TextStyle(
+                                                                      fontWeight: FontWeight
+                                                                          .w600,
+                                                                      fontSize: 18
+                                                                  )
                                                               ),
-                                                              shape: RoundedRectangleBorder(
-                                                                borderRadius: BorderRadius.circular(5),
+                                                              content: TextField(
+                                                                decoration: InputDecoration(
+                                                                  hintText: "사용자 1",
+                                                                  labelStyle: TextStyle(
+                                                                      color: Color(
+                                                                          0xFF838383)
+                                                                  ),
+                                                                ),
+                                                                onChanged: (
+                                                                    value) {
+                                                                  inputName =
+                                                                      value;
+                                                                },
                                                               ),
+                                                              actionsAlignment: MainAxisAlignment
+                                                                  .spaceBetween,
+                                                              actions: [
+                                                                SizedBox(
+                                                                  height: 50,
+                                                                  child: OutlinedButton(
+                                                                    onPressed: () {
+                                                                      Navigator
+                                                                          .of(
+                                                                          context)
+                                                                          .pop();
+                                                                      setState(() {
+                                                                        ServiceUser user = ServiceUser();
+                                                                        if (inputName !=
+                                                                            null) {
+                                                                          gvm
+                                                                              .addByDirect(
+                                                                              inputName!);
+                                                                        } else {
+                                                                          ScaffoldMessenger
+                                                                              .of(
+                                                                              context)
+                                                                              .showSnackBar(
+                                                                              SnackBar(
+                                                                                content: Text(
+                                                                                    '사용자명은 공백이 될 수 없습니다'),
+                                                                                duration: Duration(
+                                                                                    seconds: 3),
+                                                                              )
+                                                                          );
+                                                                        }
+                                                                      });
+                                                                    },
+                                                                    style: OutlinedButton
+                                                                        .styleFrom(
+                                                                      backgroundColor: color2,
+                                                                      side: const BorderSide(
+                                                                        color: color2,
+                                                                      ),
+                                                                      shape: RoundedRectangleBorder(
+                                                                        borderRadius: BorderRadius
+                                                                            .circular(
+                                                                            5),
+                                                                      ),
 
+                                                                    ),
+                                                                    child: const Text(
+                                                                      "인원 추가",
+                                                                      style:
+                                                                      TextStyle(
+                                                                          fontSize: 15,
+                                                                          color: Colors
+                                                                              .white),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                                SizedBox(
+                                                                  height: 50,
+                                                                  child: OutlinedButton(
+                                                                    onPressed: () {
+                                                                      Navigator
+                                                                          .of(
+                                                                          context)
+                                                                          .pop();
+                                                                    },
+                                                                    style: OutlinedButton
+                                                                        .styleFrom(
+                                                                      backgroundColor: Colors
+                                                                          .transparent,
+                                                                      side: const BorderSide(
+                                                                        color: Colors
+                                                                            .grey,
+                                                                      ),
+                                                                      shape: RoundedRectangleBorder(
+                                                                        borderRadius: BorderRadius
+                                                                            .circular(
+                                                                            10),
+                                                                      ),
+                                                                    ),
+                                                                    child: const Text(
+                                                                      "취소",
+                                                                      style:
+                                                                      TextStyle(
+                                                                          fontSize: 15,
+                                                                          color: Colors
+                                                                              .black),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
                                                             ),
-                                                            child: const Text(
-                                                              "인원 추가",
-                                                              style:
-                                                              TextStyle(fontSize: 15, color: Colors.white),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        SizedBox(
-                                                          height: 50,
-                                                          child: OutlinedButton(
-                                                            onPressed: () {
-                                                              Navigator.of(context).pop();
-                                                            },
-                                                            style: OutlinedButton.styleFrom(
-                                                              backgroundColor: Colors.transparent,
-                                                              side: const BorderSide(
-                                                                color: Colors.grey,
-                                                              ),
-                                                              shape: RoundedRectangleBorder(
-                                                                borderRadius: BorderRadius.circular(10),
-                                                              ),
-                                                            ),
-                                                            child: const Text(
-                                                              "취소",
-                                                              style:
-                                                              TextStyle(fontSize: 15, color: Colors.black),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
+                                                      ),
                                                   child: Center(
                                                       child: Text("직접 인원 추가",
-                                                          style:TextStyle(
+                                                          style: TextStyle(
                                                               fontSize: 15,
-                                                              fontWeight: FontWeight.w600
+                                                              fontWeight: FontWeight
+                                                                  .w600
                                                           )
                                                       )
                                                   ),
@@ -655,6 +701,9 @@ class _State extends ConsumerState<groupMainPage> {
                   )
                 ],
 
+              );
+            }
+          }
         ),
       bottomNavigationBar: const CustomBottomNavigationBar(
         index: 0,

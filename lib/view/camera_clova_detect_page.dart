@@ -44,14 +44,32 @@ class _cameraDetectPageState extends ConsumerState<cameraDetectPage> {
     _initializeControllerFuture = _controller.initialize();
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(backgroundColor: Colors.black,),
       body: FutureBuilder(
           future: _initializeControllerFuture,
           builder: (context,snapshot){
             if(snapshot.connectionState == ConnectionState.done){
               return Stack(
                 children: [
-                  CameraPreview(_controller),
+                  Container(
+                    width:double.infinity,height:double.infinity,
+                    decoration: BoxDecoration(
+                      color:Colors.black
+                    ),
+                  ),
+                  Column(
+                    children: [
+                      CameraPreview(_controller),
+                      SizedBox(height:30),
+                      Text("보다 정확한 인식을 위하여 어두운 배경에서 촬영해주세요",
+                        style: TextStyle(
+                            color:Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16
+                        ),
+                      )
+                    ],
+                  ),
                 ],
               );
             } else{
