@@ -167,6 +167,8 @@ class SettlementViewModel extends ChangeNotifier {
       newSettlementPaper.userName =
           receiptItems[receiptId]![index].serviceUsers[userId];
       newSettlementPaper.serviceUserId = userId;
+      newSettlementPaper.accountInfo = settlement.accountInfo;
+      newSettlementPaper.settlementId = settlement.settlementId;
       settlementPapers[userId] = newSettlementPaper;
       settlement.settlementPapers[userId] =
           newSettlementPaper.settlementPaperId!;
@@ -174,19 +176,19 @@ class SettlementViewModel extends ChangeNotifier {
 
     // item의 등록으로 인해 settlementItem 생성
     SettlementItem newSettlementItem = SettlementItem();
-    newSettlementItem.receiptItemId =
-        receiptItems[receiptId]![index].receiptItemId;
-    newSettlementItem.menuName = receiptItems[receiptId]![index].menuName;
-    newSettlementItem.menuCount =
-        receiptItems[receiptId]![index].serviceUsers.length;
-    newSettlementItem.price =
-        receiptItems[receiptId]![index].menuPrice!.toDouble() /
-            newSettlementItem.menuCount!.toDouble();
+    newSettlementItem.receiptItemId    = receiptItems[receiptId]![index].receiptItemId;
+    newSettlementItem.menuName         = receiptItems[receiptId]![index].menuName;
+    newSettlementItem.menuCount        = receiptItems[receiptId]![index].serviceUsers.length;
+    newSettlementItem.price            = (receiptItems[receiptId]![index].menuPrice!.toDouble() / newSettlementItem.menuCount!.toDouble());
+    newSettlementItem.receiptId = receiptId;
 
-    settlementPapers[userId]!
-        .settlementItems
-        .add(newSettlementItem.settlementItemId!);
-    if (settlementItems[userId] == null) {
+    if(settlementPapers[userId]!.settlementItems == null) {
+      settlementPapers[userId]!.settlementItems = [newSettlementItem.settlementItemId!];
+    }
+    else {
+      settlementPapers[userId]!.settlementItems!.add(newSettlementItem.settlementItemId!);
+    }
+    if(settlementItems[userId] == null) {
       settlementItems[userId] = [newSettlementItem];
     } else {
       settlementItems[userId]!.add(newSettlementItem);
@@ -262,14 +264,13 @@ class SettlementViewModel extends ChangeNotifier {
         "settlementlist", settlement.settlementId!, settlement.toJson());
 
     // SettlementPaper Create
-    for (var stmpaper in settlementPapers.entries) {
+    for(var stmpaper in settlementPapers!.entries) {
       settlement.totalPrice += stmpaper.value.totalPrice!;
       stmpaper.value.createSettlementPaper();
     }
-
     // SettlementItem Create
-    for (var stmitemlist in settlementItems.entries) {
-      for (var stmitem in stmitemlist.value) {
+    for(var stmitemlist in settlementItems!.entries) {
+      for(var stmitem in stmitemlist.value) {
         stmitem.createSettlementItem();
       }
     }
@@ -285,16 +286,15 @@ class SettlementViewModel extends ChangeNotifier {
     }
 
     // Receipt Update
-    for (var rcp in receipts.entries) {
-      FireService().updateDoc("receiptlist", rcp.key, rcp.value.toJson());
+    for(var rcp in receipts!.entries) {
+      FireService().updateDoc("receiptlist", rcp.key!, rcp.value!.toJson());
     }
 
     // ReceiptItem Update
-    for (var rcpitemlist in receiptItems.entries) {
-      for (var rcpitem in rcpitemlist.value) {
-
-        FireService()
-           .updateDoc("receiptitemlist", rcpitem.receiptItemId!, rcpitem.toJson());
+    for(var rcpitemlist in receiptItems!.entries) {
+      for(var rcpitem in rcpitemlist.value) {
+        FireService().updateDoc(
+            "receiptitemlist", rcpitemlist.key!, rcpitem.toJson());
       }
     }
     notifyListeners();

@@ -6,6 +6,7 @@ class SettlementItem {
 
   String? settlementItemId;
   String? receiptItemId;
+  String? receiptId;
   String? menuName;
   int? menuCount;
   double? price;
@@ -18,6 +19,7 @@ class SettlementItem {
   SettlementItem.fromJson(dynamic json) {
     settlementItemId = json['settlementitemid'];
     receiptItemId = json['receiptitemid'];
+    receiptId = json['receiptid'];
     menuCount = json['usercount'];
     menuName = json['name'];
     price = json['price'];
@@ -26,6 +28,7 @@ class SettlementItem {
   Map<String, dynamic> toJson() => {
     'settlementitemid' : settlementItemId,
     'receiptitemid' : receiptItemId,
+    'receiptid' : receiptId,
     'usercount' : menuCount,
     'name' : menuName,
     'price' : price,

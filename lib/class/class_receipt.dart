@@ -14,6 +14,7 @@ class Receipt {
 
   Receipt() {
     ModelUuid uuid = ModelUuid();
+    storeName = "";
     receiptId = uuid.randomId;
   }
 
