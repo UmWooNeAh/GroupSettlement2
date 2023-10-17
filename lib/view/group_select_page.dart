@@ -20,7 +20,7 @@ class groupSelectPage extends ConsumerStatefulWidget {
 
 class _groupSelectPage extends ConsumerState<groupSelectPage> {
   late UserViewModel uvm;
-
+  bool isFirst = true;
 
   @override
   Widget build(BuildContext context) {
@@ -28,109 +28,117 @@ class _groupSelectPage extends ConsumerState<groupSelectPage> {
 
     Size size = MediaQuery.of(context).size;
 
-    Future<void> refreshing()async{
-      await uvm.settingUserViewModel(uvm.userData.serviceUserId!);
-      print("Refreshing");
-      return Future<void>.value();
+    Future<bool> refreshing() async {
+      if(isFirst) {
+        isFirst = false;
+        await uvm.settingUserViewModel(widget.userId);
+      }
+      return true;
     }
     
     return Scaffold(
         appBar:AppBar(),
-        body:RefreshIndicator(
-          onRefresh: refreshing,
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 15,right: 15),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children:[
-                    Text(
-                        "내 그룹",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                        )
-                    ),
-                    GestureDetector(
-                      onTap:(){
-                        context.go("/groupCreatePage");
-                      },
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Column(
-                            children:[
-                              Stack(
-                                children: [
-                                  Positioned(
-                                    left:15,
-                                    top: 0,
-                                    child: Text(
-                                        "+",
-                                        style:TextStyle(
-                                            fontSize: 35,
-                                            color:Color(0xFF838383))
-                                    ),
-                                  ),
-                                  Positioned(
-                                    child: Container(
-                                        width: 50, height: 50,
-                                        decoration: BoxDecoration(
-                                          border: Border.all(width:2,color:Color(0xFF838383)),
-                                          shape: BoxShape.circle,
-                                        )
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top:5),
-                                child: Text(
-                                  "새 그룹 만들기",
-                                  style:TextStyle(
-                                      color:Color(0xFF838383),
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w500
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ]
+        body:FutureBuilder(
+          future: refreshing(),
+          builder: (context, snapshot) {
+            if(snapshot.hasData == false){
+              return Center(child:CircularProgressIndicator());
+            } else {
+              return SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 15, right: 15),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                            "내 그룹",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                            )
                         ),
-                      ),
-                    ),
-                    SizedBox(height:15),
-                    Column(
-                      children: List.generate(uvm.myGroup.length,(index){
-                        return groupOne(group: uvm.myGroup[index]);
-                      })
-                    )
-                  ]
-              ),
-            ),
-          ),
+                        GestureDetector(
+                          onTap: () {
+                            context.go("/groupCreatePage");
+                          },
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: Column(
+                                children: [
+                                  Stack(
+                                    children: [
+                                      Positioned(
+                                        left: 15,
+                                        top: 0,
+                                        child: Text(
+                                            "+",
+                                            style: TextStyle(
+                                                fontSize: 35,
+                                                color: Color(0xFF838383))
+                                        ),
+                                      ),
+                                      Positioned(
+                                        child: Container(
+                                            width: 50, height: 50,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(width: 2,
+                                                  color: Color(0xFF838383)),
+                                              shape: BoxShape.circle,
+                                            )
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 5),
+                                    child: Text(
+                                      "새 그룹 만들기",
+                                      style: TextStyle(
+                                          color: Color(0xFF838383),
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ]
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 15),
+                        Column(
+                            children: List.generate(uvm.myGroup.length, (
+                                index) {
+                              return groupOne(group: uvm.myGroup[index]);
+                            })
+                        )
+                      ]
+                  ),
+                ),
+              );
+            }
+          }
         ),
-        floatingActionButton: FloatingActionButton(
-        onPressed: refreshing,
-    ),
     );
   }
 }
 
-class groupOne extends StatefulWidget {
+class groupOne extends ConsumerStatefulWidget {
   final Group group;
   const groupOne({Key? key, required this.group}) : super(key: key);
 
   @override
-  State<groupOne> createState() => _groupOneState();
+  ConsumerState<groupOne> createState() => _groupOneState();
 }
 
-class _groupOneState extends State<groupOne> {
+class _groupOneState extends ConsumerState<groupOne> {
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         GestureDetector(
           onTap:(){
+            print(widget.group.groupName);
             context.go("/groupMainPage",extra: widget.group.groupId);
           },
           child: Row(
@@ -181,13 +189,16 @@ class _groupOneState extends State<groupOne> {
                       ),
                     ]
                 ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom:25),
-                  child: Text(
-                      "시간",
-                      style:TextStyle(
-                        color:Color(0xFF838383),
-                      )
+                GestureDetector(
+                  onTap:(){},
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom:25),
+                    child: Text(
+                        "시간",
+                        style:TextStyle(
+                          color:Color(0xFF838383),
+                        )
+                    ),
                   ),
                 )
               ]
