@@ -86,7 +86,7 @@ class _SettlementFinalCheckPage
           ),
           Container(
             width: size.width,
-            height: 50,
+            height: 60,
             margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: OutlinedButton(
               onPressed: () {},
@@ -100,71 +100,86 @@ class _SettlementFinalCheckPage
               ),
               child: const Text(
                 "전체 정산서 확인하기",
-                style: TextStyle(color: Colors.black),
+                style: TextStyle(color: Colors.black, fontSize: 19),
               ),
             ),
           ),
           Container(
-            height: 80,
+            height: 90,
             width: size.width,
             color: Colors.grey[100],
             child: Align(
               alignment: const Alignment(0, 0),
               child: Container(
                 width: size.width,
-                height: 50,
+                height: 60,
                 margin: const EdgeInsets.symmetric(
                     vertical: 10.0, horizontal: 20.0),
                 child: OutlinedButton(
-                  onPressed: () async{
-                    await UserApi.instance.loginWithNewScopes(["friends","talk_message"]);
+                  onPressed: () async {
+                    await UserApi.instance
+                        .loginWithNewScopes(["friends", "talk_message"]);
 
                     try {
                       List<ItemInfo> itemList = [];
-                      provider.settlementPapers.values.forEach((element) {
-                        itemList.add(ItemInfo(item:element.userName!, itemOp: element.totalPrice.toString()));
-                      });
-                      Uri shareUrl = await WebSharerClient.instance.makeDefaultUrl(template:
-                        FeedTemplate(
-                          content: Content(
-                            title: '${provider.settlementUsers[0].name}님이 정산 요청을 보냈어요.\n내역을 확인한 후 송금해주세요',
-                            description: provider.settlementUsers[0].accountInfo.first,
-                            imageUrl: Uri.parse(
-                                'https://www.press9.kr/news/photo/201910/30004_craw1.jpg'),
+                      for (var element in provider.settlementPapers.values) {
+                        itemList.add(ItemInfo(
+                            item: element.userName!,
+                            itemOp: element.totalPrice.toString()));
+                      }
+                      Uri shareUrl =
+                          await WebSharerClient.instance.makeDefaultUrl(
+                              template: FeedTemplate(
+                        content: Content(
+                          title:
+                              '${provider.settlementUsers[0].name}님이 정산 요청을 보냈어요.\n내역을 확인한 후 송금해주세요',
+                          description:
+                              provider.settlementUsers[0].accountInfo.first,
+                          imageUrl: Uri.parse(
+                              'https://www.press9.kr/news/photo/201910/30004_craw1.jpg'),
+                          link: Link(
+                              webUrl: Uri.parse('https://fir-df691.web.app/#/'),
+                              mobileWebUrl:
+                                  Uri.parse('https://fir-df691.web.app/#/')),
+                        ),
+                        itemContent: ItemContent(
+                          profileText: "Yemon",
+                          profileImageUrl: Uri.parse(
+                              'https://engineering.linecorp.com/wp-content/uploads/2019/08/flutter1.png'),
+                          titleImageUrl: Uri.parse(
+                              'https://engineering.linecorp.com/wp-content/uploads/2019/08/flutter1.png'),
+                          titleImageText: provider.settlement.settlementName,
+                          titleImageCategory:
+                              provider.receipts.values.first.receiptName,
+                          items: itemList,
+                          sum: 'total',
+                          sumOp: priceToString
+                              .format(provider.settlement.totalPrice),
+                        ),
+                        buttons: [
+                          Button(
+                            title: '정산서 보기',
                             link: Link(
-                                webUrl: Uri.parse('https://fir-df691.web.app/#/'),
-                                mobileWebUrl: Uri.parse('https://fir-df691.web.app/#/')),
-                          ),
-                          itemContent: ItemContent(
-                            profileText: "Yemon",
-                            profileImageUrl: Uri.parse(
-                                'https://engineering.linecorp.com/wp-content/uploads/2019/08/flutter1.png'),
-                            titleImageUrl: Uri.parse(
-                                'https://engineering.linecorp.com/wp-content/uploads/2019/08/flutter1.png'),
-                            titleImageText: provider.settlement.settlementName,
-                            titleImageCategory: provider.receipts.values.first.receiptName,
-                            items: itemList,
-                            sum: 'total',
-                            sumOp: priceToString.format(provider.settlement.totalPrice),
-                          ),
-                          buttons: [
-                            Button(
-                              title: '정산서 보기',
-                              link: Link(
-                                webUrl: Uri.parse('https://fir-df691.web.app/#/'),
-                                mobileWebUrl: Uri.parse('https://fir-df691.web.app/#/'),
-                              ),
+                              webUrl: Uri.parse('https://fir-df691.web.app/#/'),
+                              mobileWebUrl:
+                                  Uri.parse('https://fir-df691.web.app/#/'),
                             ),
-                            Button(
-                              title: '앱으로보기',
-                              link: Link(
-                                androidExecutionParams: {'key1': 'value1', 'key2': 'value2'},
-                                iosExecutionParams: {'key1': 'value1', 'key2': 'value2'},
-                              ),
+                          ),
+                          Button(
+                            title: '앱으로보기',
+                            link: Link(
+                              androidExecutionParams: {
+                                'key1': 'value1',
+                                'key2': 'value2'
+                              },
+                              iosExecutionParams: {
+                                'key1': 'value1',
+                                'key2': 'value2'
+                              },
                             ),
-                          ],
-                        )
-                      );
+                          ),
+                        ],
+                      ));
                       await launchBrowserTab(shareUrl, popupOpen: true);
                     } catch (error) {
                       print('카카오톡 공유 실패 $error');
@@ -173,9 +188,9 @@ class _SettlementFinalCheckPage
                     setState(() {});
                   },
                   style: OutlinedButton.styleFrom(
-                    backgroundColor: Colors.white,
+                    backgroundColor: color3,
                     side: const BorderSide(
-                      color: Colors.grey,
+                      color: Colors.transparent,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
@@ -183,7 +198,7 @@ class _SettlementFinalCheckPage
                   ),
                   child: const Text(
                     "카카오톡으로 정산서 공유하기",
-                    style: TextStyle(color: Colors.black),
+                    style: TextStyle(color: Colors.black, fontSize: 19),
                   ),
                 ),
               ),
@@ -241,7 +256,8 @@ class _SettlementFinalCheckUserPanelState
                         ),
                       ),
                       Text(
-                        "${(provider.settlementPapers[widget.index]?.userName ?? "그룹원")}",
+                        (provider.settlementPapers[widget.index]?.userName ??
+                            "그룹원"),
                         style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w400,
@@ -271,7 +287,7 @@ class _SettlementFinalCheckUserPanelState
         AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           width: size.width,
-          height: selected ? 70 : 0,
+          height: selected ? 80 : 0,
           color: Colors.grey[200],
           child: Padding(
             padding:

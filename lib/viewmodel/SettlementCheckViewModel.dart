@@ -27,7 +27,7 @@ class SettlementCheckViewModel extends ChangeNotifier{
     settingSettlementCheckViewModel(settlementId, groupname, userId);
   }
 
-  void settingSettlementCheckViewModel(String settlementId, String groupname, String userId) async {
+  Future<int> settingSettlementCheckViewModel(String settlementId, String groupname, String userId) async {
     settlement = await Settlement().getSettlementBySettlementId(settlementId);
     groupName = groupname;
     ServiceUser muser = await ServiceUser().getUserByUserId(settlement.masterUserId!);
@@ -56,6 +56,7 @@ class SettlementCheckViewModel extends ChangeNotifier{
     });
 
     notifyListeners();
+    return Future(() => 1);
   }
 
   void requestCheckMySent(String userId) {

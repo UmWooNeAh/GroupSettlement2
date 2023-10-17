@@ -176,19 +176,20 @@ class SettlementViewModel extends ChangeNotifier {
 
     // item의 등록으로 인해 settlementItem 생성
     SettlementItem newSettlementItem = SettlementItem();
-    newSettlementItem.receiptItemId    = receiptItems[receiptId]![index].receiptItemId;
-    newSettlementItem.menuName         = receiptItems[receiptId]![index].menuName;
-    newSettlementItem.menuCount        = receiptItems[receiptId]![index].serviceUsers.length;
-    newSettlementItem.price            = (receiptItems[receiptId]![index].menuPrice!.toDouble() / newSettlementItem.menuCount!.toDouble());
+    newSettlementItem.receiptItemId =
+        receiptItems[receiptId]![index].receiptItemId;
+    newSettlementItem.menuName = receiptItems[receiptId]![index].menuName;
+    newSettlementItem.menuCount =
+        receiptItems[receiptId]![index].serviceUsers.length;
+    newSettlementItem.price =
+        receiptItems[receiptId]![index].menuPrice!.toDouble() /
+            newSettlementItem.menuCount!.toDouble();
     newSettlementItem.receiptId = receiptId;
 
-    if(settlementPapers[userId]!.settlementItems == null) {
-      settlementPapers[userId]!.settlementItems = [newSettlementItem.settlementItemId!];
-    }
-    else {
-      settlementPapers[userId]!.settlementItems!.add(newSettlementItem.settlementItemId!);
-    }
-    if(settlementItems[userId] == null) {
+    settlementPapers[userId]!
+        .settlementItems
+        .add(newSettlementItem.settlementItemId!);
+    if (settlementItems[userId] == null) {
       settlementItems[userId] = [newSettlementItem];
     } else {
       settlementItems[userId]!.add(newSettlementItem);
@@ -286,15 +287,15 @@ class SettlementViewModel extends ChangeNotifier {
     }
 
     // Receipt Update
-    for(var rcp in receipts!.entries) {
-      FireService().updateDoc("receiptlist", rcp.key!, rcp.value!.toJson());
+    for (var rcp in receipts.entries) {
+      FireService().updateDoc("receiptlist", rcp.key, rcp.value.toJson());
     }
 
     // ReceiptItem Update
-    for(var rcpitemlist in receiptItems!.entries) {
-      for(var rcpitem in rcpitemlist.value) {
+    for (var rcpitemlist in receiptItems.entries) {
+      for (var rcpitem in rcpitemlist.value) {
         FireService().updateDoc(
-            "receiptitemlist", rcpitemlist.key!, rcpitem.toJson());
+            "receiptitemlist", rcpitem.receiptItemId!, rcpitem.toJson());
       }
     }
     notifyListeners();

@@ -716,36 +716,35 @@ class _State extends ConsumerState<groupMainPage> {
   }
 }
 
-class stmItem extends StatefulWidget {
+class stmItem extends ConsumerStatefulWidget {
   final Size size;
   final String masterId; final String userId;
   final Settlement settlement;
   const stmItem({Key? key, required this.size, required this.masterId, required this.userId, required this.settlement}) : super(key: key);
 
   @override
-  State<stmItem> createState() => _stmItemState();
+  ConsumerState<stmItem> createState() => _stmItemState();
 }
 
-class _stmItemState extends State<stmItem> {
+class _stmItemState extends ConsumerState<stmItem> {
   @override
   Widget build(BuildContext context) {
     bool masterFlag = widget.settlement.masterUserId == widget.userId;
     Color color = masterFlag ? Color(0xFF07BEB8) : Color(0xFFFE5F55);
     int currentStmComplete = 0;
     DateTime dt;
-
+    
     widget.settlement.checkSent.forEach((key, value) {
       if(value == 3) currentStmComplete++;
     });
 
     dt = widget.settlement.time != null ? DateTime.parse(widget.settlement.time!.toDate().toString()) : DateTime.utc(1000,01,01);
-
-
+    final gvm = ref.watch(groupProvider);
     return Row(
       children: [
         GestureDetector(
           onTap:(){
-            context.push("/settlementDetailPage");
+            context.push("/SettlementDetailPage/${widget.settlement.settlementId}/${gvm.myGroup.groupName}/${widget.userId}}");
           },
           child: Container(
             decoration: ShapeDecoration(
