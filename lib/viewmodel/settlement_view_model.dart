@@ -166,6 +166,8 @@ class SettlementViewModel extends ChangeNotifier {
       // newSettlementPaper.settlementPaperId =
       newSettlementPaper.userName =
           receiptItems[receiptId]![index].serviceUsers[userId];
+      newSettlementPaper.accountInfo = settlement.accountInfo;
+      newSettlementPaper.settlementId = settlement.settlementId;
       newSettlementPaper.serviceUserId = userId;
       settlementPapers[userId] = newSettlementPaper;
       settlement.settlementPapers[userId] =
@@ -182,6 +184,7 @@ class SettlementViewModel extends ChangeNotifier {
     newSettlementItem.price =
         receiptItems[receiptId]![index].menuPrice!.toDouble() /
             newSettlementItem.menuCount!.toDouble();
+    newSettlementItem.receiptId = receiptId;
 
     settlementPapers[userId]!
         .settlementItems
