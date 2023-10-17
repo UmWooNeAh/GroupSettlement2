@@ -292,9 +292,8 @@ class SettlementViewModel extends ChangeNotifier {
     // ReceiptItem Update
     for (var rcpitemlist in receiptItems.entries) {
       for (var rcpitem in rcpitemlist.value) {
-
-        FireService()
-           .updateDoc("receiptitemlist", rcpitem.receiptItemId!, rcpitem.toJson());
+        FireService().updateDoc(
+            "receiptitemlist", rcpitem.receiptItemId!, rcpitem.toJson());
       }
     }
     notifyListeners();

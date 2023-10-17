@@ -20,7 +20,6 @@ import 'package:groupsettlement2/view/groupMainPage.dart';
 import 'package:groupsettlement2/view/settlementDetailPage.dart';
 import 'package:groupsettlement2/view/settlementGroupSelectionPage.dart';
 import 'package:groupsettlement2/class/class_settlement.dart';
-import 'package:groupsettlement2/view/settlement_detail_page_sender.dart';
 import 'package:groupsettlement2/view/settlement_final_check.dart';
 import 'package:groupsettlement2/view/total_settlement_details_management.dart';
 import 'package:groupsettlement2/viewmodel/UserViewModel.dart';
@@ -122,9 +121,13 @@ final GoRouter _router = GoRouter(
               return groupMainPage(groupId: groupId);
             }),
         GoRoute(
-            path: 'settlementDetailPage',
+            path: 'SettlementDetailPage/:settlementId/:groupname/:userId',
             builder: (context, state) {
-              return const SettlementDetailPageSettlementer();
+              return SettlementDetailPage(
+                settlementId: state.pathParameters["settlementId"]!,
+                groupname: state.pathParameters["groupname"]!,
+                userId: state.pathParameters["userId"]!,
+              );
             }),
         GoRoute(
             path: 'CreateNewSettlementPage/:groupId/:masterId/:accountInfo',
@@ -175,14 +178,8 @@ final GoRouter _router = GoRouter(
         GoRoute(
             path: 'SettlementGroupSelectionPage',
             builder: (context, state) {
-              return settlementGroupSelectionPage();
+              return const settlementGroupSelectionPage();
             }),
-        GoRoute(
-          path: "SettlementDetailPageSender",
-          builder: (context, state) {
-            return const SettlementDetailPageSender();
-          },
-        ),
         GoRoute(
           path: "MyPage",
           builder: (context, state) {

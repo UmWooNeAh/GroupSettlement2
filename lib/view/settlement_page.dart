@@ -18,6 +18,11 @@ class CheckSettlementPaper extends ChangeNotifier {
     selectedUserName = userName;
     notifyListeners();
   }
+
+  void setting() {
+    selectedUserId = "default";
+    selectedUserName = "전체 정산서";
+  }
 }
 
 class BottomSheetSlider extends ChangeNotifier {
@@ -180,10 +185,12 @@ class _SettlementPageState extends ConsumerState<SettlementPage> {
     final bottomsheetprovider = ref.watch(bottomSheetSliderProvider);
     final providerMethod = ref.watch(stmProvider.notifier);
     final receiptprovider = ref.watch(isReceiptOpenedProvider);
+    final checkprovider = ref.watch(checkSettlementPaperProvider);
 
     if (isFirstBuild) {
       bottomsheetprovider.setBottomSheetSlider(0.0, 0.0, size.height * 0.7);
       providerMethod.settingSettlementViewModel(widget.settlementId);
+      checkprovider.setting();
       isFirstBuild = false;
       // while (provider.receipts.isEmpty) {
       //   Future.delayed(const Duration(milliseconds: 100));
@@ -449,9 +456,9 @@ class _CustomBottomSheetState extends ConsumerState<CustomBottomSheet> {
               duration: (bottomsheetprovider.currentHeight -
                               bottomsheetprovider.previousHeight)
                           .abs() >
-                      5
-                  ? const Duration(milliseconds: 400)
-                  : const Duration(milliseconds: 0),
+                      20
+                  ? const Duration(milliseconds: 300)
+                  : const Duration(milliseconds: 10),
               curve: Curves.decelerate,
               height: bottomsheetprovider.currentHeight,
               width: size.width,
@@ -671,7 +678,7 @@ class _CustomBottomSheetState extends ConsumerState<CustomBottomSheet> {
                                       height: 50,
                                       width: size.width,
                                       child: OutlinedButton(
-                                        onPressed: ()async{
+                                        onPressed: () async {
                                           await provider.completeSettlement();
                                           Navigator.of(context).pop();
                                           context.go(
