@@ -56,14 +56,10 @@ class _SinPageState extends ConsumerState<SinPage> {
                 ),
                 TextButton(
                   onPressed: () async{
-                    ReceiptItem model = ReceiptItem();
-                    model.menuName = "이셰프";
-                    model.menuPrice = 34000;
-                    model.menuCount = 1;
-
+                    ServiceUser model = ServiceUser();
+                    model.name = _inputController.text;
                     print('객체 생성이 완료되었습니다.');
-                    print("${model.receiptItemId}");
-                    model.createReceiptItem();
+                    model.createUser();
                     _inputController.clear();
                     //ref.watch(userProvider.notifier).addUser(user);
                   },
