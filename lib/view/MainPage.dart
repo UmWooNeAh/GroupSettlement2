@@ -209,21 +209,9 @@ class _MainPageState extends State<MainPage> {
                   },
                 ),
                 ElevatedButton(
-                  child: const Text("Kakao Page"),
+                  child: const Text("Group Select Page"),
                   onPressed: () {
-                    context.push("/kakaoLoginPage");
-                  },
-                ),
-                ElevatedButton(
-                  child: const Text("Clova Page"),
-                  onPressed: () {
-                    context.push("/clovaPage");
-                  },
-                ),
-                ElevatedButton(
-                  child: const Text("Group Main Page"),
-                  onPressed: () {
-                    context.push("/groupMainPage");
+                    context.push("/groupSelectPage/8dcca5ca-107c-4a12-9d12-f746e2e513b7");
                   },
                 ),
               ],

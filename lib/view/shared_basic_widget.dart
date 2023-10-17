@@ -44,7 +44,7 @@ class _CustomBottomNavigationBarState
               1;
             // context.go('/ReceiptBox');
             case 2:
-              context.go('/CreateNewSettlementPage');
+              context.go('/SettlementGroupSelectionPage');
             case 3:
               1;
             // context.go('/Notification');

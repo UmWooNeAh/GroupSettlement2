@@ -39,7 +39,11 @@ class Settlement {
     isFinished = json['isfinished'];
     isMerged = json['ismerged'];
     mergedSettlement= List<String>.from(json['mergedsettlement']);
-    totalPrice = json['totalprice'];
+    try {
+      totalPrice = json['totalprice'];
+    } catch(e){
+      totalPrice = 0;
+    }
     time = json['time'];
   }
 

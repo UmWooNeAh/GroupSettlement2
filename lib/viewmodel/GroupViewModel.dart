@@ -23,10 +23,12 @@ class GroupViewModel extends ChangeNotifier {
     settingGroupViewModel(userId, groupId);
   }
 
-  void settingGroupViewModel(String userId, String groupId) async {
+  Future<void> settingGroupViewModel(String userId, String groupId) async {
+    serviceUsers = []; settlementInGroup = []; mergedSettlementInGroup = [];
     userData = await ServiceUser().getUserByUserId(userId);
     myGroup = await Group().getGroupByGroupId(groupId);
     notifyListeners();
+
 
     myGroup.serviceUsers.forEach((userid) async {
       serviceUsers.add(await ServiceUser().getUserByUserId(userid));
@@ -46,7 +48,7 @@ class GroupViewModel extends ChangeNotifier {
       }
       notifyListeners();
     });
-
+    return;
   }
 
   void updateSettlement(String settlementId) async {

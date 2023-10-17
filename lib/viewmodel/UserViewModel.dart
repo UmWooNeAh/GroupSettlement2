@@ -28,10 +28,10 @@ class UserViewModel extends ChangeNotifier {
     settingUserViewModel(userId);
   }
 
-  void settingUserViewModel(String userId) async {
+  Future settingUserViewModel(String userId) async {
     myGroup = []; myReceipts = []; mySettlements = []; mySettlementPapers = []; newAlarm = []; receiveStmAlarm = []; sendStmAlarm = []; etcStmAlarm = [];
     fetchUser(userId);
-    fetchAlarm(userId);
+    //fetchAlarm(userId);
   }
 
   void fetchUser(String userId) async {
@@ -60,7 +60,11 @@ class UserViewModel extends ChangeNotifier {
     group.settlements.forEach((stmid) async {
       Settlement stm = await Settlement().getSettlementBySettlementId(stmid);
       mySettlements.add(stm);
-      fetchStmPaper(stm);
+      try {
+        fetchStmPaper(stm);
+      }catch(e){
+        print("error!!!!! ${e}");
+      }
     });
     notifyListeners();
   }

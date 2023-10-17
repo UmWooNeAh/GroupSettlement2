@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/class/class_group.dart';
@@ -11,38 +10,50 @@ import '../class/class_settlement.dart';
 import '../class/class_settlementitem.dart';
 import '../class/class_settlementpaper.dart';
 
-final stmProvider = ChangeNotifierProvider<SettlementViewModel>(
-        (ref) => SettlementViewModel("54d974c2-ea2a-4998-89a3-6d9cca52db80"));
+final stmProvider =
+    ChangeNotifierProvider<SettlementViewModel>((ref) => SettlementViewModel());
 
-class SettlementViewModel extends ChangeNotifier{
+class SettlementViewModel extends ChangeNotifier {
   // Information
-  Settlement                         settlement       = Settlement();
-  List<ServiceUser>                  settlementUsers = <ServiceUser> [];
-  Map<String, Receipt>               receipts         = <String, Receipt> {};
-  Map<String, List<ReceiptItem>>     receiptItems     = <String, List<ReceiptItem>> {};
+  Group group = Group();
+  Settlement settlement = Settlement();
+  List<ServiceUser> settlementUsers = <ServiceUser>[];
+  Map<String, Receipt> receipts = <String, Receipt>{};
+  Map<String, List<ReceiptItem>> receiptItems = <String, List<ReceiptItem>>{};
 
   // Management
-  List<String>                       finalSettlement  = <String>[];
-  Map<String, List<String>>          subGroups        = <String, List<String>> {};
-  Map<String, SettlementPaper>       settlementPapers = <String, SettlementPaper> {};
-  Map<String, List<SettlementItem>>  settlementItems  = <String, List<SettlementItem>> {};
+  List<String> finalSettlement = <String>[];
+  Map<String, List<String>> subGroups = <String, List<String>>{};
+  Map<String, SettlementPaper> settlementPapers = <String, SettlementPaper>{};
+  Map<String, List<SettlementItem>> settlementItems =
+      <String, List<SettlementItem>>{};
 
-  SettlementViewModel(String settlementId){
-    settlementUsers = []; receipts = {}; receiptItems = {}; finalSettlement = []; subGroups = {}; settlementPapers = {}; settlementItems = {};
-    settingSettlementViewModel(settlementId);
-  }
+  SettlementViewModel();
 
   void settingSettlementViewModel(String settlementId) async {
+    group = Group();
+    settlement = Settlement();
+    settlementUsers = <ServiceUser>[];
+    receipts = <String, Receipt>{};
+    receiptItems = <String, List<ReceiptItem>>{};
+
+    // Management
+    finalSettlement = <String>[];
+    subGroups = <String, List<String>>{};
+    settlementPapers = <String, SettlementPaper>{};
+    settlementItems = <String, List<SettlementItem>>{};
+
     settlement = await Settlement().getSettlementBySettlementId(settlementId);
-    Group group = await Group().getGroupByGroupId(settlement.groupId!);
+    group = await Group().getGroupByGroupId(settlement.groupId!);
     //log("정산 이름: ${settlement.settlementName}");
     //정산자 제외하고 그룹의 유저 목록 불러오기
 
-    ServiceUser muser = await ServiceUser().getUserByUserId(settlement.masterUserId!);
+    ServiceUser muser =
+        await ServiceUser().getUserByUserId(settlement.masterUserId!);
     settlementUsers.add(muser);
 
-    for(var userid in group.serviceUsers) {
-      if(userid == settlement.masterUserId) {
+    for (var userid in group.serviceUsers) {
+      if (userid == settlement.masterUserId) {
         continue;
       }
       ServiceUser user = await ServiceUser().getUserByUserId(userid);
@@ -56,57 +67,50 @@ class SettlementViewModel extends ChangeNotifier{
 
       receipts[receipt]!.receiptItems.forEach((receiptitemid) async {
         // Receipt -> ReceiptItem 하나씩 불러오기
-        ReceiptItem newReceiptItem = await ReceiptItem().getReceiptItemByReceiptItemId(receiptitemid);
-        if(receiptItems[receipt] == null) {
+        ReceiptItem newReceiptItem =
+            await ReceiptItem().getReceiptItemByReceiptItemId(receiptitemid);
+        if (receiptItems[receipt] == null) {
           receiptItems[receipt] = [newReceiptItem];
-        }
-        else {
+        } else {
           receiptItems[receipt]!.add(newReceiptItem);
         }
         notifyListeners();
       });
       notifyListeners();
     });
-
+    notifyListeners();
   }
 
-  void addSettlementItem(String receiptId, int index, String receiptItemId, String userId) {
+  void addSettlementItem(
+      String receiptId, int index, String receiptItemId, String userId) {
     // receiptItem이 선택이 되었는지에 따라 userId를 추가해주기 + 처음 선택됐을 때 finalSettlement에 추가
+    if (receiptItems[receiptId]![index].serviceUsers[userId] != null) {
+      return;
+    }
 
     late String userName;
-    for(var user in settlementUsers) {
-      if(user.serviceUserId == userId) {
+    for (var user in settlementUsers) {
+      if (user.serviceUserId == userId) {
         userName = user.name!;
         break;
       }
     }
 
-    if(receiptItems[receiptId]![index].serviceUsers.isEmpty) {
-      receiptItems[receiptId]![index].serviceUsers[userId] = userName!;
-      finalSettlement.add(receiptItemId);
+    if (settlementPapers[userId] == null) {
+      finalSettlement.add(userId);
     }
-    else {
-      if(receiptItems[receiptId]![index].serviceUsers![userId] != null) {
-        return;
-      } // 같은 영수증 항목에 동일한 사람이 중복 매칭되는 것을 방지
-      receiptItems[receiptId]![index].serviceUsers![userId] = userName!;
-    }
+    receiptItems[receiptId]![index].serviceUsers[userId] = userName;
 
     _addItemToSettlementPaper(receiptId, index, userId);
     _updateSettlementItemPrice(receiptId, index);
     notifyListeners();
   }
 
-  void addSettlementItemBySubGroup(String receiptId, int index, String subGroupId, String subGroupName) {
-    if(receiptItems[receiptId]![index].serviceUsers == null) {
-      receiptItems[receiptId]![index].serviceUsers[subGroupId] = subGroupName;
-      finalSettlement.add(receiptItems[receiptId]![index].receiptItemId!);
-    }
-    else {
-      receiptItems[receiptId]![index].serviceUsers[subGroupId] = subGroupName;
-    }
+  void addSettlementItemBySubGroup(
+      String receiptId, int index, String subGroupId, String subGroupName) {
+    receiptItems[receiptId]![index].serviceUsers[subGroupId] = subGroupName;
 
-    for(var userid in subGroups[subGroupId]!) {
+    for (var userid in subGroups[subGroupId]!) {
       _addItemToSettlementPaper(receiptId, index, userid);
     }
     _updateSettlementItemPrice(receiptId, index);
@@ -118,43 +122,56 @@ class SettlementViewModel extends ChangeNotifier{
     // ReceiptItem에 매칭되어있는 user 삭제
     receiptItems[receiptId]![index].serviceUsers.remove(userId);
 
-    if(receiptItems[receiptId]![index].serviceUsers.isEmpty) {
-      finalSettlement.remove(receiptItems[receiptId]![index].receiptItemId);
+    if (settlementPapers[userId] == null) {
+      finalSettlement.remove(userId);
     }
-    else {
-      _updateSettlementItemPrice(receiptItems[receiptId]![index].receiptItemId!, index);
+
+    _updateSettlementItemPrice(receiptId, index);
+    if (settlementPapers[userId] != null) {
+      settlementPapers[userId]!.totalPrice = 0;
+      for (int i = 0;
+          i < settlementPapers[userId]!.settlementItems.length;
+          i++) {
+        settlementPapers[userId]!.totalPrice =
+            settlementPapers[userId]!.totalPrice! +
+                settlementItems[userId]![i].price!;
+      }
     }
+
     notifyListeners();
   }
 
-  void deleteSettlementItemBySubGroup(String receiptId, int index, String subGroupId){
-
-    for(var userid in subGroups[subGroupId]!) {
+  void deleteSettlementItemBySubGroup(
+      String receiptId, int index, String subGroupId) {
+    for (var userid in subGroups[subGroupId]!) {
       _deleteItemToSettlementPaper(receiptId, index, userid);
     }
 
-    for(var userid in subGroups[subGroupId]!) {
+    for (var userid in subGroups[subGroupId]!) {
       receiptItems[receiptId]![index].serviceUsers.remove(userid);
     }
 
-    if(receiptItems[receiptId]![index].serviceUsers.isEmpty) {
+    if (receiptItems[receiptId]![index].serviceUsers.isEmpty) {
       finalSettlement.remove(receiptItems[receiptId]![index].receiptItemId);
-    }
-    else {
-      _updateSettlementItemPrice(receiptItems[receiptId]![index].receiptItemId!, index);
+    } else {
+      _updateSettlementItemPrice(receiptId, index);
     }
     notifyListeners();
   }
 
-  void _addItemToSettlementPaper(String receiptId, int index, String userId){
+  void _addItemToSettlementPaper(String receiptId, int index, String userId) {
     // userId에 따른 SettlementPaper가 없었을 때 생성후 settlement에 등록
-    if(!settlementPapers.containsKey(userId)) {
+    if (!settlementPapers.containsKey(userId)) {
       SettlementPaper newSettlementPaper = SettlementPaper();
+      // newSettlementPaper.settlementPaperId =
+      newSettlementPaper.userName =
+          receiptItems[receiptId]![index].serviceUsers[userId];
       newSettlementPaper.serviceUserId = userId;
       newSettlementPaper.accountInfo = settlement.accountInfo;
       newSettlementPaper.settlementId = settlement.settlementId;
       settlementPapers[userId] = newSettlementPaper;
-      settlement.settlementPapers[userId] = newSettlementPaper.settlementPaperId!;
+      settlement.settlementPapers[userId] =
+          newSettlementPaper.settlementPaperId!;
     }
 
     // item의 등록으로 인해 settlementItem 생성
@@ -173,51 +190,53 @@ class SettlementViewModel extends ChangeNotifier{
     }
     if(settlementItems[userId] == null) {
       settlementItems[userId] = [newSettlementItem];
-    }
-    else {
+    } else {
       settlementItems[userId]!.add(newSettlementItem);
     }
     notifyListeners();
   }
 
   void _updateSettlementItemPrice(String receiptId, int index) {
-    for(var userid in receiptItems[receiptId]![index].serviceUsers.keys) {
-      for(int i=0; i<settlementItems[userid]!.length; i++) {
+    for (var userid in receiptItems[receiptId]![index].serviceUsers.keys) {
+      for (int i = 0; i < settlementItems[userid]!.length; i++) {
         if (settlementItems[userid]![i].receiptItemId ==
             receiptItems[receiptId]![index].receiptItemId) {
           settlementItems[userid]![i].menuCount =
               receiptItems[receiptId]![index].serviceUsers.length;
           settlementItems[userid]![i].price =
-          (receiptItems[receiptId]![index].menuPrice!.toDouble() /
-              settlementItems[userid]![i].menuCount!.toDouble());
-          if(settlementPapers[userid]!.totalPrice == 0) {
-            settlementPapers[userid]!.totalPrice = receiptItems[receiptId]![index].menuPrice!.toDouble();
-          }
-          else {
+              receiptItems[receiptId]![index].menuPrice!.toDouble() /
+                  settlementItems[userid]![i].menuCount!.toDouble();
+          settlementPapers[userid]!.totalPrice = 0;
+          for (int j = 0; j < settlementItems[userid]!.length; j++) {
             settlementPapers[userid]!.totalPrice =
                 settlementPapers[userid]!.totalPrice! +
-                    receiptItems[receiptId]![index].menuPrice!.toDouble();
+                    settlementItems[userid]![j].price!;
           }
           break;
         }
       }
-      }
+    }
     notifyListeners();
   }
 
-  void _deleteItemToSettlementPaper(String receiptId, int index, String userId){
+  void _deleteItemToSettlementPaper(
+      String receiptId, int index, String userId) {
     // SettlementItem 삭제 paper에서 item 삭제, item객체 삭제, item map에서 삭제
-    for(var stmitemid in settlementPapers[userId]!.settlementItems) {
-      if(settlementItems[userId]![index].receiptItemId == receiptItems[receiptId]![index].receiptItemId){
-        settlementPapers[userId]!.settlementItems.remove(stmitemid);
-        settlementItems[userId]!.remove(stmitemid);
+    for (var stmitem in settlementItems[userId]!) {
+      if (stmitem.receiptItemId ==
+          receiptItems[receiptId]![index].receiptItemId) {
+        settlementItems[userId]!.remove(stmitem);
+        settlementPapers[userId]!
+            .settlementItems
+            .remove(stmitem.settlementItemId);
         break;
       }
     }
+
     // SettlementPaper가 할당받은 settlementItem이 없다면 settlementpaper 삭제
-    if(settlementPapers[userId]!.settlementItems.isEmpty){
-      for(var paper in settlement.settlementPapers.entries) {
-        if(paper.value == settlementPapers[userId]!.settlementPaperId) {
+    if (settlementPapers[userId]!.settlementItems.isEmpty) {
+      for (var paper in settlement.settlementPapers.entries) {
+        if (paper.value == settlementPapers[userId]!.settlementPaperId) {
           settlement.settlementPapers.remove(paper);
           break;
         }
@@ -239,7 +258,10 @@ class SettlementViewModel extends ChangeNotifier{
     notifyListeners();
   }
 
-  void completeSettlement() async {
+  Future<int> completeSettlement() async {
+    // settlement Create
+    FireService().updateDoc(
+        "settlementlist", settlement.settlementId!, settlement.toJson());
 
     // SettlementPaper Create
     for(var stmpaper in settlementPapers!.entries) {
@@ -252,21 +274,22 @@ class SettlementViewModel extends ChangeNotifier{
         stmitem.createSettlementItem();
       }
     }
-    // settlement Update
-    FireService().updateDoc("settlementlist", settlement.settlementId!, settlement.toJson());
 
     // User Update(송금자만 업데이트)
-    for(var stmuser in settlementUsers) {
-      ServiceUser user = await ServiceUser().getUserByUserId(stmuser.serviceUserId!);
-      for(var stmpaper in settlementPapers!.entries) {
-        user.settlementPapers?.add(stmpaper.value!.settlementPaperId!);
+    for (var stmuser in settlementUsers) {
+      ServiceUser user =
+          await ServiceUser().getUserByUserId(stmuser.serviceUserId!);
+      for (var stmpaper in settlementPapers.entries) {
+        user.settlementPapers.add(stmpaper.value.settlementPaperId!);
       }
       FireService().updateDoc("userlist", user.serviceUserId!, user.toJson());
     }
+
     // Receipt Update
     for(var rcp in receipts!.entries) {
       FireService().updateDoc("receiptlist", rcp.key!, rcp.value!.toJson());
     }
+
     // ReceiptItem Update
     for(var rcpitemlist in receiptItems!.entries) {
       for(var rcpitem in rcpitemlist.value) {
@@ -274,24 +297,21 @@ class SettlementViewModel extends ChangeNotifier{
             "receiptitemlist", rcpitemlist.key!, rcpitem.toJson());
       }
     }
-
     notifyListeners();
+    return 1;
   }
 
   void requestSettlement() async {
+    for (var stmuser in settlementUsers) {
+      ServiceUser user =
+          await ServiceUser().getUserByUserId(stmuser.serviceUserId!);
 
-      for(var stmuser in settlementUsers) {
-
-        ServiceUser user = await ServiceUser().getUserByUserId(stmuser.serviceUserId!);
-
-        if(user.kakaoId == null) { //카카오톡 공유하기
-
-        }
-        else {//카카오 피커
-
-        }
+      if (user.kakaoId == null) {
+        //카카오톡 공유하기
+      } else {
+        //카카오 피커
       }
-      notifyListeners();
+    }
+    notifyListeners();
   }
-
 }

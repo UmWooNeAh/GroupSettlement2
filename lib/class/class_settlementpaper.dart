@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:groupsettlement2/class/class_user.dart';
 import '../modeluuid.dart';
@@ -20,11 +22,17 @@ class SettlementPaper {
 
   SettlementPaper.fromJson(dynamic json) {
     settlementPaperId = json['settlementpaperid'];
-    settlementId = json['settlementid'];
     serviceUserId = json['serviceuserid'];
-    accountInfo = json['accountinfo'];
     settlementItems = List<String>.from(json["settlementitems"]);
     totalPrice = json['totalprice'];
+
+    try{
+      settlementId = json['settlementid'];
+      accountInfo = json['accountinfo'];
+    }catch(e){
+      settlementId = "";
+      accountInfo = "";
+    }
   }
 
   Map<String, dynamic> toJson() => {
@@ -59,10 +67,15 @@ class SettlementPaper {
     DocumentSnapshot<Map<String, dynamic>> result =
     await FirebaseFirestore.instance.collection("settlementpaperlist")
         .doc(paperid).get();
-    SettlementPaper paper = SettlementPaper.fromSnapShot(result);
-    ServiceUser user = await ServiceUser().getUserByUserId(serviceUserId!);
-    userName = user.name;
+    try {
+      SettlementPaper paper = SettlementPaper.fromSnapShot(result);
+    } catch(e){
+      print("개같은 에러 ${e}");
+    }
+    SettlementPaper paper = SettlementPaper();
     return paper;
+    //ServiceUser user = await ServiceUser().getUserByUserId(serviceUserId!);
+    //userName = user.name;
   }
 
   SettlementPaper.fromSnapShot(

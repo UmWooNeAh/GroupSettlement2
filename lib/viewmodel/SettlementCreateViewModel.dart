@@ -29,12 +29,13 @@ class SettlementCreateViewModel extends ChangeNotifier {
   SettlementCreateViewModel(
       String groupid, String masterid, String accountInfo) {
     receipts = {}; receiptItems = {}; totalPrice = 0;
-    settingSettlementCreateViewModel(groupid, masterid, accountInfo);
+    settlement = Settlement();
   }
 
   // 1-1. Settlement 객체 생성
   void settingSettlementCreateViewModel(
-      String groupid, String masterid, String accountInfo) async {
+    String groupid, String masterid, String accountInfo) async {
+    receipts = {}; receiptItems = {}; totalPrice = 0;
     settlement.groupId = groupid;
     settlement.masterUserId = masterid;
     settlement.accountInfo = accountInfo;
@@ -81,8 +82,12 @@ class SettlementCreateViewModel extends ChangeNotifier {
               int.parse(item['price']['price']['formatted']['value']);
           tempTotalPrice += rcpitem.menuPrice!;
         }catch(e){
-          rcpitem.menuPrice = -1;
-          print("Error occured processing price text : $e");
+          try {
+            rcpitem.menuPrice =
+                int.parse(item['price']['price']['formatted']['value']);
+          } catch(e) {
+            print("Error occured processing price text : $e");
+          }
         }
         newReceiptItems.add(rcpitem);
     }
@@ -145,9 +150,10 @@ class SettlementCreateViewModel extends ChangeNotifier {
   }
 
   // 5. 정산 최종 생성하기, DB 접근이 이루어지는 시점
-  void createSettlement(String stmname) async {
+  Future<String> createSettlement(String stmname) async {
     if (stmname == null) {
       print("정산명을 입력해주세요.");
+      return "error";
     } else {
       settlement.settlementName = stmname;
       myGroup.settlements.add(settlement.settlementId!);
@@ -170,6 +176,8 @@ class SettlementCreateViewModel extends ChangeNotifier {
       settlement.time = Timestamp.now();
       settlement.createSettlement();
       notifyListeners();
+
+      return settlement.settlementId ?? "error";
     }
   }
 }
