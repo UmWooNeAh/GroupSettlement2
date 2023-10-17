@@ -256,21 +256,24 @@ class SettlementViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void completeSettlement() async {
+  Future<int> completeSettlement() async {
     // settlement Create
     FireService().updateDoc(
         "settlementlist", settlement.settlementId!, settlement.toJson());
+
     // SettlementPaper Create
     for (var stmpaper in settlementPapers.entries) {
       settlement.totalPrice += stmpaper.value.totalPrice!;
       stmpaper.value.createSettlementPaper();
     }
+
     // SettlementItem Create
     for (var stmitemlist in settlementItems.entries) {
       for (var stmitem in stmitemlist.value) {
         stmitem.createSettlementItem();
       }
     }
+
     // User Update(송금자만 업데이트)
     for (var stmuser in settlementUsers) {
       ServiceUser user =
@@ -280,18 +283,22 @@ class SettlementViewModel extends ChangeNotifier {
       }
       FireService().updateDoc("userlist", user.serviceUserId!, user.toJson());
     }
+
     // Receipt Update
     for (var rcp in receipts.entries) {
       FireService().updateDoc("receiptlist", rcp.key, rcp.value.toJson());
     }
+
     // ReceiptItem Update
     for (var rcpitemlist in receiptItems.entries) {
       for (var rcpitem in rcpitemlist.value) {
+
         FireService()
-            .updateDoc("receiptitemlist", rcpitemlist.key, rcpitem.toJson());
+           .updateDoc("receiptitemlist", rcpitem.receiptItemId!, rcpitem.toJson());
       }
     }
     notifyListeners();
+    return 1;
   }
 
   void requestSettlement() async {

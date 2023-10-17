@@ -29,12 +29,13 @@ class SettlementCreateViewModel extends ChangeNotifier {
   SettlementCreateViewModel(
       String groupid, String masterid, String accountInfo) {
     receipts = {}; receiptItems = {}; totalPrice = 0;
-    settingSettlementCreateViewModel(groupid, masterid, accountInfo);
+    settlement = Settlement();
   }
 
   // 1-1. Settlement 객체 생성
   void settingSettlementCreateViewModel(
-      String groupid, String masterid, String accountInfo) async {
+    String groupid, String masterid, String accountInfo) async {
+    receipts = {}; receiptItems = {}; totalPrice = 0;
     settlement.groupId = groupid;
     settlement.masterUserId = masterid;
     settlement.accountInfo = accountInfo;
@@ -78,7 +79,7 @@ class SettlementCreateViewModel extends ChangeNotifier {
 
         try {
           rcpitem.menuPrice =
-              int.parse(item['price']['unitPrice']['formatted']['value']);
+              int.parse(item['price']['price']['formatted']['value']);
           tempTotalPrice += rcpitem.menuPrice!;
         }catch(e){
           try {
@@ -175,6 +176,7 @@ class SettlementCreateViewModel extends ChangeNotifier {
       settlement.time = Timestamp.now();
       settlement.createSettlement();
       notifyListeners();
+
       return settlement.settlementId ?? "error";
     }
   }
