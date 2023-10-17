@@ -106,7 +106,7 @@ final GoRouter _router = GoRouter(
               return const GunPage();
             }),
         GoRoute(
-            path: 'kakaoLoginPage',
+            path: 'KakaoLoginPage',
             builder: (context, state) {
               return const kakaoLoginPage();
             }),
@@ -116,9 +116,10 @@ final GoRouter _router = GoRouter(
               return const clovaPage();
             }),
         GoRoute(
-            path: 'groupMainPage/:groupId',
+            path: 'groupMainPage',
             builder: (context, state) {
-              return groupMainPage(groupId: state.pathParameters['groupId']!);
+              String groupId = state.extra as String;
+              return groupMainPage(groupId: groupId);
             }),
         GoRoute(
             path: 'settlementDetailPage',
@@ -126,9 +127,13 @@ final GoRouter _router = GoRouter(
               return const SettlementDetailPageSettlementer();
             }),
         GoRoute(
-            path: 'CreateNewSettlementPage',
+            path: 'CreateNewSettlementPage/:groupId/:masterId/:accountInfo',
             builder: (context, state) {
-              return const CreateNewSettlement();
+              return CreateNewSettlement(
+                groupId: state.pathParameters["groupId"]!,
+                masterId: state.pathParameters["masterId"]!,
+                accountInfo: state.pathParameters["accountInfo"]!,
+              );
             },
             routes: [
               GoRoute(
@@ -168,9 +173,9 @@ final GoRouter _router = GoRouter(
               return const SettlementFinalCheckPage();
             }),
         GoRoute(
-            path: 'settlementGroupSelectionPage',
+            path: 'SettlementGroupSelectionPage',
             builder: (context, state) {
-              return const settlementGroupSelectionPage();
+              return settlementGroupSelectionPage();
             }),
         GoRoute(
           path: "SettlementDetailPageSender",
