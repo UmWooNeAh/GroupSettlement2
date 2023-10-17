@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:groupsettlement2/viewmodel/settlement_view_model.dart';
+import 'package:groupsettlement2/viewmodel/SettlementViewModel.dart';
 
 class CheckSettlementPaper extends ConsumerStatefulWidget {
   const CheckSettlementPaper({super.key, required this.userId});

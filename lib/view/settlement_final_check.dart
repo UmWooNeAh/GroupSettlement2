@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/design_element.dart';
 import 'package:groupsettlement2/view/shared_basic_widget.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
-import '../viewmodel/settlement_view_model.dart';
+import '../viewmodel/SettlementViewModel.dart';
 
 class SettlementFinalCheckPage extends ConsumerStatefulWidget {
   const SettlementFinalCheckPage({super.key});
