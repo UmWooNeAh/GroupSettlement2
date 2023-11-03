@@ -15,7 +15,7 @@ exports.sendNtf_CreateGroup  = functions.region("asia-northeast3").firestore
     const newvalue = snap.data();
     
     try {
-          for(const user of newvalue.serviceuser) {
+          for(const user of newvalue.serviceusers) {
             const userRef = db.collection("userlist").doc(user);
             const userDoc = await userRef.get();
 
@@ -56,27 +56,56 @@ exports.sendNtf_CreateGroup  = functions.region("asia-northeast3").firestore
 
 exports.sendNtf_CreateSettlement  = functions.region("asia-northeast3").firestore
                             .document("settlementlist/{docId}").onCreate(async (snap, context) => {
-const newvalue = snap.data();
-const settlmentGroup = newvalue.groupid;
+    const newvalue = snap.data();
+    const settlmentGroup = newvalue.groupid;
 
-const masterid = newvalue.masteruserid;
-const masterRef = db.collection("userlist").doc(masterid);
-const masterDoc = await masterRef.get();
-const master = masterDoc.data().name;
+    const masterid = newvalue.masteruserid;
+    const masterRef = db.collection("userlist").doc(masterid);
+    const masterDoc = await masterRef.get();
+    const master = masterDoc.data().name;
 
-try {
+    try {
       const groupRef = db.collection("grouplist").doc(settlmentGroup);
       const groupDoc = await groupRef.get();
       const serviceusers = groupDoc.data().serviceusers;
 
       for(const userid of serviceusers) {
-        if(userid == masterid) continue;
+        if(userid == masterid) {
 
+            const alarmTitle = "정산 생성 알림";
+            const alarmBody = newvalue.settlementname + " 정산을 성공적으로 생성하였어요.";
+            const alarmId = uuid();
+
+            const message = {
+              notification: {
+                  title: alarmTitle,
+                  body: alarmBody,
+                },
+                token: masterDoc.data().fcmtoken,
+            };
+            const alarm = {
+                alarmid: alarmId,
+                title: alarmTitle,
+                body: alarmBody,
+                category: 1
+            };
+
+            db.collection("alarmlist").doc(masterDoc.data().serviceuserid)
+                    .collection("myalarmlist").doc(alarmId).set(alarm);
+
+            admin.messaging().send(message).then((response) => {
+                console.log("Successfully sent message:", response);
+              })
+              .catch((error) => {
+                console.log("Error sending message:", error);
+              });
+        }
+        else {
         const userRef = db.collection("userlist").doc(userid);
         const userDoc = await userRef.get();
 
         const alarmTitle = "정산 생성 알림";
-        const alarmBody = master + " 님이 생성한 " + newvalue.settlementName + " 정산을 확인해보세요.";
+        const alarmBody = master + " 님이 생성한 " + newvalue.settlementname + " 정산을 확인해보세요.";
         const alarmId = uuid();
 
         const message = {
@@ -103,21 +132,22 @@ try {
             console.log("Error sending message:", error);
           });
       }
-}
-catch (err) {
-          console.error(err);
-}
+      }
+    }
+    catch (err) {
+              console.error(err);
+    }
 
 });
 
 exports.sendNtf_SendSettlementPaper  = functions.region("asia-northeast3").firestore
                             .document("settlementpaperlist/{docId}").onCreate(async (snap, context) => {
-const newvalue = snap.data();
-const user = newvalue.serviceuserid;
-const settlement = newvalue.settlementid;
+    const newvalue = snap.data();
+    const user = newvalue.serviceuserid;
+    const settlement = newvalue.settlementid;
 
-try {
-      const userRef = db.collection("grouplist").doc(user);
+    try {
+      const userRef = db.collection("userlist").doc(user);
       const userDoc = await userRef.get();
 
       const settlementRef = db.collection("settlementlist").doc(settlement);
@@ -128,7 +158,7 @@ try {
       const masterDoc = await masterRef.get();
 
       const alarmTitle = "정산서 전송 알림";
-      const alarmBody = masterDoc.data().name+ " 님이 보내신 " + settlementDoc.data().settlementname  + " 정산의 정산서를 확인해보세요!";
+      const alarmBody = masterDoc.data().name+ " 님이 보내신 " + settlementDoc.data().settlementname  + " 정산의 정산서가 도착하였어요!";
       const alarmId = uuid();
 
       const message = {
@@ -155,132 +185,132 @@ try {
         console.log("Error sending message:", error);
       });
       
-}
-catch (err) {
-          console.error(err);
-}
+    }
+    catch (err) {
+              console.error(err);
+    }
 
 });
 
 exports.sendNtf_CheckSent  = functions.region("asia-northeast3").firestore
                             .document("settlementlist/{docId}").onUpdate(async (change, context) => {
-  const prev = change.before.data();
-  const prevMap = new Map(prev.checksent);
+      const prev = change.before.data();
+      const prevMap = new Map(prev.checksent);
 
-  const now = change.after.data();
-  const nowMap = new Map(now.checksent);
-  
-  const settlementname = now.settlementname;
+      const now = change.after.data();
+      const nowMap = new Map(now.checksent);
 
-  const master = now.masteruserid;
-  const masterRef = db.collection("userlist").doc(master);
-  const masterDoc = await masterRef.get();
+      const settlementname = now.settlementname;
 
-  for(const [key,value] of nowMap) {
-    const prevValue = prevMap[key];
-    if(prevValue != value) {
-      const userRef = db.collection("userlist").doc(key);
-      const userDoc = await userRef.get();
+      const master = now.masteruserid;
+      const masterRef = db.collection("userlist").doc(master);
+      const masterDoc = await masterRef.get();
 
-      try {
+      for(const [key,value] of nowMap) {
+        const prevValue = prevMap[key];
+        if(prevValue != value) {
+          const userRef = db.collection("userlist").doc(key);
+          const userDoc = await userRef.get();
 
-        if(prevValue == 0 && value == 1) {
-          const alarmTitle = "송금 확인 요청 알림";
-          const alarmBody = settlementname + " 정산: " + userDoc.data().name+ " 님이 보내신 송금을 확인해주세요!";
-          const alarmId = uuid();
+          try {
 
-          const message = {
-                notification: {
-                    title: alarmTitle,
-                    body: alarmBody,
-                  },
-                  token: userDoc.data().fcmtoken,
-              };
+            if(prevValue == 0 && value == 1) {
+              const alarmTitle = "송금 확인 요청 알림";
+              const alarmBody = settlementname + " 정산: " + userDoc.data().name+ " 님이 보내신 송금을 확인해주세요!";
+              const alarmId = uuid();
 
-          const alarm = {
-                  alarmid: alarmId,
-                  title: alarmTitle,
-                  body: alarmBody,
-                  category: 0
-            };
+              const message = {
+                    notification: {
+                        title: alarmTitle,
+                        body: alarmBody,
+                      },
+                      token: userDoc.data().fcmtoken,
+                  };
 
-          db.collection("alarmlist").doc(userDoc.data().serviceuserid)
-            .collection("myalarmlist").doc(alarmId).set(alarm);
+              const alarm = {
+                      alarmid: alarmId,
+                      title: alarmTitle,
+                      body: alarmBody,
+                      category: 0
+                };
 
-          admin.messaging().send(message).then((response) => {
-              console.log("Successfully sent message:", response);
-            })
-            .catch((error) => {
-              console.log("Error sending message:", error);
-            });
+              db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+                .collection("myalarmlist").doc(alarmId).set(alarm);
+
+              admin.messaging().send(message).then((response) => {
+                  console.log("Successfully sent message:", response);
+                })
+                .catch((error) => {
+                  console.log("Error sending message:", error);
+                });
+            }
+            else if(prevValue == 1 && value == 2) {
+              const alarmTitle = "송금 재요청 알림";
+              const alarmBody = settlementname + " 정산: " + "회원님의 송금이 반려되었어요. 확인 후 다시 송금해주세요!";
+              const alarmId = uuid();
+
+              const message = {
+                    notification: {
+                        title: alarmTitle,
+                        body: alarmBody,
+                      },
+                      token: userDoc.data().fcmtoken,
+                  };
+
+              const alarm = {
+                      alarmid: alarmId,
+                      title: alarmTitle,
+                      body: alarmBody,
+                      category: 1
+                };
+
+              db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+                .collection("myalarmlist").doc(alarmId).set(alarm);
+
+              admin.messaging().send(message).then((response) => {
+                  console.log("Successfully sent message:", response);
+                })
+                .catch((error) => {
+                  console.log("Error sending message:", error);
+                });
+            }
+            else if(prevValue == 1 && value == 3) {
+              const alarmTitle = "송금 확인 알림";
+              const alarmBody = settlementname + " 정산: " + masterDoc.data().name+ "님이 송금을 컨펌하였어요!";
+              const alarmId = uuid();
+
+              const message = {
+                    notification: {
+                        title: alarmTitle,
+                        body: alarmBody,
+                      },
+                      token: userDoc.data().fcmtoken,
+                  };
+
+              const alarm = {
+                      alarmid: alarmId,
+                      title: alarmTitle,
+                      body: alarmBody,
+                      category: 1
+                };
+
+              db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+                .collection("myalarmlist").doc(alarmId).set(alarm);
+
+              admin.messaging().send(message).then((response) => {
+                  console.log("Successfully sent message:", response);
+                })
+                .catch((error) => {
+                  console.log("Error sending message:", error);
+                });
+            }
+
+          }
+          catch (err) {
+            console.error(err);
+          }
         }
-        else if(prevValue == 1 && value == 2) {
-          const alarmTitle = "송금 재요청 알림";
-          const alarmBody = settlementname + " 정산: " + "회원님의 송금이 반려되었어요. 확인 후 다시 송금해주세요!";
-          const alarmId = uuid();
-
-          const message = {
-                notification: {
-                    title: alarmTitle,
-                    body: alarmBody,
-                  },
-                  token: userDoc.data().fcmtoken,
-              };
-
-          const alarm = {
-                  alarmid: alarmId,
-                  title: alarmTitle,
-                  body: alarmBody,
-                  category: 1
-            };
-
-          db.collection("alarmlist").doc(userDoc.data().serviceuserid)
-            .collection("myalarmlist").doc(alarmId).set(alarm);
-
-          admin.messaging().send(message).then((response) => {
-              console.log("Successfully sent message:", response);
-            })
-            .catch((error) => {
-              console.log("Error sending message:", error);
-            });
-        }
-        else if(prevValue == 1 && value == 3) {
-          const alarmTitle = "송금 확인 알림";
-          const alarmBody = settlementname + " 정산: " + masterDoc.data().name+ "님이 송금을 컨펌하였어요!";
-          const alarmId = uuid();
-
-          const message = {
-                notification: {
-                    title: alarmTitle,
-                    body: alarmBody,
-                  },
-                  token: userDoc.data().fcmtoken,
-              };
-
-          const alarm = {
-                  alarmid: alarmId,
-                  title: alarmTitle,
-                  body: alarmBody,
-                  category: 1
-            };
-
-          db.collection("alarmlist").doc(userDoc.data().serviceuserid)
-            .collection("myalarmlist").doc(alarmId).set(alarm);
-
-          admin.messaging().send(message).then((response) => {
-              console.log("Successfully sent message:", response);
-            })
-            .catch((error) => {
-              console.log("Error sending message:", error);
-            });
-        }
-
       }
-      catch (err) {
-        console.error(err);
-      }
-    }
-  }
 });
 
 exports.sendNtf_finishSettlement  = functions.region("asia-northeast3").firestore
