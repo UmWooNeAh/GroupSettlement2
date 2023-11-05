@@ -137,6 +137,17 @@ class UserViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void addAccount(String bank, String accountNum, String holder) async {
+    String fullInfo = bank + " " + accountNum + " " + holder;
+    userData.accountInfo.add(fullInfo);
+    FireService().updateDoc("userlist", userData.serviceUserId!, userData.toJson());
+  }
+
+  void deleteAccount(int index) async {
+    userData.accountInfo.removeAt(index);
+    FireService().updateDoc("userlist", userData.serviceUserId!, userData.toJson());
+  }
+
 }
 
 

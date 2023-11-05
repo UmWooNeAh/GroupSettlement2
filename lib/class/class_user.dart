@@ -14,6 +14,8 @@ class ServiceUser {
   List<String> settlementPapers = <String> [];
   List<String> accountInfo = <String> [];
   List<String> savedReceipts = <String> [];
+  Map<String, bool> friends = <String,bool> {};
+  List<String> requestedFriend = [];
 
   ServiceUser () {
     ModelUuid uuid = ModelUuid();
@@ -33,6 +35,8 @@ class ServiceUser {
     settlementPapers = List<String>.from(json["settlementpapers"]);
     accountInfo = List<String>.from(json["accountinfo"]);
     savedReceipts = List<String>.from(json["savedreceipts"]);
+    friends = Map<String, bool>.from(json["friends"]);
+    requestedFriend = List<String>.from(json["requestedfriend"]);
   }
 
   Map<String, dynamic> toJson() => {
@@ -45,6 +49,8 @@ class ServiceUser {
     'settlementpapers' : settlementPapers,
     'accountinfo' : accountInfo,
     'savedreceipts' : savedReceipts,
+    'friends' : friends,
+    'requestedfriend' : requestedFriend,
   };
 
   void createUser() async {
