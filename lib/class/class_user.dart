@@ -11,6 +11,7 @@ class ServiceUser {
   String? serviceUserId;
   String? friendId;
   String? name;
+  String? nickname;
   String? kakaoId;
   String? fcmToken;
   Timestamp? tokenTimestamp;
@@ -34,6 +35,7 @@ class ServiceUser {
     serviceUserId = json['serviceuserid'];
     friendId = json['friendid'];
     name = json['name'];
+    nickname = json['nickname'];
     kakaoId = json['kakaoid'];
     fcmToken = json['fcmtoken'];
     tokenTimestamp = json['tokentimestamp'];
@@ -50,6 +52,7 @@ class ServiceUser {
     'serviceuserid' : serviceUserId,
     'friendid' : friendId,
     'name' : name,
+    'nickname' : nickname,
     'kakaoid' : kakaoId,
     'fcmtoken' : fcmToken,
     'tokentimestamp' : tokenTimestamp,

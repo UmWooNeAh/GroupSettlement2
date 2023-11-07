@@ -54,6 +54,56 @@ class Friend {
     return friend;
   }
 
+  void _requestFriend(String otherfriendid) async {
+    ServiceUser other = await ServiceUser().getUserByUserId(_hashing(otherfriendid));
+    other.requestedFriend.add(friendId!);
+    FireService().updateDoc("userlist", other.serviceUserId!, other.toJson());
+  }
+
+  void acceptFriend(String otherfriendid) async {
+    ServiceUser me = await ServiceUser().getUserByUserId(_hashing(friendId!));
+    ServiceUser other = await ServiceUser().getUserByUserId(_hashing(otherfriendid));
+
+    me.requestedFriend.remove(otherfriendid);
+    me.friends.add(otherfriendid);
+    other.friends.add(friendId!);
+
+    FireService().updateDoc("userlist", me.serviceUserId!, me.toJson());
+    FireService().updateDoc("userlist", other.serviceUserId!, other.toJson());
+  }
+
+  String _hashing(String fid) {
+    String sid = "";
+    List<int> hiphen = [8, 13, 18, 23];
+    for (int i = 0; i < 36; i++) {
+      if (hiphen.contains(i)) {
+        sid += '-';
+        continue;
+      }
+      int ordfi = fid.codeUnitAt(i);
+      if ('0'.codeUnitAt(0) <= ordfi && ordfi <= '9'.codeUnitAt(0)) {
+        ordfi = ordfi - '0'.codeUnitAt(0) + 1;
+      } else if ('a'.codeUnitAt(0) <= ordfi && ordfi <= 'z'.codeUnitAt(0)) {
+        ordfi = ordfi - 'a'.codeUnitAt(0) + 11;
+      }
+
+      int key = 7;
+      int fi = key;
+      for (int j = 0; j < ordfi; j++) {
+        fi *= key;
+        fi %= 37;
+      }
+
+      if (fi <= 10) {
+        sid += String.fromCharCode('0'.codeUnitAt(0) + fi - 1);
+      } else if (fi > 10) {
+        sid += String.fromCharCode('a'.codeUnitAt(0) + fi - 11);
+      }
+    }
+
+    return sid;
+  }
+
   Friend.fromSnapShot(
       DocumentSnapshot<Map<String, dynamic>> snapshot)
       : this.fromJson(snapshot.data());
