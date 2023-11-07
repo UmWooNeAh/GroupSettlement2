@@ -13,8 +13,8 @@ import '../class/class_user.dart';
 import '../clova/clova.dart';
 
 final stmCreateProvider = ChangeNotifierProvider<SettlementCreateViewModel>(
-    (ref) => SettlementCreateViewModel("88f8433b-0af1-44be-95be-608316118fad",
-        "8dcca5ca-107c-4a12-9d12-f746e2e513b7", ""));
+    (ref) => SettlementCreateViewModel("1800d31d-6d49-4672-8ca7-d094b1a2e1d5",
+        "8969xxwf-8wf8-pf89-9x6p-88p0wpp9ppfb", ""));
 
 class SettlementCreateViewModel extends ChangeNotifier {
   // 0. Settlement 생성에 필요한 객체들 선언

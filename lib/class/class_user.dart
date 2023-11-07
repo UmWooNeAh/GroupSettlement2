@@ -9,6 +9,7 @@ import 'package:groupsettlement2/modeluuid.dart';
 class ServiceUser {
  
   String? serviceUserId;
+  String? friendId;
   String? name;
   String? kakaoId;
   String? fcmToken;
@@ -23,13 +24,15 @@ class ServiceUser {
 
   ServiceUser () {
     ModelUuid uuid = ModelUuid();
-    serviceUserId = uuid.randomId;
+    friendId = uuid.randomId;
+    serviceUserId = _hashing(friendId!);
     kakaoId = "";
     fcmToken = "";
   }
 
   ServiceUser.fromJson(dynamic json) {
     serviceUserId = json['serviceuserid'];
+    friendId = json['friendid'];
     name = json['name'];
     kakaoId = json['kakaoid'];
     fcmToken = json['fcmtoken'];
@@ -45,6 +48,7 @@ class ServiceUser {
 
   Map<String, dynamic> toJson() => {
     'serviceuserid' : serviceUserId,
+    'friendid' : friendId,
     'name' : name,
     'kakaoid' : kakaoId,
     'fcmtoken' : fcmToken,
@@ -102,6 +106,38 @@ class ServiceUser {
     }
     log("닉네임이 중복되지 않습니다.");
     return false;
+  }
+
+  String _hashing(String fid) {
+    String sid = "";
+    List<int> hiphen = [8, 13, 18, 23];
+    for (int i = 0; i < 36; i++) {
+      if (hiphen.contains(i)) {
+        sid += '-';
+        continue;
+      }
+      int ordfi = fid.codeUnitAt(i);
+      if ('0'.codeUnitAt(0) <= ordfi && ordfi <= '9'.codeUnitAt(0)) {
+        ordfi = ordfi - '0'.codeUnitAt(0) + 1;
+      } else if ('a'.codeUnitAt(0) <= ordfi && ordfi <= 'z'.codeUnitAt(0)) {
+        ordfi = ordfi - 'a'.codeUnitAt(0) + 11;
+      }
+
+      int key = 7;
+      int fi = key;
+      for (int j = 0; j < ordfi; j++) {
+        fi *= key;
+        fi %= 37;
+      }
+
+      if (fi <= 10) {
+        sid += String.fromCharCode('0'.codeUnitAt(0) + fi - 1);
+      } else if (fi > 10) {
+        sid += String.fromCharCode('a'.codeUnitAt(0) + fi - 11);
+      }
+    }
+
+    return sid;
   }
 
   ServiceUser.fromSnapShot(

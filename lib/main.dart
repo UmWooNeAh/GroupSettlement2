@@ -291,9 +291,10 @@ class _SplashViewState extends State<SplashView> {
   void _checkToken(String userid) async {
     ServiceUser user = await ServiceUser().getUserByUserId(userid);
     var nowtime = DateTime.now().millisecondsSinceEpoch;
-    DateTime prevtime = DateTime.parse(user.tokenTimestamp!.toDate().toString());
-    if (user.fcmToken == null ||
-        ( (nowtime - prevtime.millisecondsSinceEpoch) / (1000 * 60 * 60 * 24) ) >= 28) {
+    //DateTime prevtime = DateTime.parse(user.tokenTimestamp!.toDate().toString());
+    if (user.fcmToken == "") {
+      _getMyDeviceToken(user);
+    } else if( (nowtime - DateTime.parse(user.tokenTimestamp!.toDate().toString()).millisecondsSinceEpoch) / (1000 * 60 * 60 * 24)  >= 28 ) {
       _getMyDeviceToken(user);
     }
   }
@@ -302,7 +303,7 @@ class _SplashViewState extends State<SplashView> {
   void initState() {
     super.initState();
     //_getMyDeviceToken(me);
-    _checkToken("8dcca5ca-107c-4a12-9d12-f746e2e513b7");
+    _checkToken("8969xxwf-8wf8-pf89-9x6p-88p0wpp9ppfb");
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       RemoteNotification? notification = message.notification;
 

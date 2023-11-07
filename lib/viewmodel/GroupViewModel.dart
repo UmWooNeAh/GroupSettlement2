@@ -1,14 +1,16 @@
 import 'dart:developer';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
 import '../class/class_group.dart';
+import '../class/class_mergedSettlement.dart';
 import '../class/class_settlement.dart';
 import '../class/class_user.dart';
 
 final groupProvider = ChangeNotifierProvider<GroupViewModel>(
-        (ref) => GroupViewModel("8dcca5ca-107c-4a12-9d12-f746e2e513b7","88f8433b-0af1-44be-95be-608316118fad"));
+        (ref) => GroupViewModel("8969xxwf-8wf8-pf89-9x6p-88p0wpp9ppfb","1800d31d-6d49-4672-8ca7-d094b1a2e1d5"));
 
 class GroupViewModel extends ChangeNotifier {
 
@@ -16,7 +18,7 @@ class GroupViewModel extends ChangeNotifier {
   Group myGroup = Group();
   List<ServiceUser> serviceUsers = <ServiceUser> [];
   List<Settlement> settlementInGroup = <Settlement> [];
-  List<Settlement> mergedSettlementInGroup = <Settlement> [];
+  List<MergedSettlement> mergedSettlementInGroup = <MergedSettlement> [];
 
   GroupViewModel(String userId, String groupId) {
     serviceUsers = []; settlementInGroup = []; mergedSettlementInGroup = [];
@@ -37,17 +39,17 @@ class GroupViewModel extends ChangeNotifier {
 
     myGroup.settlements.forEach((stmid) async {
       Settlement stm = await Settlement().getSettlementBySettlementId(stmid);
-
-      if(!stm.mergedSettlement.isEmpty) {
-        mergedSettlementInGroup.add(stm);
-        //log("합쳐진 정산: ${stm.settlementName}");
-      }
-      else {
-        settlementInGroup.add(stm);
+      settlementInGroup.add(stm);
         //log("그냥 정산: ${stm.settlementName}");
-      }
       notifyListeners();
     });
+    /*myGroup.mergedSettlements.forEach((stmid) async {
+      MergedSettlement stm = await MergedSettlement().getSettlementBySettlementId(stmid);
+      mergedSettlementInGroup.add(stm);
+      //log("그냥 정산: ${stm.settlementName}");
+      notifyListeners();
+    });
+     */
     return;
   }
 
@@ -117,49 +119,68 @@ class GroupViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void mergeSettlement(Settlement stm1, Settlement stm2, String newName) async {
+  void mergeSettlementV1(Settlement stm1, Settlement stm2, String newName) async {
+    //하나의 정산 + 하나의 정산
+    MergedSettlement newMergedStm = MergedSettlement();
+    newMergedStm.groupId = myGroup.groupId;
+    newMergedStm.settlementName = newName;
+    newMergedStm.mergedSettlements.addAll([stm1.settlementId!, stm2.settlementId!]);
+    newMergedStm.totalPrice = stm1.totalPrice + stm2.totalPrice;
+    newMergedStm.time = Timestamp.now();
+    newMergedStm.createSettlement();
 
-    if(stm1.mergedSettlement.length > 0) { //합쳐진 정산 + 하나의 정산
-        stm1.mergedSettlement.add(stm2.settlementId!);
-        stm2.isMerged = true;
-        FireService().updateDoc("settlementlist", stm1.settlementId!, stm1.toJson());
-    }
-    else  { //하나의 정산 + 하나의 정산
-      Settlement newMergedStm = Settlement();
-      newMergedStm.settlementName = newName;
-      newMergedStm.mergedSettlement.addAll([stm1.settlementId!, stm2.settlementId!]);
-      stm1.isMerged = true; stm2.isMerged = true;
-      newMergedStm.createSettlement();
-      FireService().updateDoc("settlementlist", stm1.settlementId!, stm1.toJson());
-      FireService().updateDoc("settlementlist", stm2.settlementId!, stm2.toJson());
-      myGroup.settlements.add(newMergedStm.settlementId!);
-      mergedSettlementInGroup.add(newMergedStm);
-    }
+    stm1.isMerged = true; stm2.isMerged = true;
+    FireService().updateDoc("settlementlist", stm1.settlementId!, stm1.toJson());
+    FireService().updateDoc("settlementlist", stm2.settlementId!, stm2.toJson());
+    myGroup.mergedSettlements.add(newMergedStm.settlementId!);
+    FireService().updateDoc("grouplist", myGroup.groupId!, myGroup.toJson());
+    mergedSettlementInGroup.add(newMergedStm);
     notifyListeners();
+
   }
 
-  void disassembleMergedSettlement(Settlement mergedSettlement) async {
+  /*void makeOneMergedSettlement(MergedSettlement newMergedStm) async {
+      //하나의 정산 + 하나의 정산
+      MergedSettlement newMergedStm = MergedSettlement();
+      if(stm1.masterUserId != stm2.masterUserId) {
+        newMergedStm.masterUserIds.addAll(
+            [stm1.masterUserId!, stm2.masterUserId!]);
+      } else {
+        newMergedStm.masterUserIds.add(stm1.masterUserId!);
+      }
 
-    mergedSettlement.mergedSettlement.forEach((stmid) async {
-      Settlement stm = await Settlement().getSettlementBySettlementId(stmid);
-      stm.isMerged = false;
-      FireService().updateDoc("settlementlist", stm.settlementId!, stm.toJson());
-    });
+      newMergedStm.receipts.addAll(stm1.receipts); newMergedStm.receipts.addAll(stm2.receipts);
+      stm1.settlementPapers.forEach((key, value) {
+        newMergedStm.settlementPapers[key]?.add(value);
+      });
+      stm2.settlementPapers.forEach((key, value) {
+        newMergedStm.settlementPapers[key]?.add(value);
+      });
+      stm1.checkSent.forEach((key, value) {
+        newMergedStm.checkSent[key] = value;
+      });
+      stm2.checkSent.forEach((key, value) {
+        if(newMergedStm.checkSent[key] == 3 && value == 3) {
+          newMergedStm.checkSent[key] = 3;
+        }
+        else {
+          newMergedStm.checkSent[key] = 0;
+        }
+      });
+      newMergedStm.accountInfos[stm1.settlementId!] = stm1.accountInfo!;
+      newMergedStm.accountInfos[stm2.settlementId!] = stm2.accountInfo!;
+  }*/
 
-    FireService().deleteDoc("settlementlist", mergedSettlement.settlementId!);
-    myGroup.settlements.remove(mergedSettlement.settlementId);
-    mergedSettlementInGroup.remove(mergedSettlement);
-    notifyListeners();
-  }
-
-  void pilferFromMergedSettlement(Settlement mergedSettlement, String stmid) async {
-    Settlement stm = await Settlement().getSettlementBySettlementId(stmid);
-    stm.isMerged = false;
+  void mergeSettlementV2(MergedSettlement mergedStm, Settlement stm) {
+    // 기존 합쳐진 정산 + 새로운 정산
+    mergedStm.mergedSettlements.add(stm.settlementId!);
+    mergedStm.totalPrice += stm.totalPrice;
+    mergedStm.time = Timestamp.now();
+    FireService().updateDoc("mergedsettlementlist", mergedStm.settlementId!, mergedStm.toJson());
+    stm.isMerged = true;
     FireService().updateDoc("settlementlist", stm.settlementId!, stm.toJson());
-
-    mergedSettlement.mergedSettlement.remove(stmid);
-    FireService().updateDoc("settlementlist", mergedSettlement.settlementId!, mergedSettlement.toJson());
     notifyListeners();
   }
+
   
 }
