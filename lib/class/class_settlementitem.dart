@@ -53,7 +53,7 @@ class SettlementItem {
 
   Future<SettlementItem> getSettlementItemBySettlementItemId(String settlementitemid) async {
     DocumentSnapshot<Map<String, dynamic>> result =
-    await FirebaseFirestore.instance.collection("settlementitemlist").doc(settlementitemid).get();
+    await FirebaseFirestore.instance.collection("settlemenitemtlist").doc(settlementitemid).get();
     SettlementItem item = SettlementItem.fromSnapShot(result);
     return item;
   }

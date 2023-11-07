@@ -1,5 +1,5 @@
 import 'dart:math';
-
+import 'dart:developer';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/design_element.dart';
@@ -7,6 +7,8 @@ import 'package:groupsettlement2/view/shared_basic_widget.dart';
 import 'package:flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 import 'package:groupsettlement2/viewmodel/SettlementCheckViewModel.dart';
 import 'package:intl/intl.dart';
+
+import '../class/class_user.dart';
 
 class SettlementDetailPage extends ConsumerStatefulWidget {
   const SettlementDetailPage(
@@ -28,7 +30,7 @@ class _SettlementDetailPageState extends ConsumerState<SettlementDetailPage> {
   late String groupname;
   late String userId;
   bool isFirstBuild = true;
-  bool isMaster = false;
+  bool isMaster = true;
 
   @override
   void initState() {
@@ -42,14 +44,53 @@ class _SettlementDetailPageState extends ConsumerState<SettlementDetailPage> {
   @override
   Widget build(BuildContext context) {
     final provider = ref.watch(stmCheckProvider);
+
+    /*
     if (isFirstBuild) {
       provider
           .settingSettlementCheckViewModel(settlementId, groupname, userId)
           .then((value) {
         isMaster = (provider.settlement.masterUserId == userId);
       });
+
       isFirstBuild = false;
     }
+
+     */
+
+    Future<bool> refreshing() async {
+      if(isFirstBuild) {
+        isFirstBuild = false;
+        await provider.settingSettlementCheckViewModel(settlementId,groupname,userId);
+        return true;
+      }
+      return false;
+    }
+
+    return FutureBuilder(
+        future: refreshing(),
+        builder: (context,snapshot){
+          if(snapshot.hasData == false){
+            return Container(
+              width: 100, height: 100,
+              child: CircularProgressIndicator()
+            );
+          }
+          return isMaster
+          // ? SettlementDetailPageSettlementer(
+          //   userId: userId,
+          // )
+          // : SettlementDetailPageSender(
+          //     userId: userId,
+          //   );
+              ? SettlementDetailPageSender(
+            userId: userId,
+          )
+              : SettlementDetailPageSettlementer(
+            userId: userId,
+          );
+    });
+    /*
     return isMaster
         // ? SettlementDetailPageSettlementer(
         //   userId: userId,
@@ -63,6 +104,8 @@ class _SettlementDetailPageState extends ConsumerState<SettlementDetailPage> {
         : SettlementDetailPageSettlementer(
             userId: userId,
           );
+
+     */
   }
 }
 
@@ -223,10 +266,13 @@ class _SettlementDetailPageSettlementerState
                               "정산자",
                               style: TextStyle(color: color1, fontSize: 15),
                             ),
-                            Text(
-                              provider.settlement.settlementName ?? "이름",
-                              style: const TextStyle(
-                                fontSize: 25,
+                            SizedBox(
+                              width: 130,
+                              child: Text(
+                                provider.masterName ?? "이름",
+                                style: const TextStyle(
+                                  fontSize: 25,
+                                ),
                               ),
                             ),
                           ],
@@ -1100,61 +1146,81 @@ class _SettlementDetailPageSenderState
                       return Column(
                         children: List.generate(
                           min(provider.settlementPapers.length - index * 3, 3),
-                          (iindex) => Container(
-                            margin: const EdgeInsets.all(5),
-                            height: 70,
-                            width: 140,
-                            child: Row(
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.all(10),
-                                  width: 50,
-                                  height: 50,
-                                  child: ClipOval(
-                                    child: Container(
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 70,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        provider.settlementPapers.values
-                                                .toList()[index * 3 + iindex]
-                                                .userName ??
-                                            "user",
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w800,
-                                        ),
+                          (iindex){
+                              return FutureBuilder(
+                                future: ServiceUser().getUserByUserId(provider.settlementPapers.values
+                                    .toList()[index * 3 + iindex]
+                                    .serviceUserId ?? ""),
+                                builder: (context, snapshot) {
+                                  if(snapshot.hasData == false){
+                                    return CircularProgressIndicator();
+                                  } else {
+                                    return Container(
+                                      margin: const EdgeInsets.all(5),
+                                      height: 70,
+                                      width: 140,
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            margin: const EdgeInsets.all(10),
+                                            width: 50,
+                                            height: 50,
+                                            child: ClipOval(
+                                              child: Container(
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 70,
+                                            child: Column(
+                                              crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                              mainAxisAlignment: MainAxisAlignment
+                                                  .center,
+                                              children: [
+                                                Text(
+                                                  snapshot.data?.name ?? ""
+                                                  ,
+                                                  style: const TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.w800,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  "${priceToString.format(
+                                                      provider.settlementPapers
+                                                          .values
+                                                          .toList()[index * 3 +
+                                                          iindex]
+                                                          .totalPrice)}원",
+                                                  style: TextStyle(
+                                                    color: provider.settlement
+                                                        .checkSent[provider
+                                                        .settlementPapers.keys
+                                                        .toList()[
+                                                    index * 3 + iindex]] ==
+                                                        3
+                                                        ? color2
+                                                        : colorGrey,
+                                                    fontSize: 15,
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                      Text(
-                                        "${priceToString.format(provider.settlementPapers.values.toList()[index * 3 + iindex].totalPrice)}원",
-                                        style: TextStyle(
-                                          color: provider.settlement
-                                                      .checkSent[provider
-                                                          .settlementPapers.keys
-                                                          .toList()[
-                                                      index * 3 + iindex]] ==
-                                                  3
-                                              ? color2
-                                              : colorGrey,
-                                          fontSize: 15,
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                                    );
+                                  }
+                                }
+
+                              );
+
+                            }
                         ), //
                       );
+
                     },
                   ),
                 ),

@@ -86,57 +86,57 @@ class _kakaoLoginPageState extends State<kakaoLoginPage> {
                       ),
                     ),
                   ),
-                  // Padding(
-                  //   padding: const EdgeInsets.only(
-                  //       left: 16.0,
-                  //       right: 16.0),
-                  //   child: ElevatedButton(
-                  //     onPressed: () async {
-                  //       // 친구 목록 및 메시지 권한 받기
-                  //       await UserApi.instance.loginWithNewScopes(["friends","talk_message"]);
-                  //       List<String> ids = [];
-                  //       // 피커 호출
-                  //       try {
-                  //         SelectedUsers users = await PickerApi.instance.selectFriends(params: viewModel.params, context: context);
-                  //         print('친구 선택 성공: ${users.users!.length}');
-                  //         users.users!.forEach((user){
-                  //           ids.add(user.uuid);
-                  //         });
-                  //       } catch(e) {
-                  //         print('친구 선택 실패: $e');
-                  //       }
-                  //
-                  //       try{
-                  //         MessageSendResult result = await TalkApi.instance.sendDefaultMessage(
-                  //             receiverUuids: ids, template: viewModel.makedebugFeed());
-                  //         print('메시지 전송 성공 ${result.successfulReceiverUuids}');
-                  //       }catch(e){
-                  //         print('메시지 전송 오류: $e');
-                  //       }
-                  //       setState(() {
-                  //       });
-                  //
-                  //     },
-                  //     child: Container(
-                  //       height: 45.0,
-                  //       alignment: Alignment.center,
-                  //       child: Text(
-                  //         "피커로 선택하기",
-                  //         style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                  //             fontSize: 18.0,
-                  //             color: Colors.white,
-                  //             fontWeight: FontWeight.bold
-                  //         ),
-                  //       ),
-                  //     ),
-                  //     style: ElevatedButton.styleFrom(
-                  //         primary: kPrimary,
-                  //         elevation: 5.0,
-                  //         shape: RoundedRectangleBorder(
-                  //             borderRadius: BorderRadius.circular(45.0))
-                  //     ),
-                  //   ),
-                  // ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        left: 16.0,
+                        right: 16.0),
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        // 친구 목록 및 메시지 권한 받기
+                        await UserApi.instance.loginWithNewScopes(["friends","talk_message"]);
+                        List<String> ids = [];
+                        // 피커 호출
+                        try {
+                          SelectedUsers users = await PickerApi.instance.selectFriends(params: viewModel.params, context: context);
+                          print('친구 선택 성공: ${users.users!.length}');
+                          users.users!.forEach((user){
+                            ids.add(user.uuid);
+                          });
+                        } catch(e) {
+                          print('친구 선택 실패: $e');
+                        }
+
+                        try{
+                          MessageSendResult result = await TalkApi.instance.sendDefaultMessage(
+                              receiverUuids: ids, template: viewModel.makedebugFeed());
+                          print('메시지 전송 성공 ${result.successfulReceiverUuids}');
+                        }catch(e){
+                          print('메시지 전송 오류: $e');
+                        }
+                        setState(() {
+                        });
+
+                      },
+                      child: Container(
+                        height: 45.0,
+                        alignment: Alignment.center,
+                        child: Text(
+                          "피커로 선택하기",
+                          style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                              fontSize: 18.0,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                          primary: kPrimary,
+                          elevation: 5.0,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(45.0))
+                      ),
+                    ),
+                  ),
                 ],
               ),
               Padding(
@@ -150,10 +150,10 @@ class _kakaoLoginPageState extends State<kakaoLoginPage> {
                       onPressed:()async{
                         if(viewModel.isLogined) {
                           //await viewModel.logout();
-                          context.go("/MainPage");
+                          //context.go("/MainPage");
                         }else{
                           await viewModel.login();
-                          context.go("/MainPage");
+                          //context.go("/MainPage");
                         }
                         setState(() {});
                       }

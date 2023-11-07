@@ -25,7 +25,6 @@ class SettlementPaper {
     serviceUserId = json['serviceuserid'];
     settlementItems = List<String>.from(json["settlementitems"]);
     totalPrice = json['totalprice'];
-
     try{
       settlementId = json['settlementid'];
       accountInfo = json['accountinfo'];
@@ -54,12 +53,13 @@ class SettlementPaper {
     QuerySnapshot<Map<String,dynamic>> querySnapshot =
     await _collectionReference.get();
     List<SettlementPaper> papers = [];
-    for(var doc in querySnapshot.docs) {
+
+    querySnapshot.docs.forEach((doc) async {
       SettlementPaper paper = SettlementPaper.fromQuerySnapshot(doc);
       ServiceUser user = await ServiceUser().getUserByUserId(paper.serviceUserId!);
       userName = user.name;
       papers.add(paper);
-    }
+    });
     return papers;
   }
 
@@ -67,15 +67,11 @@ class SettlementPaper {
     DocumentSnapshot<Map<String, dynamic>> result =
     await FirebaseFirestore.instance.collection("settlementpaperlist")
         .doc(paperid).get();
-    try {
-      SettlementPaper paper = SettlementPaper.fromSnapShot(result);
-    } catch(e){
-      print("개같은 에러 ${e}");
-    }
-    SettlementPaper paper = SettlementPaper();
-    return paper;
     //ServiceUser user = await ServiceUser().getUserByUserId(serviceUserId!);
     //userName = user.name;
+    SettlementPaper paper = SettlementPaper.fromSnapShot(result);
+    return paper;
+
   }
 
   SettlementPaper.fromSnapShot(
