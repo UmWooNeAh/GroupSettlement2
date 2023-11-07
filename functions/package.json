@@ -22,14 +22,5 @@
     "eslint-config-google": "^0.14.0",
     "firebase-functions-test": "^3.1.0"
   },
-  "private": true,
-  
-  "eslintConfig": {
-    "parserOptions": {
-      "parser": "babel-eslint",
-      "sourceType": "module",
-      "allowImportExportEverywhere": true,
-      "ecmaVersion": 2015
-    }
-  }
+  "private": true
 }

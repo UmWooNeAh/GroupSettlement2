@@ -9,6 +9,7 @@ class Group {
   String? groupName;
   List<String> serviceUsers = <String> [];
   List<String> settlements = <String> [];
+  List<String> mergedSettlements = <String> [];
 
   Group() {
     ModelUuid uuid = ModelUuid();
@@ -20,6 +21,7 @@ class Group {
     groupName = json['groupname'];
     serviceUsers = List<String>.from(json['serviceusers']);
     settlements = List<String>.from(json['settlements']);
+    //mergedSettlements = List<String>.from(json['mergedsettlements']);
   }
 
   Map<String, dynamic> toJson() => {
@@ -27,6 +29,7 @@ class Group {
     'groupname' : groupName,
     'serviceusers' : serviceUsers,
     'settlements': settlements,
+    //'mergedsettlements' : mergedSettlements,
   };
 
   void createGroup() async {
