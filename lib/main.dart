@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:io';
 import 'package:camera/camera.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:groupsettlement2/view/complete_settlement_matching.dart';
@@ -279,27 +280,29 @@ class _SplashViewState extends State<SplashView> {
   ServiceUser me = ServiceUser();
 
   void _getMyDeviceToken(ServiceUser user) async {
+
     final token = await FirebaseMessaging.instance.getToken();
     print("내 디바이스 토큰: $token");
     user.fcmToken = token;
-    user.tokenTimestamp = DateTime.now().millisecondsSinceEpoch;
+    user.tokenTimestamp = Timestamp.now();
+    FireService().updateDoc("userlist", user.serviceUserId!, user.toJson());
   }
 
   void _checkToken(String userid) async {
     ServiceUser user = await ServiceUser().getUserByUserId(userid);
-    int nowtime = DateTime.now().millisecondsSinceEpoch;
+    var nowtime = DateTime.now().millisecondsSinceEpoch;
+    DateTime prevtime = DateTime.parse(user.tokenTimestamp!.toDate().toString());
     if (user.fcmToken == null ||
-        (nowtime - user.tokenTimestamp!) / (1000 * 60 * 60 * 24 * 30) >= 28) {
+        ( (nowtime - prevtime.millisecondsSinceEpoch) / (1000 * 60 * 60 * 24) ) >= 28) {
       _getMyDeviceToken(user);
-      FireService().updateDoc("userlist", userid, user.toJson());
     }
   }
 
   @override
   void initState() {
     super.initState();
-    _getMyDeviceToken(me);
-    // _checkToken(me.serviceUserId!);
+    //_getMyDeviceToken(me);
+    _checkToken("8dcca5ca-107c-4a12-9d12-f746e2e513b7");
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       RemoteNotification? notification = message.notification;
 

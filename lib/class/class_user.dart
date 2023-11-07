@@ -1,4 +1,8 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import '../common_fireservice.dart';
 import 'class_settlement.dart';
 import 'package:groupsettlement2/modeluuid.dart';
 
@@ -8,13 +12,13 @@ class ServiceUser {
   String? name;
   String? kakaoId;
   String? fcmToken;
-  int? tokenTimestamp;
+  Timestamp? tokenTimestamp;
   List<String> groups = <String> [];
   List<String> settlements = <String> [];
   List<String> settlementPapers = <String> [];
   List<String> accountInfo = <String> [];
   List<String> savedReceipts = <String> [];
-  Map<String, bool> friends = <String,bool> {};
+  List<String> friends = [];
   List<String> requestedFriend = [];
 
   ServiceUser () {
@@ -22,7 +26,6 @@ class ServiceUser {
     serviceUserId = uuid.randomId;
     kakaoId = "";
     fcmToken = "";
-    tokenTimestamp = 0;
   }
 
   ServiceUser.fromJson(dynamic json) {
@@ -30,12 +33,13 @@ class ServiceUser {
     name = json['name'];
     kakaoId = json['kakaoid'];
     fcmToken = json['fcmtoken'];
+    tokenTimestamp = json['tokentimestamp'];
     groups = List<String>.from(json["groups"]);
     settlements = List<String>.from(json["settlements"]);
     settlementPapers = List<String>.from(json["settlementpapers"]);
     accountInfo = List<String>.from(json["accountinfo"]);
     savedReceipts = List<String>.from(json["savedreceipts"]);
-    friends = Map<String, bool>.from(json["friends"]);
+    friends = List<String>.from(json["friends"]);
     requestedFriend = List<String>.from(json["requestedfriend"]);
   }
 
@@ -44,6 +48,7 @@ class ServiceUser {
     'name' : name,
     'kakaoid' : kakaoId,
     'fcmtoken' : fcmToken,
+    'tokentimestamp' : tokenTimestamp,
     'groups' : groups,
     'settlements' : settlements,
     'settlementpapers' : settlementPapers,
@@ -86,6 +91,17 @@ class ServiceUser {
       stmlist.add(stm);
     }
     return stmlist;
+  }
+
+  Future<bool> isexistingNickname(String nickname) async {
+    DocumentSnapshot<Map<String, dynamic>> result =
+    await FirebaseFirestore.instance.collection("nicknamelist").doc(nickname).get();
+    if(result.exists) {
+      log("해당 닉네임은 중복되는 닉네임입니다. 다시 입력해주세요.");
+      return true;
+    }
+    log("닉네임이 중복되지 않습니다.");
+    return false;
   }
 
   ServiceUser.fromSnapShot(
