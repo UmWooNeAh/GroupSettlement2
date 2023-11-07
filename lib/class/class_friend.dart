@@ -54,7 +54,14 @@ class Friend {
     return friend;
   }
 
-  void _requestFriend(String otherfriendid) async {
+  void requestFriend(String nickname) async {
+    if(ServiceUser().isexistingNickname(nickname) == false) {
+      print("해당 닉네임은 존재하지 않는 닉네임입니다.");
+      return;
+    }
+    DocumentSnapshot<Map<String, dynamic>> result =
+    await FirebaseFirestore.instance.collection("nicknamelist").doc(nickname).get();
+    String otherfriendid = result["friendid"];
     ServiceUser other = await ServiceUser().getUserByUserId(_hashing(otherfriendid));
     other.requestedFriend.add(friendId!);
     FireService().updateDoc("userlist", other.serviceUserId!, other.toJson());
