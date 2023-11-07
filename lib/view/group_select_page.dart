@@ -43,7 +43,9 @@ class _groupSelectPage extends ConsumerState<groupSelectPage> {
           builder: (context, snapshot) {
             if(snapshot.hasData == false){
               return Center(child:CircularProgressIndicator());
-            } else {
+            } else if(snapshot.hasError){
+              return Container();
+            } else  {
               return SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 15, right: 15),
