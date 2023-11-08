@@ -62,6 +62,7 @@ dependencies:
   path: ^1.8.3
   firebase_analytics: ^10.6.3
   numberpicker: ^2.1.2
+  dotted_border: ^2.1.0
 
 dev_dependencies:
   flutter_test:

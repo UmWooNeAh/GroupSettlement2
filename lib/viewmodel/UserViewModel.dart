@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:groupsettlement2/class/class_receiptitem.dart';
 import '../class/class_group.dart';
 import '../class/class_settlement.dart';
 import '../class/class_settlementpaper.dart';
@@ -23,6 +24,7 @@ class UserViewModel extends ChangeNotifier {
   List<Alarm> receiveStmAlarm = <Alarm> [];
   List<Alarm> sendStmAlarm = <Alarm> [];
   List<Alarm> etcStmAlarm = <Alarm> [];
+  Map<String, String> firstReceiptItemName = <String, String>{};
 
   UserViewModel(String userId) {
     //settingUserViewModel(userId);
@@ -55,6 +57,13 @@ class UserViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void deleteSavedReceipt(Receipt myReceipt){
+    for (int i = 0; i < myReceipt.receiptItems.length; i++){
+      // receiptItem Id를 이용해서 receiptItem을 삭제하는 코드
+    }
+    // receiptId를 이용해서 receipt를 삭제 후 user정보 업데이트
+  }
+
   void fetchSettlement(Group group) async {
 
     group.settlements.forEach((stmid) async {
@@ -80,10 +89,13 @@ class UserViewModel extends ChangeNotifier {
   }
 
   void fetchReceipt(List<String> rcpIds) async {
+    print("recipt loading num${rcpIds.length}");
 
     if(rcpIds.length > 0) {
       rcpIds.forEach((rcpid) async {
         Receipt rcp = await Receipt().getReceiptByReceiptId(rcpid);
+        ReceiptItem rcpi = await ReceiptItem().getReceiptItemByReceiptItemId(rcp.receiptItems[0]);
+        firstReceiptItemName[rcp.receiptId ?? "X"] = rcpi.menuName ?? "뭘먹었을까";
         myReceipts.add(rcp);
       });
       notifyListeners();

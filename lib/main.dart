@@ -14,6 +14,7 @@ import 'package:groupsettlement2/view/group_select_page.dart';
 import 'package:groupsettlement2/view/group_settlement_list_page.dart';
 import 'package:groupsettlement2/view/mypage.dart';
 import 'package:groupsettlement2/view/notification_page.dart';
+import 'package:groupsettlement2/view/receipt_box_page.dart';
 import 'package:groupsettlement2/view/settlementDetailPage.dart';
 import 'package:groupsettlement2/view/create_new_settlement.dart';
 import 'package:groupsettlement2/view/edit_receipt.dart';
@@ -80,6 +81,11 @@ final GoRouter _router = GoRouter(
         return const MainPage();
       },
       routes: <RouteBase>[
+        GoRoute(
+            path: 'ReceiptBoxPage',
+            builder: (context, state) {
+              return const ReceiptBoxPage();
+            }),
         GoRoute(
             path: 'SplashView',
             builder: (context, state) {
