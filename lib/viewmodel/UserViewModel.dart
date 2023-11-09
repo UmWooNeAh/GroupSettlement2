@@ -26,7 +26,6 @@ class UserViewModel extends ChangeNotifier {
 
   UserViewModel(String userId) {
     //settingUserViewModel(userId);
-    print("dddddd"+userId);
   }
 
   Future settingUserViewModel(String userId) async {

@@ -756,9 +756,6 @@ class _RecentSettlementState extends ConsumerState<RecentSettlement> {
       sendMoney = mvm.getSendMoney(widget.settlement);
       _didSend = widget.settlement.checkSent[mvm.userData.serviceUserId] == 2;
     }
-    print("settlementId : ${widget.settlement.settlementId}");
-    print("currentMoney : ${currentMoney}");
-    print("totalPrice : ${totalPrice}");
     DateTime dt = widget.settlement.time != null
         ? DateTime.parse(widget.settlement.time!.toDate().toString())
         : DateTime.utc(1000, 01, 01);
@@ -766,9 +763,6 @@ class _RecentSettlementState extends ConsumerState<RecentSettlement> {
       children: [
         GestureDetector(
           onTap: () {
-            print(mvm.userData.serviceUserId);
-            print(mvm.getGroupName(widget.settlement));
-            print(widget.settlement.settlementId);
             context.go(
                 "/SettlementDetailPage/${widget.settlement.settlementId}/${mvm.getGroupName(widget.settlement)}/${mvm.userData.serviceUserId}");
           },
@@ -981,60 +975,6 @@ class _RecentSettlementState extends ConsumerState<RecentSettlement> {
         ),
         SizedBox(height:20)
       ],
-    );
-  }
-}
-
-class infiniteScroll extends StatefulWidget {
-  final List<Settlement> stms;
-  final Size size;
-  const infiniteScroll({Key? key, required this.size,required this.stms}) : super(key: key);
-
-  @override
-  State<infiniteScroll> createState() => _infiniteScrollState();
-}
-
-class _infiniteScrollState extends State<infiniteScroll> {
-  static const _maxSize = 5;
-
-  final PagingController<int,Settlement> _pagingController = PagingController(firstPageKey: 0);
-
-  @override
-  void initState(){
-    print("in init State : " + widget.stms.length.toString());
-    _pagingController.addPageRequestListener((pageKey) {
-      _fetchPage(pageKey);
-    });
-    super.initState();
-  }
-
-  Future<void> _fetchPage(int key) async{
-    print("?? : " + widget.stms.toString());
-    final settlements = widget.stms.sublist(key,key+_maxSize <= widget.stms.length ? key+_maxSize : widget.stms.length - key);
-    final isLastPage = settlements.length < _maxSize;
-    if(isLastPage){
-      _pagingController.appendLastPage(settlements);
-    } else{
-      final nextPageKey = key + 1;
-      _pagingController.appendPage(settlements, nextPageKey);
-    }
-  }
-  @override
-  Widget build(BuildContext context) {
-    print("in build ${widget.stms}");
-    return PagedListView<int,Settlement>(
-        shrinkWrap: true,
-        pagingController: _pagingController,
-        builderDelegate: PagedChildBuilderDelegate<Settlement>(
-            itemBuilder: (context, item, index){
-              return Column(
-                children: [
-                  RecentSettlement(size: widget.size, settlement: item),
-                  SizedBox(height: 20)
-                ],
-              );
-            }
-        )
     );
   }
 }
