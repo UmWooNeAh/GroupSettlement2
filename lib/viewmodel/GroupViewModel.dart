@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
 import '../class/class_group.dart';
+import '../class/class_receipt.dart';
 import '../class/class_settlement.dart';
 import '../class/class_settlementitem.dart';
 import '../class/class_settlementpaper.dart';
@@ -198,10 +199,20 @@ class GroupViewModel extends ChangeNotifier {
       newMergedSettlement.settlementPapers[user.serviceUserId!] = newMergedPaper.settlementPaperId!;
       newMergedPapers[user.serviceUserId!] = newMergedPaper;
       newMergedSettlement.checkSent[user.serviceUserId!] = -1;
+
+      user.settlements.add(newMergedSettlement.settlementId!);
+      user.settlementPapers.add(newMergedPaper.settlementPaperId!);
     }
 
+    //병합할 정산들에 대한 병합 과정 진행
     indexes.forEach((index) async {
       newMergedSettlement.receipts.addAll(settlementInGroup[index].receipts);
+      
+      settlementInGroup[index].receipts.forEach((rcpid) async{
+        Receipt rcp = await Receipt().getReceiptByReceiptId(rcpid);
+        rcp.settlementId = newMergedSettlement.settlementId;
+        FireService().updateDoc("receiptlist", rcpid!, rcp.toJson());
+      });
 
       for(var user in serviceUsers) {
         //해당 정산에 참여하지 않는 유저는 skip
@@ -226,6 +237,7 @@ class GroupViewModel extends ChangeNotifier {
         });
         //합쳐진 정산의 개별 정산서의 합계 금액(totalPrice)은 이미 송금 완료된 것을 제외한 것들의 총 합계금액이 됨
         newMergedPapers[user.serviceUserId!]!.totalPrice = newMergedPapers[user.serviceUserId!]!.totalPrice! + paper.totalPrice!;
+        user.settlements.remove(settlementInGroup[index].settlementId!);
       }
 
       newMergedSettlement.totalPrice += settlementInGroup[index].totalPrice;
@@ -258,10 +270,13 @@ class GroupViewModel extends ChangeNotifier {
             newMergedPapers[user.serviceUserId!]!.settlementItems.add(itemid);
           });
         }
-
       }
+      newMergedPapers[user.serviceUserId!]!.createSettlementPaper();
+      FireService().updateDoc("serviceuserlist", user.serviceUserId!, user.toJson());
     });
 
+    myGroup.settlements.add(newMergedSettlement.settlementId!);
+    FireService().updateDoc("grouplist", myGroup.groupId!, myGroup.toJson());
     newMergedSettlement.time = Timestamp.now();
     newMergedSettlement.createSettlement();
   }
