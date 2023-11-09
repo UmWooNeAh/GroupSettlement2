@@ -69,11 +69,12 @@ class SettlementPaper {
         .doc(paperid).get();
     try {
       SettlementPaper paper = SettlementPaper.fromSnapShot(result);
+      return paper;
     } catch(e){
       print("개같은 에러 ${e}");
+
+      return SettlementPaper();
     }
-    SettlementPaper paper = SettlementPaper();
-    return paper;
     //ServiceUser user = await ServiceUser().getUserByUserId(serviceUserId!);
     //userName = user.name;
   }

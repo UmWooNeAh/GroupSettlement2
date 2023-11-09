@@ -11,6 +11,7 @@ import 'package:groupsettlement2/view/groupMainPage.dart';
 import 'package:groupsettlement2/view/group_create_page.dart';
 import 'package:groupsettlement2/view/group_select_page.dart';
 import 'package:groupsettlement2/view/group_settlement_list_page.dart';
+import 'package:groupsettlement2/view/main_page.dart';
 import 'package:groupsettlement2/view/mypage.dart';
 import 'package:groupsettlement2/view/notification_page.dart';
 import 'package:groupsettlement2/view/settlementDetailPage.dart';
@@ -76,7 +77,7 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/',
       builder: (context, state) {
-        return const MainPage();
+        return const mainPage();
       },
       routes: <RouteBase>[
         GoRoute(
@@ -117,8 +118,8 @@ final GoRouter _router = GoRouter(
         GoRoute(
             path: 'groupMainPage',
             builder: (context, state) {
-              String groupId = state.extra as String;
-              return groupMainPage(groupId: groupId);
+              List<String> ids = state.extra as List<String>;
+              return groupMainPage(ids: ids);
             }),
         GoRoute(
             path: 'SettlementDetailPage/:settlementId/:groupname/:userId',
@@ -178,7 +179,8 @@ final GoRouter _router = GoRouter(
         GoRoute(
             path: 'SettlementGroupSelectionPage',
             builder: (context, state) {
-              return const settlementGroupSelectionPage();
+              String userId = state.extra as String;
+              return settlementGroupSelectionPage(userId: userId);
             }),
         GoRoute(
           path: "MyPage",
@@ -226,6 +228,18 @@ final GoRouter _router = GoRouter(
             );
           },
         ),
+        GoRoute(
+          path: "mp",
+          builder: (context, state) {
+            return mainPage();
+          },
+        ),
+        GoRoute(
+          path: "kakaoPage",
+          builder: (context, state) {
+            return kakaoLoginPage();
+          },
+        )
       ],
     ),
   ],

@@ -41,7 +41,7 @@ class Clova {
 
   getSecretKey() async {
     //secretKey = await File("key.txt").readAsString();
-    secretKey = 'T1puY2dSTnVwTHp4YkNqWFdFQnFEdkVxUWdNa2h5bFI=';
+    secretKey = 'eGRWSnpLdFNDUUZUa2VTeVp1U0l2WGxXS1N3c2FycXc=';
   }
 
   getImageByFile(File receipt) {

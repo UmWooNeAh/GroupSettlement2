@@ -11,8 +11,8 @@ import '../class/class_user.dart';
 import '../design_element.dart';
 
 class groupMainPage extends ConsumerStatefulWidget {
-  final String groupId;
-  const groupMainPage({Key? key, required this.groupId}) : super(key: key);
+  final List<String> ids;
+  const groupMainPage({Key? key, required this.ids}) : super(key: key);
 
   @override
   ConsumerState<groupMainPage> createState() => _State();
@@ -32,9 +32,11 @@ class _State extends ConsumerState<groupMainPage> {
     final gvm = ref.watch(groupProvider);
 
     Future<bool> refreshing() async {
+
       if(isFirst) {
         isFirst = false;
-        await gvm.settingGroupViewModel(gvm.userData.serviceUserId!, widget.groupId!);
+        print(gvm.userData.serviceUserId!);
+        await gvm.settingGroupViewModel(widget.ids[0], widget.ids[1]);
       }
       return true;
     }
@@ -709,9 +711,6 @@ class _State extends ConsumerState<groupMainPage> {
         index: 0,
         isIn: true,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: refreshing,
-      ),
     );
   }
 }
@@ -735,7 +734,7 @@ class _stmItemState extends ConsumerState<stmItem> {
     DateTime dt;
     
     widget.settlement.checkSent.forEach((key, value) {
-      if(value == 3) currentStmComplete++;
+      if(value == 2) currentStmComplete++;
     });
 
     dt = widget.settlement.time != null ? DateTime.parse(widget.settlement.time!.toDate().toString()) : DateTime.utc(1000,01,01);
