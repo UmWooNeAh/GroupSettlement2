@@ -51,7 +51,7 @@ class _ReceiptBoxPageState extends ConsumerState<ReceiptBoxPage> {
                     children: List.generate(
                       size.width ~/ 180,
                       (iindex) {
-                        if (provider.myReceipts.length == 9) {
+                        if (provider.myReceipts.length == 14) {
                           if (index * (size.width ~/ 180) + iindex >
                               provider.myReceipts.length - 1) {
                             if (provider.myReceipts.length %
@@ -60,7 +60,7 @@ class _ReceiptBoxPageState extends ConsumerState<ReceiptBoxPage> {
                               return const SizedBox();
                             }
                             return Container(
-                              height: 200,
+                              height: (provider.myReceipts.length) ~/ (size.width ~/ 180) < index ? 0 : 200,
                               width: 150,
                               margin: const EdgeInsets.all(10),
                               color: Colors.green,
@@ -72,7 +72,7 @@ class _ReceiptBoxPageState extends ConsumerState<ReceiptBoxPage> {
                         if (index * (size.width ~/ 180) + iindex >
                             provider.myReceipts.length) {
                           return Container(
-                            height: 200,
+                            height: (provider.myReceipts.length + 1) % (size.width ~/ 180) == 0 ? 0 : 200,
                             width: 150,
                             margin: const EdgeInsets.all(10),
                             color: Colors.green,
@@ -149,7 +149,9 @@ class _StoredReceiptState extends ConsumerState<StoredReceipt> {
               top: 5,
               right: 5,
               child: GestureDetector(
-                onTap: () {},
+                onTap: () {
+                  provider.deleteSavedReceipt(receipt.receiptId!);
+                },
                 child: const Icon(
                   Icons.close_rounded,
                   color: color1,
@@ -231,17 +233,18 @@ class _StoredReceiptState extends ConsumerState<StoredReceipt> {
   }
 }
 
-class AddingReceipt extends StatefulWidget {
+class AddingReceipt extends ConsumerStatefulWidget {
   const AddingReceipt({super.key});
 
   @override
-  State<AddingReceipt> createState() => _AddingReceiptState();
+  ConsumerState<AddingReceipt> createState() => _AddingReceiptState();
 }
 
-class _AddingReceiptState extends State<AddingReceipt> {
+class _AddingReceiptState extends ConsumerState<AddingReceipt> {
   bool isTapDown = false;
   @override
   Widget build(BuildContext context) {
+    final provider = ref.watch(userProvider);
     return GestureDetector(
       onTapDown: (details) {
         setState(() {
@@ -251,6 +254,7 @@ class _AddingReceiptState extends State<AddingReceipt> {
       onTapUp: (details) {
         setState(() {
           isTapDown = !isTapDown;
+          provider.createSavedReceipt();
         });
       },
       onTapCancel: () {
