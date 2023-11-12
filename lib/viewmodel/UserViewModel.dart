@@ -26,7 +26,7 @@ class UserViewModel extends ChangeNotifier {
   List<Alarm> etcStmAlarm = <Alarm> [];
   Map<String, String> firstReceiptItemName = <String, String>{};
 
-  UserViewModel(String userId) {}
+  UserViewModel(String userId);
 
   Future settingUserViewModel(String userId) async {
     myGroup = []; myReceipts = []; mySettlements = []; mySettlementPapers = []; newAlarm = []; receiveStmAlarm = []; sendStmAlarm = []; etcStmAlarm = [];

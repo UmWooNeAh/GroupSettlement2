@@ -221,6 +221,18 @@ class _MainPageState extends State<MainPage> {
                     context.go('/ReceiptBoxPage');
                   },
                 ),
+                ElevatedButton(
+                  child: const Text("Main Page"),
+                  onPressed: () {
+                    context.push("/mainPage");
+                  },
+                ),
+                ElevatedButton(
+                  child: const Text("kakao Page"),
+                  onPressed: () {
+                    context.push("/kakaoPage");
+                  },
+                )
               ],
             ),
           ],

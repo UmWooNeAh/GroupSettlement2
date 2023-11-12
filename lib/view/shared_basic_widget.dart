@@ -39,12 +39,12 @@ class _CustomBottomNavigationBarState
         if (!widget.isIn || widget.index != value) {
           switch (value) {
             case 0:
-              context.go('/');
+              context.go('/mp');
             case 1:
-              1;
+              context.go('/mp');
             // context.go('/ReceiptBox');
             case 2:
-              context.go('/SettlementGroupSelectionPage');
+              context.go('/SettlementGroupSelectionPage',extra: "8969xxwf-8wf8-pf89-9x6p-88p0wpp9ppfb");
             case 3:
               1;
             // context.go('/Notification');

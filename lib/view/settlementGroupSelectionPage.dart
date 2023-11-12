@@ -11,19 +11,27 @@ import '../design_element.dart';
 import '../viewmodel/UserViewModel.dart';
 
 class settlementGroupSelectionPage extends ConsumerStatefulWidget {
-  const settlementGroupSelectionPage({Key? key}) : super(key: key);
+  final String userId;
+  const settlementGroupSelectionPage({Key? key, required this.userId}) : super(key: key);
 
   @override
   ConsumerState<settlementGroupSelectionPage> createState() => _settlementGroupSelectionPage();
 }
 
 class _settlementGroupSelectionPage extends ConsumerState<settlementGroupSelectionPage> {
-
+  bool _isFirst = true;
   @override
   Widget build(BuildContext context) {
     final uvm = ref.watch(userProvider);
 
     //uvm.settingUserViewModel(widget.userId);
+    Future<bool> refreshing() async {
+      if(_isFirst) {
+        _isFirst = false;
+        await uvm.settingUserViewModel(widget.userId);
+      }
+      return true;
+    }
 
     Size size = MediaQuery.of(context).size;
     return Scaffold(
@@ -90,10 +98,15 @@ class _settlementGroupSelectionPage extends ConsumerState<settlementGroupSelecti
                     ),
                   ),
                   SizedBox(height:15),
-                  Column(
-                      children: List.generate(uvm.myGroup.length,(index){
-                        return groupOne(group: uvm.myGroup[index]);
-                      })
+                  FutureBuilder(
+                    future: refreshing(),
+                    builder: (context, snapshot) {
+                      return Column(
+                          children: List.generate(uvm.myGroup.length,(index){
+                            return groupOne(group: uvm.myGroup[index]);
+                          })
+                      );
+                    }
                   )
                 ]
             ),

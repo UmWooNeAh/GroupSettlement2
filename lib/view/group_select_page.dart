@@ -136,12 +136,13 @@ class groupOne extends ConsumerStatefulWidget {
 class _groupOneState extends ConsumerState<groupOne> {
   @override
   Widget build(BuildContext context) {
+    var uvm = ref.watch(userProvider);
     return Column(
       children: [
         GestureDetector(
           onTap:(){
-            print(widget.group.groupName);
-            context.go("/groupMainPage",extra: widget.group.groupId);
+            print("select page -> g main page gid : ${widget.group.groupId}");
+            context.go("/groupMainPage",extra: [uvm.userData.serviceUserId!,widget.group.groupId!]);
           },
           child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

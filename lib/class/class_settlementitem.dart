@@ -35,7 +35,7 @@ class SettlementItem {
   };
 
   void createSettlementItem() async {
-    await FirebaseFirestore.instance.collection("settlemenitemtlist").doc(settlementItemId).set(toJson());
+    await FirebaseFirestore.instance.collection("settlementitemlist").doc(settlementItemId).set(toJson());
   }
 
   Future<List<SettlementItem>> getSettlementItemList() async {

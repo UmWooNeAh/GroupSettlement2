@@ -21,24 +21,20 @@ class GroupViewModel extends ChangeNotifier {
   // List<MergedSettlement> mergedSettlementInGroup = <MergedSettlement> [];
 
   GroupViewModel(String userId, String groupId) {
-    serviceUsers = []; settlementInGroup = []; 
-    // mergedSettlementInGroup = [];
-    settingGroupViewModel(userId, groupId);
+    serviceUsers = []; settlementInGroup = [];
   }
 
   Future<void> settingGroupViewModel(String userId, String groupId) async {
-    serviceUsers = []; settlementInGroup = []; 
-    // mergedSettlementInGroup = [];
+    serviceUsers = []; settlementInGroup = [];
+    print("in setting userId : ${userId}");
     userData = await ServiceUser().getUserByUserId(userId);
     myGroup = await Group().getGroupByGroupId(groupId);
     notifyListeners();
-
 
     myGroup.serviceUsers.forEach((userid) async {
       serviceUsers.add(await ServiceUser().getUserByUserId(userid));
       notifyListeners();
     });
-
     myGroup.settlements.forEach((stmid) async {
       Settlement stm = await Settlement().getSettlementBySettlementId(stmid);
       settlementInGroup.add(stm);

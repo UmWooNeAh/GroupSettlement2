@@ -67,10 +67,18 @@ class SettlementPaper {
     DocumentSnapshot<Map<String, dynamic>> result =
     await FirebaseFirestore.instance.collection("settlementpaperlist")
         .doc(paperid).get();
+    try {
+      SettlementPaper paper = SettlementPaper.fromSnapShot(result);
+      return paper;
+    } catch(e){
+      print("개같은 에러 ${e}");
+
+      return SettlementPaper();
+    }
     //ServiceUser user = await ServiceUser().getUserByUserId(serviceUserId!);
     //userName = user.name;
-    SettlementPaper paper = SettlementPaper.fromSnapShot(result);
-    return paper;
+    // SettlementPaper paper = SettlementPaper.fromSnapShot(result);
+    // return paper;
 
   }
 
