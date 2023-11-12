@@ -29,7 +29,7 @@ class _groupSettlementListPageState
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    GroupViewModel gvm = ref.watch(groupProvider.notifier);
+    GroupViewModel gvm = ref.watch(groupProvider);
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.transparent,

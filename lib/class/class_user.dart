@@ -91,7 +91,7 @@ class ServiceUser {
 
   Future<List<Settlement>> getSettlementListInUser() async {
     List<Settlement> stmlist = [];
-    for(var stmid in settlements!) {
+    for(var stmid in settlements) {
       DocumentSnapshot<Map<String, dynamic>> result =
       await FirebaseFirestore.instance.collection("settlementlist").doc(stmid).get();
       Settlement stm = Settlement.fromSnapShot(result);

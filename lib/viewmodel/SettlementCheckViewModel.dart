@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:groupsettlement2/class/class_group.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
 import '../class/class_receipt.dart';
 import '../class/class_receiptitem.dart';

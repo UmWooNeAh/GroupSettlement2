@@ -1,34 +1,24 @@
-import 'dart:developer';
-import 'dart:io';
-import 'dart:math';
-
 import 'package:animated_digit/animated_digit.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:groupsettlement2/view/shared_basic_widget.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:numberpicker/numberpicker.dart';
-
 import '../class/class_settlement.dart';
-import '../class/class_settlementitem.dart';
 import '../class/class_settlementpaper.dart';
 import '../design_element.dart';
 import '../viewmodel/MainViewModel.dart';
 import '../viewmodel/UserViewModel.dart';
 
-class mainPage extends ConsumerStatefulWidget {
-  const mainPage({Key? key}) : super(key: key);
+class MainPage extends ConsumerStatefulWidget {
+  const MainPage({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<mainPage> createState() => _mainPageState();
+  ConsumerState<MainPage> createState() => _MainPage();
 }
 
-class _mainPageState extends ConsumerState<mainPage> {
+class _MainPage extends ConsumerState<MainPage> {
   double settlementerRes = 0;
   bool _isCalculated = false;
   bool _isFirstBuild = true;
@@ -39,6 +29,7 @@ class _mainPageState extends ConsumerState<mainPage> {
   List<Settlement> currentStms = [];
   List<Settlement> allStms = [];
   ScrollController scrollController = ScrollController();
+  
   simpleSettlementerCal(double res) {
     this.settlementerRes = res;
     this._isCalculated = true;
@@ -369,7 +360,7 @@ class _mainPageState extends ConsumerState<mainPage> {
               GestureDetector(
                   onTap: () {
                     context
-                        .go("/GroupSelectPage/${mvm.userData.serviceUserId}");
+                        .go("/GroupSelectPage", extra: mvm.userData);
                   },
                   child: Padding(
                     padding: const EdgeInsets.only(left: 10, right: 10),

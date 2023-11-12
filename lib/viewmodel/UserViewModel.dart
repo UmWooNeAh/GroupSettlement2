@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/class/class_receiptitem.dart';
@@ -11,10 +10,9 @@ import '../class/class_receipt.dart';
 import '../common_fireservice.dart';
 
 final userProvider = ChangeNotifierProvider<UserViewModel>(
-        (ref) => UserViewModel("8969xxwf-8wf8-pf89-9x6p-88p0wpp9ppfb"));
+        (ref) => UserViewModel());
 
 class UserViewModel extends ChangeNotifier {
-
   ServiceUser userData = ServiceUser();
   List<Group> myGroup = <Group> [];
   List<Receipt> myReceipts = <Receipt> [];
@@ -26,33 +24,38 @@ class UserViewModel extends ChangeNotifier {
   List<Alarm> etcStmAlarm = <Alarm> [];
   Map<String, String> firstReceiptItemName = <String, String>{};
 
-  UserViewModel(String userId);
+  UserViewModel();
 
-  Future settingUserViewModel(String userId) async {
-    myGroup = []; myReceipts = []; mySettlements = []; mySettlementPapers = []; newAlarm = []; receiveStmAlarm = []; sendStmAlarm = []; etcStmAlarm = [];
-    fetchUser(userId);
-    //fetchAlarm(userId);
-  }
+  // Future<int> settingUserViewModel(ServiceUser me) async {
+  //   userData = me;
+  //   myGroup = []; myReceipts = []; mySettlements = []; mySettlementPapers = []; newAlarm = []; receiveStmAlarm = []; sendStmAlarm = []; etcStmAlarm = [];
+  //   fetchGroup(userData.serviceUserId!);
+  //   notifyListeners();
+  //   return 1;
+  //   //fetchAlarm(userId);
+  // }
 
-  void fetchUser(String userId) async {
-    userData = await ServiceUser().getUserByUserId(userId);
-    notifyListeners();
+  Future<int> fetchUser(String userId) async {
     fetchReceipt(userData.savedReceipts);
     fetchGroup(userData.serviceUserId!);
+    notifyListeners();
+    return 1;
   }
 
-  void fetchGroup(String userId) async {
+  Future<int> fetchGroup(String userId) async {
     List<Group> groups = await Group().getGroupList();
+    myGroup = [];
     for(var group in groups) {
         for(var user in group.serviceUsers) {
           if(user == userId){
             //Group Fetch
             myGroup.add(group);
-            fetchSettlement(group);
+            // fetchSettlement(group);
           }
       }
     }
     notifyListeners();
+    return 1;
   }
 
   Future<int> createSavedReceipt() async{
@@ -68,7 +71,8 @@ class UserViewModel extends ChangeNotifier {
     await newSavedReceipt.createReceipt();
     userData.savedReceipts.add(newSavedReceipt.receiptId!);
     await FireService().updateDoc("userlist", userData.serviceUserId!, userData.toJson());
-    await settingUserViewModel(userData.serviceUserId!);
+    await fetchUser(userData.serviceUserId!);
+    await fetchReceipt(userData.savedReceipts);
     return 1;
   }
 
@@ -86,13 +90,12 @@ class UserViewModel extends ChangeNotifier {
     await FireService().deleteDoc("receiptlist", myReceiptId);
     userData.savedReceipts.remove(myReceiptId);
     await FireService().updateDoc("userlist", userData.serviceUserId!, userData.toJson());
-    await settingUserViewModel(userData.serviceUserId!);
-    // receiptId를 이용해서 receipt를 삭제 후 user정보 업데이트
+    await fetchUser(userData.serviceUserId!);
+    await fetchReceipt(userData.savedReceipts);
     return 1;
   }
 
   void fetchSettlement(Group group) async {
-
     group.settlements.forEach((stmid) async {
       Settlement stm = await Settlement().getSettlementBySettlementId(stmid);
       mySettlements.add(stm);
@@ -106,7 +109,6 @@ class UserViewModel extends ChangeNotifier {
   }
 
   void fetchStmPaper(Settlement settlement) async {
-
     settlement.settlementPapers.forEach((key, value) async {
       //SettlementPaper Fetch
       SettlementPaper temp = await SettlementPaper().getSettlementPaperByPaperId(value);
@@ -115,9 +117,7 @@ class UserViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void fetchReceipt(List<String> rcpIds) async {
-    print("recipt loading num${rcpIds.length}");
-
+  Future<int> fetchReceipt(List<String> rcpIds) async {
     if(rcpIds.isNotEmpty) {
       rcpIds.forEach((rcpid) async {
         Receipt rcp = await Receipt().getReceiptByReceiptId(rcpid);
@@ -127,6 +127,7 @@ class UserViewModel extends ChangeNotifier {
       });
       notifyListeners();
     }
+    return 1;
   }
 
   void fetchAlarm(String userId) async {

@@ -21,7 +21,7 @@ class _ReceiptBoxPageState extends ConsumerState<ReceiptBoxPage> {
   Widget build(BuildContext context) {
     final provider = ref.watch(userProvider);
     if (isFirst) {
-      provider.settingUserViewModel("8969xxwf-8wf8-pf89-9x6p-88p0wpp9ppfb");
+      // provider.settingUserViewModel("8969xxwf-8wf8-pf89-9x6p-88p0wpp9ppfb");
       isFirst = false;
     }
     Size size = MediaQuery.of(context).size;
