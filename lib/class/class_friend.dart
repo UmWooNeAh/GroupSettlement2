@@ -10,8 +10,8 @@ import 'class_user.dart';
 class Friend {
 
   String? friendId;
-  String? name;
-  String? nickname;
+  String? userName;
+  String? userNickname;
 
   Friend() {
     ModelUuid uuid = ModelUuid();
@@ -20,14 +20,14 @@ class Friend {
 
   Friend.fromJson(dynamic json) {
     friendId = json['friendid'];
-    name = json['firstusername'];
-    nickname = json['firstusernickname'];
+    userName = json['username'];
+    userNickname = json['usernickname'];
   }
 
   Map<String, dynamic> toJson() => {
     'friendid': friendId,
-    'name': name,
-    'nickname': nickname,
+    'username': userName,
+    'usernickname': userNickname,
   };
 
   void createFriend() async {
@@ -77,6 +77,11 @@ class Friend {
 
     FireService().updateDoc("userlist", me.serviceUserId!, me.toJson());
     FireService().updateDoc("userlist", other.serviceUserId!, other.toJson());
+  }
+
+  void rejectFriend(String otherfriendid) async {
+    ServiceUser me = await ServiceUser().getUserByUserId(_hashing(friendId!));
+    me.requestedFriend.remove(otherfriendid);
   }
 
   String _hashing(String fid) {
