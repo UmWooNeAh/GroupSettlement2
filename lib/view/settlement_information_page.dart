@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'dart:developer';
 import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/design_element.dart';
@@ -7,119 +6,49 @@ import 'package:groupsettlement2/view/shared_basic_widget.dart';
 import 'package:flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 import 'package:groupsettlement2/viewmodel/SettlementCheckViewModel.dart';
 import 'package:intl/intl.dart';
-
 import '../class/class_user.dart';
 
-class SettlementDetailPage extends ConsumerStatefulWidget {
-  const SettlementDetailPage(
-      {super.key,
-      required this.settlementId,
-      required this.groupname,
-      required this.userId});
-  final String settlementId;
-  final String groupname;
-  final String userId;
+class SettlementInformationPage extends ConsumerStatefulWidget {
+  const SettlementInformationPage({super.key, required this.info});
+  final List<dynamic> info;
 
   @override
-  ConsumerState<SettlementDetailPage> createState() =>
+  ConsumerState<SettlementInformationPage> createState() =>
       _SettlementDetailPageState();
 }
 
-class _SettlementDetailPageState extends ConsumerState<SettlementDetailPage> {
-  late String settlementId;
-  late String groupname;
-  late String userId;
-  bool isFirstBuild = true;
+class _SettlementDetailPageState
+    extends ConsumerState<SettlementInformationPage> {
+  bool isFirst = true;
   bool isMaster = true;
-
-  @override
-  void initState() {
-    super.initState();
-
-    settlementId = widget.settlementId;
-    groupname = widget.groupname;
-    userId = widget.userId;
-  }
 
   @override
   Widget build(BuildContext context) {
     final provider = ref.watch(stmCheckProvider);
 
-    /*
-    if (isFirstBuild) {
-      provider
-          .settingSettlementCheckViewModel(settlementId, groupname, userId)
-          .then((value) {
-        isMaster = (provider.settlement.masterUserId == userId);
+    if (isFirst) {
+      Future(() {
+        provider.settingSettlementCheckViewModel(
+            widget.info[0], widget.info[1], widget.info[2]);
       });
-
-      isFirstBuild = false;
+      isFirst = false;
     }
-
-     */
-
-    Future<bool> refreshing() async {
-      if(isFirstBuild) {
-        isFirstBuild = false;
-        await provider.settingSettlementCheckViewModel(settlementId,groupname,userId);
-        return true;
-      }
-      return false;
-    }
-
-    return FutureBuilder(
-        future: refreshing(),
-        builder: (context,snapshot){
-          if(snapshot.hasData == false){
-            return Container(
-              width: 100, height: 100,
-              child: CircularProgressIndicator()
-            );
-          }
-          return isMaster
-          // ? SettlementDetailPageSettlementer(
-          //   userId: userId,
-          // )
-          // : SettlementDetailPageSender(
-          //     userId: userId,
-          //   );
-              ? SettlementDetailPageSender(
-            userId: userId,
-          )
-              : SettlementDetailPageSettlementer(
-            userId: userId,
-          );
-    });
-    /*
-    return isMaster
-        // ? SettlementDetailPageSettlementer(
-        //   userId: userId,
-        // )
-        // : SettlementDetailPageSender(
-        //     userId: userId,
-        //   );
-        ? SettlementDetailPageSender(
-            userId: userId,
-          )
-        : SettlementDetailPageSettlementer(
-            userId: userId,
-          );
-
-     */
+    return provider.settlement.masterUserId == provider.userData.serviceUserId
+        ? const SettlementInformationReceiver()
+        : const SettlementInformationSender();
   }
 }
 
-class SettlementDetailPageSettlementer extends ConsumerStatefulWidget {
-  const SettlementDetailPageSettlementer({super.key, required this.userId});
-  final String userId;
+class SettlementInformationReceiver extends ConsumerStatefulWidget {
+  const SettlementInformationReceiver({super.key});
 
   @override
-  ConsumerState<SettlementDetailPageSettlementer> createState() =>
-      _SettlementDetailPageSettlementerState();
+  ConsumerState<SettlementInformationReceiver> createState() =>
+      _SettlementInformationReceiverState();
 }
 
-class _SettlementDetailPageSettlementerState
-    extends ConsumerState<SettlementDetailPageSettlementer> {
+class _SettlementInformationReceiverState
+    extends ConsumerState<SettlementInformationReceiver> {
   String inputName = '';
   @override
   Widget build(BuildContext context) {
@@ -137,7 +66,7 @@ class _SettlementDetailPageSettlementerState
                 vertical: 5,
               ),
               child: Text(
-                provider.groupName ?? "default group name",
+                provider.group.groupName ?? "default group name",
                 style: const TextStyle(
                   fontSize: 16,
                 ),
@@ -608,7 +537,7 @@ class _SettlementDetailPageSettlementerState
                     )),
                 Column(
                   children: List.generate(
-                      provider.settlementPapers[widget.userId]?.settlementItems
+                      provider.settlementPapers[provider.userData.serviceUserId]?.settlementItems
                               .length ??
                           0, (index) {
                     return Container(
@@ -620,7 +549,7 @@ class _SettlementDetailPageSettlementerState
                           SizedBox(
                             width: 180,
                             child: Text(
-                              provider.settlementItems[widget.userId]?[index]
+                              provider.settlementItems[provider.userData.serviceUserId]?[index]
                                       .menuName ??
                                   "menu",
                               style: const TextStyle(
@@ -632,7 +561,7 @@ class _SettlementDetailPageSettlementerState
                           SizedBox(
                             width: 180,
                             child: Text(
-                              "${priceToString.format(provider.settlementItems[widget.userId]?[index].price ?? 100)}원",
+                              "${priceToString.format(provider.settlementItems[provider.userData.serviceUserId]?[index].price ?? 100)}원",
                               textAlign: TextAlign.right,
                               style: const TextStyle(
                                 fontWeight: FontWeight.w800,
@@ -662,7 +591,7 @@ class _SettlementDetailPageSettlementerState
                         ),
                       ),
                       Text(
-                        "${priceToString.format(provider.settlementPapers[widget.userId]?.totalPrice ?? 0)}원",
+                        "${priceToString.format(provider.settlementPapers[provider.userData.serviceUserId]?.totalPrice ?? 0)}원",
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 24,
@@ -721,17 +650,16 @@ class _SettlementDetailPageSettlementerState
   }
 }
 
-class SettlementDetailPageSender extends ConsumerStatefulWidget {
-  const SettlementDetailPageSender({super.key, required this.userId});
-  final String userId;
+class SettlementInformationSender extends ConsumerStatefulWidget {
+  const SettlementInformationSender({super.key});
 
   @override
-  ConsumerState<SettlementDetailPageSender> createState() =>
+  ConsumerState<SettlementInformationSender> createState() =>
       _SettlementDetailPageSenderState();
 }
 
 class _SettlementDetailPageSenderState
-    extends ConsumerState<SettlementDetailPageSender> {
+    extends ConsumerState<SettlementInformationSender> {
   String inputName = '';
 
   @override
@@ -750,7 +678,7 @@ class _SettlementDetailPageSenderState
                 vertical: 5,
               ),
               child: Text(
-                provider.groupName ?? "default group name",
+                provider.group.groupName ?? "default group name",
                 style: const TextStyle(
                   fontSize: 16,
                 ),
@@ -923,7 +851,7 @@ class _SettlementDetailPageSenderState
                     )),
                 Column(
                   children: List.generate(
-                      provider.settlementPapers[widget.userId]?.settlementItems
+                      provider.settlementPapers[provider.userData.serviceUserId]?.settlementItems
                               .length ??
                           0, (index) {
                     return Container(
@@ -935,7 +863,7 @@ class _SettlementDetailPageSenderState
                           SizedBox(
                             width: 180,
                             child: Text(
-                              provider.settlementItems[widget.userId]?[index]
+                              provider.settlementItems[provider.userData.serviceUserId]?[index]
                                       .menuName ??
                                   "menu",
                               style: const TextStyle(
@@ -954,7 +882,7 @@ class _SettlementDetailPageSenderState
                                     children: [
                                       TextSpan(
                                           text:
-                                              "${provider.settlementItems[widget.userId]?[index].menuCount}명 ",
+                                              "${provider.settlementItems[provider.userData.serviceUserId]?[index].menuCount}명 ",
                                           style: const TextStyle(
                                             color: color2,
                                             fontSize: 17,
@@ -1004,7 +932,7 @@ class _SettlementDetailPageSenderState
                         ),
                       ),
                       Text(
-                        "${priceToString.format(provider.settlementPapers[widget.userId]?.totalPrice ?? 0)}원",
+                        "${priceToString.format(provider.settlementPapers[provider.userData.serviceUserId]?.totalPrice ?? 0)}원",
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 24,
@@ -1145,82 +1073,75 @@ class _SettlementDetailPageSenderState
                     (index) {
                       return Column(
                         children: List.generate(
-                          min(provider.settlementPapers.length - index * 3, 3),
-                          (iindex){
-                              return FutureBuilder(
-                                future: ServiceUser().getUserByUserId(provider.settlementPapers.values
-                                    .toList()[index * 3 + iindex]
-                                    .serviceUserId ?? ""),
-                                builder: (context, snapshot) {
-                                  if(snapshot.hasData == false){
-                                    return CircularProgressIndicator();
-                                  } else {
-                                    return Container(
-                                      margin: const EdgeInsets.all(5),
-                                      height: 70,
-                                      width: 140,
-                                      child: Row(
-                                        children: [
-                                          Container(
-                                            margin: const EdgeInsets.all(10),
-                                            width: 50,
-                                            height: 50,
-                                            child: ClipOval(
-                                              child: Container(
-                                                color: Colors.grey,
-                                              ),
+                            min(provider.settlementPapers.length - index * 3,
+                                3), (iindex) {
+                          return FutureBuilder(
+                              future: ServiceUser().getUserByUserId(provider
+                                      .settlementPapers.values
+                                      .toList()[index * 3 + iindex]
+                                      .serviceUserId ??
+                                  ""),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData == false) {
+                                  return const CircularProgressIndicator();
+                                } else {
+                                  return Container(
+                                    margin: const EdgeInsets.all(5),
+                                    height: 70,
+                                    width: 140,
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          margin: const EdgeInsets.all(10),
+                                          width: 50,
+                                          height: 50,
+                                          child: ClipOval(
+                                            child: Container(
+                                              color: Colors.grey,
                                             ),
                                           ),
-                                          SizedBox(
-                                            height: 70,
-                                            child: Column(
-                                              crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                              mainAxisAlignment: MainAxisAlignment
-                                                  .center,
-                                              children: [
-                                                Text(
-                                                  snapshot.data?.name ?? ""
-                                                  ,
-                                                  style: const TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.w800,
-                                                  ),
+                                        ),
+                                        SizedBox(
+                                          height: 70,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                snapshot.data?.name ?? "",
+                                                style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w800,
                                                 ),
-                                                Text(
-                                                  "${priceToString.format(
-                                                      provider.settlementPapers
-                                                          .values
-                                                          .toList()[index * 3 +
-                                                          iindex]
-                                                          .totalPrice)}원",
-                                                  style: TextStyle(
-                                                    color: provider.settlement
-                                                        .checkSent[provider
-                                                        .settlementPapers.keys
-                                                        .toList()[
-                                                    index * 3 + iindex]] ==
-                                                        3
-                                                        ? color2
-                                                        : colorGrey,
-                                                    fontSize: 15,
-                                                  ),
-                                                )
-                                              ],
-                                            ),
+                                              ),
+                                              Text(
+                                                "${priceToString.format(provider.settlementPapers.values.toList()[index * 3 + iindex].totalPrice)}원",
+                                                style: TextStyle(
+                                                  color: provider.settlement
+                                                              .checkSent[provider
+                                                                  .settlementPapers
+                                                                  .keys
+                                                                  .toList()[
+                                                              index * 3 +
+                                                                  iindex]] ==
+                                                          3
+                                                      ? color2
+                                                      : colorGrey,
+                                                  fontSize: 15,
+                                                ),
+                                              )
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                    );
-                                  }
+                                        ),
+                                      ],
+                                    ),
+                                  );
                                 }
-
-                              );
-
-                            }
-                        ), //
+                              });
+                        }), //
                       );
-
                     },
                   ),
                 ),

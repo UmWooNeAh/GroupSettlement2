@@ -5,7 +5,7 @@ import 'package:groupsettlement2/common_fireservice.dart';
 import '../class/class_group.dart';
 import '../class/class_user.dart';
 
-final groupProvider = ChangeNotifierProvider<GroupCreateViewModel>(
+final groupCreateProvider = ChangeNotifierProvider<GroupCreateViewModel>(
     (ref) => GroupCreateViewModel());
 
 class GroupCreateViewModel extends ChangeNotifier {
@@ -14,7 +14,7 @@ class GroupCreateViewModel extends ChangeNotifier {
 
   GroupCreateViewModel();
 
-  void settingGroupViewModel(ServiceUser me) async {
+  void settingGroupCreateViewModel(ServiceUser me) async {
     serviceUsers = [me];
     userData = me;
     notifyListeners();

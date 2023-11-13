@@ -45,7 +45,7 @@ class _GroupSelectPage extends ConsumerState<GroupSelectPage> {
               ),
               GestureDetector(
                 onTap: () {
-                  context.go("/groupCreatePage");
+                  context.push("/groupCreatePage", extra: widget.me);
                 },
                 child: Align(
                   alignment: Alignment.center,
@@ -118,7 +118,7 @@ class _OneGroupState extends ConsumerState<OneGroup> {
       children: [
         GestureDetector(
           onTap: () {
-            context.push("/GroupMainPage",
+            context.push("/GroupSelectPage/GroupMainPage",
                 extra: [uvm.userData, widget.group.groupId!]);
           },
           child:

@@ -92,7 +92,7 @@ final GoRouter _router = GoRouter(
                     GoRoute(
                       path: "GroupSettlementListPage",
                       builder: (context, state) {
-                        return const groupSettlementListPage();
+                        return const GroupSettlementListPage();
                       },
                     ),
                   ]),
@@ -100,16 +100,24 @@ final GoRouter _router = GoRouter(
         GoRoute(
           path: "GroupCreatePage",
           builder: (context, state) {
-            return const GroupCreatePage();
+            ServiceUser me = state.extra as ServiceUser;
+            return GroupCreatePage(me: me,);
           },
         ),
-
         GoRoute(
             path: 'SettlementGroupSelectPage',
             builder: (context, state) {
               ServiceUser me = state.extra as ServiceUser;
               return SettlementGroupSelectPage(
                 me: me,
+              );
+            }),
+        GoRoute(
+            path: 'SettlementInformationPage',
+            builder: (context, state) {
+              List<dynamic> info = state.extra as List<dynamic>;
+              return SettlementInformationPage(
+                info: info,
               );
             }),
         // GoRoute(
@@ -131,15 +139,6 @@ final GoRouter _router = GoRouter(
         //     path: 'clovaPage',
         //     builder: (context, state) {
         //       return const clovaPage();
-        //     }),
-        // GoRoute(
-        //     path: 'SettlementDetailPage/:settlementId/:groupname/:userId',
-        //     builder: (context, state) {
-        //       return SettlementDetailPage(
-        //         settlementId: state.pathParameters["settlementId"]!,
-        //         groupname: state.pathParameters["groupname"]!,
-        //         userId: state.pathParameters["userId"]!,
-        //       );
         //     }),
         // GoRoute(
         //     path: 'CreateNewSettlementPage/:groupId/:masterId/:accountInfo',

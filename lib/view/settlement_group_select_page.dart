@@ -46,7 +46,7 @@ class _SettlementGroupSelectPage
               ),
               GestureDetector(
                 onTap: () {
-                  context.push("/GroupCreatePage");
+                  context.push("/GroupCreatePage", extra: widget.me);
                 },
                 child: Align(
                   alignment: Alignment.center,

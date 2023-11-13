@@ -1,22 +1,23 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../class/class_settlement.dart';
 import '../design_element.dart';
 import '../viewmodel/GroupViewModel.dart';
 
-class groupSettlementListPage extends ConsumerStatefulWidget {
-  const groupSettlementListPage({Key? key}) : super(key: key);
+class GroupSettlementListPage extends ConsumerStatefulWidget {
+  const GroupSettlementListPage({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<groupSettlementListPage> createState() =>
-      _groupSettlementListPageState();
+  ConsumerState<GroupSettlementListPage> createState() =>
+      _GroupSettlementListPageState();
 }
 
-class _groupSettlementListPageState
-    extends ConsumerState<groupSettlementListPage> {
+class _GroupSettlementListPageState
+    extends ConsumerState<GroupSettlementListPage> {
   bool flag = true;
   bool _isFilterClicked = false;
   Map<Settlement, bool> ischecked = {};
@@ -116,12 +117,12 @@ class _groupSettlementListPageState
                     bool masterFlag =
                         gvm.userData.serviceUserId == settlement.masterUserId;
                     return settlement.isMerged!
-                        ? multipleSettlement(
+                        ? MultipleSettlement(
                             size: size,
                             masterFlag: masterFlag,
                             settlement: settlement,
                             flag: flag)
-                        : oneSettlement(
+                        : OneSettlement(
                             size: size,
                             masterFlag: masterFlag,
                             settlement: settlement,
@@ -183,14 +184,14 @@ class _groupSettlementListPageState
   }
 }
 
-class oneSettlement extends StatefulWidget {
+class OneSettlement extends ConsumerStatefulWidget {
   final Size size;
   final Settlement settlement;
   final bool masterFlag;
   final bool flag;
   final Function callBack;
 
-  const oneSettlement(
+  const OneSettlement(
       {Key? key,
       required this.size,
       required this.settlement,
@@ -200,10 +201,10 @@ class oneSettlement extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<oneSettlement> createState() => _oneSettlementState();
+  ConsumerState<OneSettlement> createState() => _OneSettlementState();
 }
 
-class _oneSettlementState extends State<oneSettlement> {
+class _OneSettlementState extends ConsumerState<OneSettlement> {
   bool _isChecked = false;
 
   @override
@@ -224,7 +225,7 @@ class _oneSettlementState extends State<oneSettlement> {
     dt = widget.settlement.time != null
         ? DateTime.parse(widget.settlement.time!.toDate().toString())
         : DateTime.utc(1000, 01, 01);
-
+    final provider = ref.watch(groupProvider);
     return Column(
       children: [
         SizedBox(width: double.infinity, height: 30),
@@ -236,7 +237,7 @@ class _oneSettlementState extends State<oneSettlement> {
                 widget.callBack(widget.settlement, _isChecked);
               });
             }
-            //context.push("/settlementDetailPage");
+            context.push("/SettlementInformationPage", extra: [widget.settlement, provider.myGroup, provider.userData]);
           },
           child: Stack(
             children: [
@@ -365,13 +366,13 @@ class _oneSettlementState extends State<oneSettlement> {
   }
 }
 
-class multipleSettlement extends StatefulWidget {
+class MultipleSettlement extends ConsumerStatefulWidget {
   final Size size;
   final bool masterFlag;
   final Settlement settlement;
   final bool flag;
 
-  const multipleSettlement(
+  const MultipleSettlement(
       {Key? key,
       required this.size,
       required this.masterFlag,
@@ -380,10 +381,10 @@ class multipleSettlement extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<multipleSettlement> createState() => _multipleSettlementState();
+  ConsumerState<MultipleSettlement> createState() => _MultipleSettlementState();
 }
 
-class _multipleSettlementState extends State<multipleSettlement> {
+class _MultipleSettlementState extends ConsumerState<MultipleSettlement> {
   bool _isChecked = true;
 
   @override
@@ -401,13 +402,13 @@ class _multipleSettlementState extends State<multipleSettlement> {
     dt = widget.settlement.time != null
         ? DateTime.parse(widget.settlement.time!.toDate().toString())
         : DateTime.utc(1000, 01, 01);
-
+    final provider = ref.watch(groupProvider);
     return Column(
       children: [
-        SizedBox(width: double.infinity, height: 30),
+        const SizedBox(width: double.infinity, height: 30),
         GestureDetector(
           onTap: () {
-            //context.push("/settlementDetailPage");
+            context.push("/settlementDetailPage", extra: [widget.settlement, provider.myGroup, provider.userData]);
           },
           child: Stack(
             children: [

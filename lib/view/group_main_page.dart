@@ -86,7 +86,7 @@ class _GroupMainPageState extends ConsumerState<GroupMainPage> {
                   ),
                   Row(children: [
                     Text(
-                      gvm.myGroup.groupName ?? "null",
+                      gvm.myGroup.groupName ?? "",
                       style: const TextStyle(
                           color: Colors.black,
                           fontSize: 30,
@@ -164,23 +164,23 @@ class _GroupMainPageState extends ConsumerState<GroupMainPage> {
                       ),
                     )
                   ]),
-                  SizedBox(height: 15),
+                  const SizedBox(height: 15),
                   Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text.rich(TextSpan(children: [
-                          TextSpan(
+                          const TextSpan(
                               text: "진행 중인 정산",
                               style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 20,
                                   fontWeight: FontWeight.w700)),
-                          TextSpan(
+                          const TextSpan(
                             text: "   ",
                           ),
                           TextSpan(
                             text: gvm.settlementInGroup.length.toString(),
-                            style: TextStyle(
+                            style: const TextStyle(
                               color: Color(0xFFFE5F55),
                               fontSize: 25,
                               fontWeight: FontWeight.w500,
@@ -188,8 +188,9 @@ class _GroupMainPageState extends ConsumerState<GroupMainPage> {
                           ),
                         ])),
                         TextButton(
-                          onPressed: (){
-                            context.push("/GroupSelectPage/GroupMainPage/GroupSettlementListPage");
+                          onPressed: () {
+                            context.push(
+                                "/GroupSelectPage/GroupMainPage/GroupSettlementListPage");
                           },
                           child: const Text(
                             '자세히 보기 >',
@@ -296,7 +297,9 @@ class _GroupMainPageState extends ConsumerState<GroupMainPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 100,),
+                  const SizedBox(
+                    height: 100,
+                  ),
                 ],
               ),
             ),
@@ -631,7 +634,8 @@ class _StmItemState extends ConsumerState<StmItem> {
   @override
   Widget build(BuildContext context) {
     bool masterFlag = widget.settlement.masterUserId == widget.userId;
-    Color color = masterFlag ? const Color(0xFF07BEB8) : const Color(0xFFFE5F55);
+    Color color =
+        masterFlag ? const Color(0xFF07BEB8) : const Color(0xFFFE5F55);
     int currentStmComplete = 0;
     DateTime dt;
 
@@ -648,7 +652,7 @@ class _StmItemState extends ConsumerState<StmItem> {
         GestureDetector(
           onTap: () {
             context.push(
-                "/SettlementDetailPage/${widget.settlement.settlementId}/${gvm.myGroup.groupName}/${widget.userId}}");
+                "/SettlementInformationPage", extra: [widget.settlement, gvm.myGroup, gvm.userData]);
           },
           child: Container(
             decoration: ShapeDecoration(

@@ -6,19 +6,27 @@ import '../design_element.dart';
 import '../viewmodel/GroupCreateViewModel.dart';
 
 class GroupCreatePage extends ConsumerStatefulWidget {
-  const GroupCreatePage({Key? key}) : super(key: key);
+  const GroupCreatePage({Key? key, required this.me}) : super(key: key);
+  final ServiceUser me;
 
   @override
   ConsumerState<GroupCreatePage> createState() => _GroupCreatePageState();
 }
 
 class _GroupCreatePageState extends ConsumerState<GroupCreatePage> {
+  bool isFirst = true;
   String inputGroupName = "";
   String inputName = "";
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    final gvm = ref.watch(groupProvider);
+    final provider = ref.watch(groupCreateProvider);
+    if(isFirst){
+      Future((){
+        provider.settingGroupCreateViewModel(widget.me);
+      });
+      isFirst = false;
+    }
     return Scaffold(
         appBar: AppBar(),
         body: GestureDetector(
@@ -92,7 +100,7 @@ class _GroupCreatePageState extends ConsumerState<GroupCreatePage> {
                         TextSpan(
                           children: [
                             TextSpan(
-                              text: "${gvm.serviceUsers.length.toString()} ",
+                              text: "${provider.serviceUsers.length.toString()} ",
                               style: const TextStyle(
                                 color: Color(0xFF07BEB8),
                                 fontSize: 20,
@@ -119,17 +127,17 @@ class _GroupCreatePageState extends ConsumerState<GroupCreatePage> {
                   child: SingleChildScrollView(
                     child: Column(
                       children: List.generate(
-                          ((gvm.serviceUsers.length - 1) ~/ 4) + 1, (index) {
+                          ((provider.serviceUsers.length - 1) ~/ 4) + 1, (index) {
                         return Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: List.generate(4, (innerIndex) {
                             try {
                               ServiceUser user =
-                                  gvm.serviceUsers[index * 4 + innerIndex];
+                                  provider.serviceUsers[index * 4 + innerIndex];
                               bool flag = user.kakaoId == null ? true : false;
                               //카카오 아이디 존재시 false -> 직접 추가됨
                               bool userFlag = user.serviceUserId ==
-                                      gvm.userData.serviceUserId
+                                      provider.userData.serviceUserId
                                   ? true
                                   : false;
                               //사용자 본인일시 삭제버튼 무효화
@@ -187,7 +195,7 @@ class _GroupCreatePageState extends ConsumerState<GroupCreatePage> {
                                     child: userFlag == false
                                         ? GestureDetector(
                                             onTap: () {
-                                              gvm.removeGroupUser(user);
+                                              provider.removeGroupUser(user);
                                             },
                                             child: const Icon(Icons.close))
                                         : const SizedBox.shrink(),
@@ -270,7 +278,7 @@ class _GroupCreatePageState extends ConsumerState<GroupCreatePage> {
                                       setState(
                                         () {
                                           if (inputName != "") {
-                                            gvm.addByDirect(inputName);
+                                            provider.addByDirect(inputName);
                                           } else {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
@@ -375,7 +383,7 @@ class _GroupCreatePageState extends ConsumerState<GroupCreatePage> {
                                 ),
                               );
                             } else {
-                              gvm.createGroup(inputGroupName);
+                              provider.createGroup(inputGroupName);
                               showDialog(
                                 context: context,
                                 barrierDismissible: false,
@@ -388,7 +396,7 @@ class _GroupCreatePageState extends ConsumerState<GroupCreatePage> {
                                           child: const Text("확인"),
                                           onPressed: () {
                                             context.pushReplacement(
-                                                "/groupSelectPage/${gvm.userData.serviceUserId}");
+                                                "/groupSelectPage/${provider.userData.serviceUserId}");
                                           },
                                         ),
                                       )

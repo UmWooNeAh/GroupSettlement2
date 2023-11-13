@@ -38,8 +38,8 @@ class MainViewModel extends ChangeNotifier {
   }
   void fetchUser(String userId) async {
     userData = await ServiceUser().getUserByUserId(userId);
-    notifyListeners();
     fetchGroup(userData.serviceUserId!);
+    notifyListeners();
   }
 
   void fetchGroup(String userId) async {
