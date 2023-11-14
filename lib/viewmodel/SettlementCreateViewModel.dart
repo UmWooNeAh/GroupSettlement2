@@ -22,7 +22,7 @@ class SettlementCreateViewModel extends ChangeNotifier {
   Group                           myGroup       = Group();
   Map<String, Receipt>            receipts      = <String, Receipt> {};
   Map<String, List<ReceiptItem>>  receiptItems  = <String, List<ReceiptItem>> {};
-  int                             totalPrice    = 0;
+  double                          totalPrice    = 0;
   Clova                           clova         = Clova();
 
   // 1. 정산생성 이후에만 나머지 창 을 들어갈 수 있으므로 처음 만들어질 때 객체를 새롭게 생성한다
@@ -173,6 +173,7 @@ class SettlementCreateViewModel extends ChangeNotifier {
           }
         }
       }
+      settlement.totalPrice = totalPrice;
       settlement.time = Timestamp.now();
       settlement.createSettlement();
       notifyListeners();

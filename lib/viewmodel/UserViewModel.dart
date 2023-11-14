@@ -74,6 +74,7 @@ class UserViewModel extends ChangeNotifier {
     settlement.settlementPapers.forEach((key, value) async {
       //SettlementPaper Fetch
       SettlementPaper temp = await SettlementPaper().getSettlementPaperByPaperId(value);
+      temp.userName = userData.name;
       mySettlementPapers.add(temp);
     });
     notifyListeners();
