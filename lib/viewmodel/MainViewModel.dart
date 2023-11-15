@@ -70,11 +70,9 @@ class MainViewModel extends ChangeNotifier {
           isFetchFinished = true;
           break;
         }
-        print(userData.settlements[i]);
         Settlement stm = await Settlement().getSettlementBySettlementId(
             userData.settlements[userData.settlements.length - (i + 1)]);
         settlementInfo[stm] = [];
-        print("TlqkfToxdl");
         await fetchStmPaper(stm);
       }
     }
@@ -128,7 +126,6 @@ class MainViewModel extends ChangeNotifier {
 
   double getCurrentMoney(Settlement settlement){
     double currentMoney = 0;
-    print("is empty : ${settlementInfo[settlement]!.isEmpty}");
     settlementInfo[settlement]!.forEach((paper) {
       if (settlement.checkSent[paper.serviceUserId] == 2) {
         currentMoney = currentMoney + paper.totalPrice!;
@@ -143,7 +140,6 @@ class MainViewModel extends ChangeNotifier {
     settlementInfo[settlement]!.forEach((paper) {
       totalPrice = totalPrice + paper.totalPrice!;
     });
-    //print("TP in MV : ${totalPrice}, length : ${settlementInfo[settlement]!.length}");
     return totalPrice;
   }
 

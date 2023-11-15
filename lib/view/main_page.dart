@@ -394,8 +394,6 @@ class _mainPageState extends ConsumerState<mainPage> {
                       shrinkWrap: true,
                       itemCount: mvm.settlementInfo.length == 0 ? 1 : mvm.settlementInfo.length,
                       itemBuilder: (BuildContext context, int index) {
-                        print("currentCount in ListView : ${currentCount}");
-                        //print('${currentCount} ${_isMore}, ${mvm.settlementInfo.values.toList()[index].isNotEmpty}');
                         if(mvm.settlementInfo.length != 0) {
                           Settlement settlement = mvm.settlementInfo.keys
                               .toList()[index];
@@ -717,8 +715,6 @@ class _RecentSettlementState extends ConsumerState<RecentSettlement> {
     dt = widget.settlement.time != null
         ? DateTime.parse(widget.settlement.time!.toDate().toString())
         : DateTime.utc(1000, 01, 01);
-    print(widget.settlement.settlementPapers.length);
-    print("CM : ${currentMoney}, TP : ${totalPrice}, SM : ${sendMoney}");
     return Column(
       children: [
         GestureDetector(
