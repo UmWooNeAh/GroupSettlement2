@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:groupsettlement2/class/class_receipt.dart';
 import 'package:groupsettlement2/design_element.dart';
 import 'dart:math' as math;
 import 'shared_basic_widget.dart';

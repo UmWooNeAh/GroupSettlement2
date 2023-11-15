@@ -32,8 +32,9 @@ class Group {
     //'mergedsettlements' : mergedSettlements,
   };
 
-  void createGroup() async {
-    await FirebaseFirestore.instance.collection("grouplist").doc(this.groupId).set(toJson());
+  Future<int> createGroup() async {
+    await FirebaseFirestore.instance.collection("grouplist").doc(groupId).set(toJson());
+    return 1;
   }
 
   Future<List<Group>> getGroupList() async {

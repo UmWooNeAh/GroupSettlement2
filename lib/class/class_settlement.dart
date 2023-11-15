@@ -1,4 +1,4 @@
-import 'dart:ffi';
+// import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../modeluuid.dart';
@@ -37,6 +37,7 @@ class Settlement {
     checkSent = Map<String, int>.from(json['checksent']);
     isFinished = json['isfinished'];
     isMerged = json['ismerged'];
+    // mergedSettlement= List<String>.from(json['mergedsettlement']);
     try {
       totalPrice = json['totalprice'];
     } catch(e){

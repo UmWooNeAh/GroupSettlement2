@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:groupsettlement2/viewmodel/MainViewModel.dart';
 import 'package:intl/intl.dart';
 
 var priceToString = NumberFormat.currency(locale: 'ko_KR', symbol: "");
@@ -20,6 +21,7 @@ class _CustomBottomNavigationBarState
     extends ConsumerState<CustomBottomNavigationBar> {
   @override
   Widget build(BuildContext context) {
+    final provider = ref.watch(mainProvider);
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       elevation: 10,
@@ -44,7 +46,7 @@ class _CustomBottomNavigationBarState
               context.go('/mp');
             // context.go('/ReceiptBox');
             case 2:
-              context.go('/SettlementGroupSelectionPage',extra: "8969xxwf-8wf8-pf89-9x6p-88p0wpp9ppfb");
+              context.go('/SettlementGroupSelect',extra: provider.userData);
             case 3:
               1;
             // context.go('/Notification');

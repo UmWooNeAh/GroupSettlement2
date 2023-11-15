@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:groupsettlement2/class/class_user.dart';
 import '../modeluuid.dart';
@@ -67,8 +65,8 @@ class SettlementPaper {
     DocumentSnapshot<Map<String, dynamic>> result =
     await FirebaseFirestore.instance.collection("settlementpaperlist")
         .doc(paperid).get();
-    //ServiceUser user = await ServiceUser().getUserByUserId(serviceUserId!);
-    //userName = user.name;
+    ServiceUser user = await ServiceUser().getUserByUserId(serviceUserId!);
+    userName = user.name;
     SettlementPaper paper = SettlementPaper.fromSnapShot(result);
     return paper;
 

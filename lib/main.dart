@@ -1,41 +1,28 @@
-import 'dart:collection';
-import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:groupsettlement2/view/complete_settlement_matching.dart';
 import 'package:groupsettlement2/class/class_receiptContent.dart';
-import 'package:groupsettlement2/view/camera_clova_detect_page.dart';
-import 'package:groupsettlement2/view/check_scanned_receipt.dart';
-import 'package:groupsettlement2/view/groupMainPage.dart';
 import 'package:groupsettlement2/view/group_create_page.dart';
+import 'package:groupsettlement2/view/group_main_page.dart';
 import 'package:groupsettlement2/view/group_select_page.dart';
 import 'package:groupsettlement2/view/group_settlement_list_page.dart';
 import 'package:groupsettlement2/view/main_page.dart';
-import 'package:groupsettlement2/view/mypage.dart';
+import 'package:groupsettlement2/view/mypage_page.dart';
 import 'package:groupsettlement2/view/notification_page.dart';
-import 'package:groupsettlement2/view/settlementDetailPage.dart';
-import 'package:groupsettlement2/view/create_new_settlement.dart';
-import 'package:groupsettlement2/view/edit_receipt.dart';
-import 'package:groupsettlement2/view/groupMainPage.dart';
-import 'package:groupsettlement2/view/settlementDetailPage.dart';
-import 'package:groupsettlement2/view/settlementGroupSelectionPage.dart';
-import 'package:groupsettlement2/class/class_settlement.dart';
+import 'package:groupsettlement2/view/receipt_add_page.dart';
+import 'package:groupsettlement2/view/receipt_box_page.dart';
+import 'package:groupsettlement2/view/receipt_check_scanned_page.dart';
+import 'package:groupsettlement2/view/receipt_edit_page.dart';
+import 'package:groupsettlement2/view/settlement_create_page.dart';
 import 'package:groupsettlement2/view/settlement_final_check.dart';
-import 'package:groupsettlement2/view/total_settlement_details_management.dart';
-import 'package:groupsettlement2/viewmodel/UserViewModel.dart';
+import 'package:groupsettlement2/view/settlement_group_select_page.dart';
+import 'package:groupsettlement2/view/settlement_information_page.dart';
+import 'package:groupsettlement2/view/settlement_matching_complete_page.dart';
+import 'package:groupsettlement2/view/settlement_matching_page.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
-import 'package:groupsettlement2/view/MainPage.dart';
-import 'package:groupsettlement2/view/gun_page.dart';
-import 'package:groupsettlement2/view/ryu_page.dart';
-import 'package:groupsettlement2/view/settlement_page.dart';
-import 'package:groupsettlement2/view/sin_page.dart';
 import 'package:groupsettlement2/view/viewmodelTest_page.dart';
-import 'package:groupsettlement2/view/viewmodelTest_page.dart';
-import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
-import 'clova/clova.dart';
 import 'clova/clovaPage.dart';
 import 'design_element.dart';
 import 'firebase_options.dart';
@@ -78,7 +65,7 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/',
       builder: (context, state) {
-        return const mainPage();
+        return const MainPage();
       },
       routes: <RouteBase>[
         GoRoute(
@@ -87,160 +74,150 @@ final GoRouter _router = GoRouter(
               return const SplashView();
             }),
         GoRoute(
-            path: 'RyuPage',
+            path: "GroupSelect",
             builder: (context, state) {
-              return const RyuPage();
-            }),
-        GoRoute(
-            path: 'SinPage',
-            builder: (context, state) {
-              return const SinPage();
-            }),
-        GoRoute(
-            path: 'VMTestPage',
-            builder: (context, state) {
-              return const VMTestPage();
-            }),
-        GoRoute(
-            path: 'GunPage',
-            builder: (context, state) {
-              return const GunPage();
-            }),
-        GoRoute(
-            path: 'KakaoLoginPage',
-            builder: (context, state) {
-              return const kakaoLoginPage();
-            }),
-        GoRoute(
-            path: 'clovaPage',
-            builder: (context, state) {
-              return const clovaPage();
-            }),
-        GoRoute(
-            path: 'groupMainPage',
-            builder: (context, state) {
-              List<String> ids = state.extra as List<String>;
-              return groupMainPage(ids: ids);
-            }),
-        GoRoute(
-            path: 'SettlementDetailPage/:settlementId/:groupname/:userId',
-            builder: (context, state) {
-              return SettlementDetailPage(
-                settlementId: state.pathParameters["settlementId"]!,
-                groupname: state.pathParameters["groupname"]!,
-                userId: state.pathParameters["userId"]!,
-              );
-            }),
-        GoRoute(
-            path: 'CreateNewSettlementPage/:groupId/:masterId/:accountInfo',
-            builder: (context, state) {
-              return CreateNewSettlement(
-                groupId: state.pathParameters["groupId"]!,
-                masterId: state.pathParameters["masterId"]!,
-                accountInfo: state.pathParameters["accountInfo"]!,
-              );
+              ServiceUser me = state.extra as ServiceUser;
+              return GroupSelectPage(me: me);
             },
             routes: [
               GoRoute(
-                path: 'EditReceiptPage/:modifyFlag',
-                builder: (context, state) {
-                  ReceiptContent content = state.extra as ReceiptContent;
-                  return EditReceiptPage(
-                    receiptContent: content,
-                    modifyFlag: state.pathParameters["modifyFlag"]!,
-                  );
-                },
-              ),
-              // GoRoute(
-              //   path: 'cameraDetectPage',
-              //   builder: (context, state) => cameraDetectPage(camera: state.qu),
-              // ),
+                  path: 'GroupMain',
+                  builder: (context, state) {
+                    List<dynamic> info = state.extra as List<dynamic>;
+                    return GroupMainPage(info: info);
+                  },
+                  routes: [
+                    GoRoute(
+                      path: "GroupSettlementList",
+                      builder: (context, state) {
+                        return const GroupSettlementListPage();
+                      },
+                    )
+                  ]),
             ]),
         GoRoute(
-          path: "SettlementPage/:settlementId",
-          builder: (context, state) {
-            return SettlementPage(
-              settlementId: state.pathParameters["settlementId"]!,
-            );
-          },
-          routes: <RouteBase>[
-            GoRoute(
-              path: 'CompleteSettlementMatching',
-              builder: (context, state) {
-                return const CompleteSettlementMatching();
-              },
-            ),
-          ],
-        ),
-        GoRoute(
-            path: 'SettlementFinalCheckPage',
+            path: "GroupCreate",
             builder: (context, state) {
-              return const SettlementFinalCheckPage();
+              ServiceUser me = state.extra as ServiceUser;
+              return GroupCreatePage(me: me);
             }),
         GoRoute(
-            path: 'SettlementGroupSelectionPage',
+            path: 'SettlementGroupSelect',
             builder: (context, state) {
-              String userId = state.extra as String;
-              return settlementGroupSelectionPage(userId: userId);
+              ServiceUser me = state.extra as ServiceUser;
+              return SettlementGroupSelectPage(me: me);
             }),
         GoRoute(
-          path: "MyPage",
-          builder: (context, state) {
-            return const myPage();
-          },
-        ),
+            path: 'SettlementInformation',
+            builder: (context, state) {
+              List<dynamic> info = state.extra as List<dynamic>;
+              return SettlementInformationPage(info: info);
+            }),
         GoRoute(
-          path: "NotificationPage",
-          builder: (context, state) {
-            return const notificationPage();
-          },
-        ),
+            path: 'SettlementCreate',
+            builder: (context, state) {
+              List<dynamic> info = state.extra as List<dynamic>;
+              return SettlementCreatePage(info: info);
+            }),
         GoRoute(
-          path: "GroupCreatePage",
-          builder: (context, state) {
-            return const groupCreatePage();
-          },
-        ),
+            path: 'ReceiptAdd',
+            builder: (context, state) {
+              Object camera = state.extra as Object;
+              return ReceiptAddPage(camera: camera);
+            }),
         GoRoute(
-          path: "GroupSelectPage/:userId",
-          builder: (context, state) {
-            return groupSelectPage(userId: state.pathParameters["userId"]!);
-          },
-        ),
-        GoRoute(
-          path: "GroupSettlementListPage",
-          builder: (context, state) {
-            return const groupSettlementListPage();
-          },
-        ),
-        GoRoute(
-          path: "cameraDetectPage",
-          builder: (context, state) {
-            CameraDescription camera = state.extra as CameraDescription;
-            return cameraDetectPage(extra: camera);
-          },
-        ),
-        GoRoute(
-          path: "scanedRecieptPage",
-          builder: (context, state) {
-            ReceiptContent content = state.extra as ReceiptContent;
-            return CheckScannedReceiptPge(
-              receiptContent: content,
-            );
-          },
-        ),
-        GoRoute(
-          path: "mp",
-          builder: (context, state) {
-            return mainPage();
-          },
-        ),
-        GoRoute(
-          path: "kakaoPage",
-          builder: (context, state) {
-            return kakaoLoginPage();
-          },
-        )
+            path: 'ReceiptBox',
+            builder: (context, state) {
+              return const ReceiptBoxPage();
+            }),
+        // GoRoute(
+        //     path: 'VMTestPage',
+        //     builder: (context, state) {
+        //       return const VMTestPage();
+        //     }),
+        // GoRoute(
+        //     path: 'KakaoLoginPage',
+        //     builder: (context, state) {
+        //       return const kakaoLoginPage();
+        //     }),
+        // GoRoute(
+        //     path: 'clovaPage',
+        //     builder: (context, state) {
+        //       return const clovaPage();
+        //     }),
+        //     routes: [
+        //       GoRoute(
+        //         path: 'EditReceiptPage/:modifyFlag',
+        //         builder: (context, state) {
+        //           ReceiptContent content = state.extra as ReceiptContent;
+        //           return EditReceiptPage(
+        //             receiptContent: content,
+        //             modifyFlag: state.pathParameters["modifyFlag"]!,
+        //           );
+        //         },
+        //       ),
+        //     ]),
+        // GoRoute(
+        //   path: "SettlementPage/:settlementId",
+        //   builder: (context, state) {
+        //     return SettlementPage(
+        //       settlementId: state.pathParameters["settlementId"]!,
+        //     );
+        //   },
+        //   routes: <RouteBase>[
+        //     GoRoute(
+        //       path: 'CompleteSettlementMatching',
+        //       builder: (context, state) {
+        //         return const CompleteSettlementMatching();
+        //       },
+        //     ),
+        //   ],
+        // ),
+        // GoRoute(
+        //     path: 'SettlementFinalCheckPage',
+        //     builder: (context, state) {
+        //       return const SettlementFinalCheckPage();
+        //     }),
+        // GoRoute(
+        //   path: "MyPage",
+        //   builder: (context, state) {
+        //     return const myPage();
+        //   },
+        // ),
+        // GoRoute(
+        //   path: "NotificationPage",
+        //   builder: (context, state) {
+        //     return const notificationPage();
+        //   },
+        // ),
+        // GoRoute(
+        //   path: "cameraDetectPage",
+        //   builder: (context, state) {
+        //     CameraDescription camera = state.extra as CameraDescription;
+        //     return cameraDetectPage(extra: camera);
+        //   },
+        // ),
+        // GoRoute(
+        //   path: "scanedRecieptPage",
+        //   builder: (context, state) {
+        //     ReceiptContent content = state.extra as ReceiptContent;
+        //     return CheckScannedReceiptPge(
+        //       receiptContent: content,
+        //     );
+        //   },
+        // ),
+        // GoRoute(
+        //   path: "mp",
+        //   builder: (context, state) {
+        //     return MainPage();
+        //   },
+        // ),
+        // GoRoute(
+        //   path: "kakaoPage",
+        //   builder: (context, state) {
+        //     return kakaoLoginPage();
+        //   },
+        // )
       ],
     ),
   ],
@@ -294,7 +271,6 @@ class _SplashViewState extends State<SplashView> {
   ServiceUser me = ServiceUser();
 
   void _getMyDeviceToken(ServiceUser user) async {
-
     final token = await FirebaseMessaging.instance.getToken();
     print("내 디바이스 토큰: $token");
     user.fcmToken = token;
@@ -308,7 +284,11 @@ class _SplashViewState extends State<SplashView> {
     //DateTime prevtime = DateTime.parse(user.tokenTimestamp!.toDate().toString());
     if (user.fcmToken == "") {
       _getMyDeviceToken(user);
-    } else if( (nowtime - DateTime.parse(user.tokenTimestamp!.toDate().toString()).millisecondsSinceEpoch) / (1000 * 60 * 60 * 24)  >= 28 ) {
+    } else if ((nowtime -
+                DateTime.parse(user.tokenTimestamp!.toDate().toString())
+                    .millisecondsSinceEpoch) /
+            (1000 * 60 * 60 * 24) >=
+        28) {
       _getMyDeviceToken(user);
     }
   }
@@ -316,7 +296,7 @@ class _SplashViewState extends State<SplashView> {
   @override
   void initState() {
     super.initState();
-    //_getMyDeviceToken(me);
+    // _getMyDeviceToken(me);
     _checkToken("8969xxwf-8wf8-pf89-9x6p-88p0wpp9ppfb");
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       RemoteNotification? notification = message.notification;

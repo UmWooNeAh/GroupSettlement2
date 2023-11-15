@@ -30,8 +30,9 @@ class ReceiptItem {
     'menuprice' : menuPrice,
   };
 
-  void createReceiptItem() async {
+  Future<int> createReceiptItem() async {
     await FirebaseFirestore.instance.collection("receiptitemlist").doc(receiptItemId).set(toJson());
+    return 1;
   }
   
   Future<List<ReceiptItem>> getReceiptItemList() async {

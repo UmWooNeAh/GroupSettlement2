@@ -1,36 +1,24 @@
-import 'dart:developer';
-import 'dart:io';
-import 'dart:math';
-
 import 'package:animated_digit/animated_digit.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:groupsettlement2/view/shared_basic_widget.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:intl/intl.dart';
 import 'package:numberpicker/numberpicker.dart';
-
 import '../class/class_settlement.dart';
-import '../class/class_settlementitem.dart';
 import '../class/class_settlementpaper.dart';
 import '../design_element.dart';
 import '../viewmodel/MainViewModel.dart';
 import '../viewmodel/UserViewModel.dart';
 
-AnimatedDigitController controller = AnimatedDigitController(1);
-
-class mainPage extends ConsumerStatefulWidget {
-  const mainPage({Key? key}) : super(key: key);
+class MainPage extends ConsumerStatefulWidget {
+  const MainPage({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<mainPage> createState() => _mainPageState();
+  ConsumerState<MainPage> createState() => _MainPage();
 }
 
-class _mainPageState extends ConsumerState<mainPage> {
+class _MainPage extends ConsumerState<MainPage> {
   double settlementerRes = 0;
   bool _isCalculated = false;
   bool _isFirstBuild = true;
@@ -40,7 +28,7 @@ class _mainPageState extends ConsumerState<mainPage> {
   List<Settlement> currentStms = [];
   List<Settlement> allStms = [];
   ScrollController scrollController = ScrollController();
-  var pos;
+  
   simpleSettlementerCal(double res) {
     this.settlementerRes = res;
     this._isCalculated = true;
@@ -60,7 +48,6 @@ class _mainPageState extends ConsumerState<mainPage> {
       await mvm.settingMainViewModel("bxxwb8xp-p90w-ppfp-bbw9-b9bwwx8bf9bf");
 
       scrollController.addListener(() async{
-        pos = scrollController.position.pixels;
         if(!mvm.isFetchFinished) {
           if (mvm.lock && scrollController.position.maxScrollExtent * 0.7 <
               scrollController.position.pixels) {
@@ -350,10 +337,13 @@ class _mainPageState extends ConsumerState<mainPage> {
                 child: Divider(thickness: 1, color: Color(0xFFD9D9D9)),
               ),
               SizedBox(height: 10),
+              ElevatedButton(onPressed: (){
+                context.go("/ReceiptBox");
+              }, child: const Text("receipt box")),
               GestureDetector(
                   onTap: () {
                     context
-                        .go("/GroupSelectPage/${mvm.userData.serviceUserId}");
+                        .go("/GroupSelect", extra: mvm.userData);
                   },
                   child: Padding(
                     padding: const EdgeInsets.only(left: 10, right: 10),
@@ -624,7 +614,6 @@ class _SimpleSettlementerResState extends State<SimpleSettlementerRes> {
                   top: 25,
                   left: 80,
                   child: AnimatedDigitWidget(
-                    controller: controller,
                     fractionDigits: 2,
                     duration: Duration(seconds: 1),
                     value: widget.res,
@@ -728,7 +717,7 @@ class _RecentSettlementState extends ConsumerState<RecentSettlement> {
         GestureDetector(
           onTap: () {
             context.go(
-                "/SettlementDetailPage/${widget.settlement.settlementId}/${mvm.getGroupName(widget.settlement)}/${mvm.userData.serviceUserId}");
+                "/SettlementInformation", extra: []);
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
