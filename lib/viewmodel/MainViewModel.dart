@@ -10,7 +10,7 @@ import '../class/class_receipt.dart';
 import '../common_fireservice.dart';
 
 final mainProvider = ChangeNotifierProvider<MainViewModel>(
-        (ref) => MainViewModel("8969xxwf-8wf8-pf89-9x6p-88p0wpp9ppfb"));
+        (ref) => MainViewModel("bxxwb8xp-p90w-ppfp-bbw9-b9bwwx8bf9bf"));
 
 class MainViewModel extends ChangeNotifier {
 
@@ -21,9 +21,17 @@ class MainViewModel extends ChangeNotifier {
   List<Alarm> receiveStmAlarm = <Alarm> [];
   List<Alarm> sendStmAlarm = <Alarm> [];
   List<Alarm> etcStmAlarm = <Alarm> [];
+  bool isFetchFinished = false;
+  bool lock = true;
+  int stmNum = 0;
 
   MainViewModel(String userId) {
     //settingMainViewModel(userId);
+  }
+
+  void stmPlus(){
+    stmNum += 1;
+    notifyListeners();
   }
 
   Future settingMainViewModel(String userId) async {
@@ -49,39 +57,41 @@ class MainViewModel extends ChangeNotifier {
         if(user == userId){
           //Group Fetch
           myGroup.add(group);
-          fetchSettlement(group);
         }
       }
     }
     notifyListeners();
   }
 
-  void fetchSettlement(Group group) async {
-
-    group.settlements.forEach((stmid) async {
-      Settlement stm = await Settlement().getSettlementBySettlementId(stmid);
-      settlementInfo[stm] = [];
-      try {
-        fetchStmPaper(stm);
-      }catch(e){
-        print("error!!!!! ${e}");
+  Future<void> fetchSettlement(int currentCount, int num) async {
+    if(isFetchFinished == false) {
+      for (int i = currentCount; i < currentCount + num; i++) {
+        if (i >= userData.settlements.length) {
+          isFetchFinished = true;
+          break;
+        }
+        print(userData.settlements[i]);
+        Settlement stm = await Settlement().getSettlementBySettlementId(
+            userData.settlements[userData.settlements.length - (i + 1)]);
+        settlementInfo[stm] = [];
+        print("TlqkfToxdl");
+        await fetchStmPaper(stm);
       }
-    });
+    }
     notifyListeners();
+    return;
   }
 
-  void fetchStmPaper(Settlement settlement) async {
-
-    settlement.settlementPapers.forEach((key, value) async {
-      //SettlementPaper Fetch
-      SettlementPaper temp = await SettlementPaper().getSettlementPaperByPaperId(value);
-
-      if(settlementInfo[settlement] == null){
-        settlementInfo[settlement] = [];
-      } else {
-        settlementInfo[settlement]!.add(temp);
-      }
+  Future<void> fetchStmPaper(Settlement settlement) async {
+    await Future.forEach(settlement.settlementPapers.values, (value) async {
+      settlementInfo[settlement]!.add(await SettlementPaper().getSettlementPaperByPaperId(value));
     });
+
+    return;
+  }
+
+  void toggleLock(){
+    lock = !lock;
     notifyListeners();
   }
 
@@ -118,6 +128,7 @@ class MainViewModel extends ChangeNotifier {
 
   double getCurrentMoney(Settlement settlement){
     double currentMoney = 0;
+    print("is empty : ${settlementInfo[settlement]!.isEmpty}");
     settlementInfo[settlement]!.forEach((paper) {
       if (settlement.checkSent[paper.serviceUserId] == 2) {
         currentMoney = currentMoney + paper.totalPrice!;
@@ -132,13 +143,20 @@ class MainViewModel extends ChangeNotifier {
     settlementInfo[settlement]!.forEach((paper) {
       totalPrice = totalPrice + paper.totalPrice!;
     });
+    //print("TP in MV : ${totalPrice}, length : ${settlementInfo[settlement]!.length}");
     return totalPrice;
   }
 
   double getSendMoney(Settlement settlement){
-    return settlementInfo[settlement]!.where((paper) {
-      return paper.serviceUserId == userData.serviceUserId;
-    }).first.totalPrice ?? 0.0;
+
+
+    for(SettlementPaper paper in settlementInfo[settlement]!){
+      if(paper.serviceUserId == userData.serviceUserId){
+        return paper.totalPrice!;
+      }
+    }
+
+    return -1;
   }
 
   String getGroupName(Settlement settlement){

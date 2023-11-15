@@ -32,13 +32,13 @@ class _mainPageState extends ConsumerState<mainPage> {
   double settlementerRes = 0;
   bool _isCalculated = false;
   bool _isFirstBuild = true;
-  bool _isFirstInvoke = true;
   int maxSettlementCount = 1;
-  int currentCount = 1;
+  int currentCount = 0;
   bool _isMore = false;
   List<Settlement> currentStms = [];
   List<Settlement> allStms = [];
   ScrollController scrollController = ScrollController();
+  var pos;
   simpleSettlementerCal(double res) {
     this.settlementerRes = res;
     this._isCalculated = true;
@@ -55,28 +55,23 @@ class _mainPageState extends ConsumerState<mainPage> {
   void initState(){
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async{
       var mvm = ref.watch(mainProvider);
-      await mvm.settingMainViewModel("8969xxwf-8wf8-pf89-9x6p-88p0wpp9ppfb");
-      allStms = mvm.settlementInfo.keys.toList();
+      await mvm.settingMainViewModel("bxxwb8xp-p90w-ppfp-bbw9-b9bwwx8bf9bf");
 
+      scrollController.addListener(() async{
+        pos = scrollController.position.pixels;
+        if(!mvm.isFetchFinished) {
+          if (mvm.lock && scrollController.position.maxScrollExtent * 0.7 <
+              scrollController.position.pixels) {
+            mvm.toggleLock();
+            await mvm.fetchSettlement(mvm.settlementInfo.length, maxSettlementCount);
+            await Future.delayed(Duration(milliseconds: 1000));
+            mvm.toggleLock();
+          }
+        }
+      });
     });
 
-    scrollController.addListener(() {
-      if(!_isMore && scrollController.position.maxScrollExtent * 0.7 < scrollController.position.pixels){
-        print("invoked");
-        _isMore = true;
-        Future.delayed(Duration(milliseconds: 1500),(){
-          currentCount = currentCount + maxSettlementCount;
-          print(currentCount);
 
-          _isMore = false;
-
-          setState(() {
-
-          });
-        });
-
-      }
-    });
 
     super.initState();
 
@@ -86,19 +81,6 @@ class _mainPageState extends ConsumerState<mainPage> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     var mvm = ref.watch(mainProvider);
-    Future<List<Settlement>> refreshing() async {
-      if (_isFirstBuild) {
-        _isFirstBuild = false;
-        //await mvm.settingMainViewModel("8969xxwf-8wf8-pf89-9x6p-88p0wpp9ppfb");
-        //currentStms.add(mvm.settlementInfo.keys.first);
-      }
-      mvm.sortSettlementInfo();
-      Future.delayed(Duration(milliseconds: 500));
-      currentCount = currentCount > mvm.settlementInfo.length
-          ? mvm.settlementInfo.length
-          : currentCount;
-      return mvm.settlementInfo.keys.toList();
-    }
 
     return Scaffold(
       body: GestureDetector(
@@ -236,11 +218,11 @@ class _mainPageState extends ConsumerState<mainPage> {
                           child: Stack(
                             children: [
                               Positioned(
-                                left:55, top: 8,
+                                left:70, top: 8,
                                 child: Stack(
                                   children: [
                                     Container(
-                                      width: 150,
+                                      width: size.width * 0.3,
                                       height: 150,
                                       child: Image.asset(
                                         'images/getCameraYemon.png',
@@ -302,7 +284,7 @@ class _mainPageState extends ConsumerState<mainPage> {
                                     child: Stack(
                                       children: [
                                         Container(
-                                          width: 100,
+                                          width: size.width * 0.3,
                                           height: 100,
                                           child: Image.asset(
                                             'images/dynamicYemonLogo.png',
@@ -399,58 +381,34 @@ class _mainPageState extends ConsumerState<mainPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
+                    Container(
                       padding:
-                          const EdgeInsets.only(top: 10, bottom: 10, left: 10),
+                          EdgeInsets.only(top: 10,left: 10),
                       child: Text("최근 정산",
                           style: TextStyle(
                               fontWeight: FontWeight.w600, fontSize: 20)),
                     ),
-                    FutureBuilder(
-                      future: refreshing(),
-                      builder: (context, snapshot) {
-                        if(snapshot.hasData) {
-                          return ListView.builder(
-                            padding: EdgeInsets.all(0),
-                            physics: const NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: currentCount == 0 ? 1 : currentCount,
-                            itemBuilder: (BuildContext context, int index) {
-                              if(currentCount == 0 && !_isMore){
-                                return Center(child: Padding(
-                                  padding: const EdgeInsets.only(top:100),
-                                  child: CircularProgressIndicator(),
-                                ));
-                              } else {
-                                return Column(
-                                  children: [
-                                    RecentSettlement(size: size,
-                                        settlement: mvm.settlementInfo.keys
-                                            .toList()[index]),
-                                    !_isMore && index == currentCount - 1 &&
-                                        index !=
-                                            mvm.settlementInfo.keys.length - 1 ?
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 20),
-                                      child: CircularProgressIndicator(),
-                                    ) :
-                                    SizedBox.shrink()
-                                  ],
-                                );
-                              }
-                            },
-                          );
-                        } else {
-                          return CircularProgressIndicator();
-                        }
-                      }
-
+                    ListView.builder(
+                      padding: EdgeInsets.only(top:20),
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: mvm.settlementInfo.length == 0 ? 1 : mvm.settlementInfo.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        print("currentCount in ListView : ${currentCount}");
+                        //print('${currentCount} ${_isMore}, ${mvm.settlementInfo.values.toList()[index].isNotEmpty}');
+                        if(mvm.settlementInfo.length != 0) {
+                          Settlement settlement = mvm.settlementInfo.keys
+                              .toList()[index];
+                          return RecentSettlement(size: size,
+                              settlement: settlement);
+                          }
+                        },
                     ),
-                    SizedBox(height:currentCount == mvm.settlementInfo.length ? 0 : 60)
-
+                    !mvm.lock ? Center(child: CircularProgressIndicator()) : SizedBox.shrink(),
+                    SizedBox(height:mvm.isFetchFinished ? 0 : 60)
                   ],
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -726,7 +684,6 @@ class _SimpleSettlementerResState extends State<SimpleSettlementerRes> {
 class RecentSettlement extends ConsumerStatefulWidget {
   final Size size;
   final Settlement settlement;
-
   const RecentSettlement(
       {Key? key, required this.size, required this.settlement})
       : super(key: key);
@@ -738,11 +695,12 @@ class RecentSettlement extends ConsumerStatefulWidget {
 class _RecentSettlementState extends ConsumerState<RecentSettlement> {
   List<SettlementPaper> papers = [];
   double currentMoney = 1;
-  double sendMoney = -1;
-  double totalPrice = 0;
+  late double totalPrice;
+  late double sendMoney;
   bool _didSend = true;
-  bool _isFirstBuild = true;
-  late double barSize;
+  DateTime dt = DateTime.now();
+  bool masterFlag = false;
+  double barSize = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -756,9 +714,11 @@ class _RecentSettlementState extends ConsumerState<RecentSettlement> {
       sendMoney = mvm.getSendMoney(widget.settlement);
       _didSend = widget.settlement.checkSent[mvm.userData.serviceUserId] == 2;
     }
-    DateTime dt = widget.settlement.time != null
+    dt = widget.settlement.time != null
         ? DateTime.parse(widget.settlement.time!.toDate().toString())
         : DateTime.utc(1000, 01, 01);
+    print(widget.settlement.settlementPapers.length);
+    print("CM : ${currentMoney}, TP : ${totalPrice}, SM : ${sendMoney}");
     return Column(
       children: [
         GestureDetector(
@@ -767,9 +727,10 @@ class _RecentSettlementState extends ConsumerState<RecentSettlement> {
                 "/SettlementDetailPage/${widget.settlement.settlementId}/${mvm.getGroupName(widget.settlement)}/${mvm.userData.serviceUserId}");
           },
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                  width: widget.size.width * 0.92,
+                  width: (widget.size.width - 12) * 0.92 ,
                   height: 165,
                   decoration: BoxDecoration(
                       color: Colors.white,
@@ -790,10 +751,10 @@ class _RecentSettlementState extends ConsumerState<RecentSettlement> {
                   child: Stack(
                     children: [
                       Positioned(
-                        left: widget.size.width * 0.7,
+                        right:0,
                         bottom: 135,
                         child: Padding(
-                          padding: const EdgeInsets.only(right: 25, top: 25),
+                          padding: const EdgeInsets.only(right: 10, top: 25),
                           child: Text(DateFormat("yyyy/MM/dd").format(dt),
                               style: TextStyle(color: Colors.grey)),
                         ),
@@ -960,7 +921,15 @@ class _RecentSettlementState extends ConsumerState<RecentSettlement> {
                           borderRadius: BorderRadius.only(
                             topRight: Radius.circular(10),
                             bottomRight: Radius.circular(10),
-                          ))),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.7),
+                              blurRadius: 6,
+                              spreadRadius: 0.0,
+                            ),
+                          ]
+                      )),
                   Positioned(
                       left: -7,
                       top: 70,
