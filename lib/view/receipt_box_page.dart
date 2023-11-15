@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,7 +20,9 @@ class _ReceiptBoxPageState extends ConsumerState<ReceiptBoxPage> {
   Widget build(BuildContext context) {
     final provider = ref.watch(userProvider);
     if (isFirst) {
-      // provider.settingUserViewModel("8969xxwf-8wf8-pf89-9x6p-88p0wpp9ppfb");
+      Future(() async {
+        await provider.fetchUser("8969xxwf-8wf8-pf89-9x6p-88p0wpp9ppfb");
+      });
       isFirst = false;
     }
     Size size = MediaQuery.of(context).size;
@@ -51,7 +52,7 @@ class _ReceiptBoxPageState extends ConsumerState<ReceiptBoxPage> {
                     children: List.generate(
                       size.width ~/ 180,
                       (iindex) {
-                        if (provider.myReceipts.length == 14) {
+                        if (provider.myReceipts.length == 4) {
                           if (index * (size.width ~/ 180) + iindex >
                               provider.myReceipts.length - 1) {
                             if (provider.myReceipts.length %
@@ -111,7 +112,7 @@ class _StoredReceiptState extends ConsumerState<StoredReceipt> {
   @override
   Widget build(BuildContext context) {
     final provider = ref.watch(userProvider);
-    int index = widget.index - 1;
+    int index = provider.myReceipts.length - ( widget.index);
     Receipt? receipt = provider.myReceipts[index];
     return GestureDetector(
       onTapDown: (details) {
@@ -163,7 +164,7 @@ class _StoredReceiptState extends ConsumerState<StoredReceipt> {
               top: 20,
               left: 10,
               child: Text(
-                receipt.receiptName ?? "영수증",
+                receipt.receiptId ?? "영수증",
                 style: const TextStyle(
                   fontSize: 25,
                 ),

@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:groupsettlement2/class/class_user.dart';
 import '../modeluuid.dart';

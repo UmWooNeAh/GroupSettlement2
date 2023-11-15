@@ -396,7 +396,7 @@ class _GroupCreatePageState extends ConsumerState<GroupCreatePage> {
                                           child: const Text("확인"),
                                           onPressed: () {
                                             context.pop();
-                                            context.pushReplacement("/SettlementGroupSelect");
+                                            context.pushReplacement("/SettlementGroupSelect", extra:provider.userData);
                                           },
                                         ),
                                       )

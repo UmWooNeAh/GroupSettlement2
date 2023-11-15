@@ -36,6 +36,7 @@ class UserViewModel extends ChangeNotifier {
   // }
 
   Future<int> fetchUser(String userId) async {
+    userData = await ServiceUser().getUserByUserId(userId);
     fetchReceipt(userData.savedReceipts);
     fetchGroup(userData);
     notifyListeners();
@@ -65,7 +66,8 @@ class UserViewModel extends ChangeNotifier {
     await newSavedReceipt.createReceipt();
     userData.savedReceipts.add(newSavedReceipt.receiptId!);
     await FireService().updateDoc("userlist", userData.serviceUserId!, userData.toJson());
-    await fetchUser(userData.serviceUserId!);
+    // await fetchUser(userData.serviceUserId!);
+    userData = await ServiceUser().getUserByUserId(userData.serviceUserId!);
     await fetchReceipt(userData.savedReceipts);
     return 1;
   }
@@ -84,7 +86,8 @@ class UserViewModel extends ChangeNotifier {
     await FireService().deleteDoc("receiptlist", myReceiptId);
     userData.savedReceipts.remove(myReceiptId);
     await FireService().updateDoc("userlist", userData.serviceUserId!, userData.toJson());
-    await fetchUser(userData.serviceUserId!);
+    // await fetchUser(userData.serviceUserId!);
+    userData = await ServiceUser().getUserByUserId(userData.serviceUserId!);
     await fetchReceipt(userData.savedReceipts);
     return 1;
   }
@@ -112,13 +115,14 @@ class UserViewModel extends ChangeNotifier {
   }
 
   Future<int> fetchReceipt(List<String> rcpIds) async {
+    myReceipts = [];
     if(rcpIds.isNotEmpty) {
-      rcpIds.forEach((rcpid) async {
+      for(var rcpid in rcpIds){
         Receipt rcp = await Receipt().getReceiptByReceiptId(rcpid);
         ReceiptItem rcpi = await ReceiptItem().getReceiptItemByReceiptItemId(rcp.receiptItems[0]);
         firstReceiptItemName[rcp.receiptId ?? "X"] = rcpi.menuName ?? "뭘먹었을까";
         myReceipts.add(rcp);
-      });
+      }
       notifyListeners();
     }
     return 1;

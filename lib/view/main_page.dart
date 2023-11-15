@@ -357,6 +357,9 @@ class _MainPage extends ConsumerState<MainPage> {
                 child: Divider(thickness: 1, color: Color(0xFFD9D9D9)),
               ),
               SizedBox(height: 10),
+              ElevatedButton(onPressed: (){
+                context.go("/ReceiptBox");
+              }, child: const Text("receipt box")),
               GestureDetector(
                   onTap: () {
                     context

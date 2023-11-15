@@ -125,11 +125,11 @@ final GoRouter _router = GoRouter(
               Object camera = state.extra as Object;
               return ReceiptAddPage(camera: camera);
             }),
-        // GoRoute(
-        //     path: 'ReceiptBoxPage',
-        //     builder: (context, state) {
-        //       return const ReceiptBoxPage();
-        //     }),
+        GoRoute(
+            path: 'ReceiptBox',
+            builder: (context, state) {
+              return const ReceiptBoxPage();
+            }),
         // GoRoute(
         //     path: 'VMTestPage',
         //     builder: (context, state) {
@@ -296,7 +296,7 @@ class _SplashViewState extends State<SplashView> {
   @override
   void initState() {
     super.initState();
-    //_getMyDeviceToken(me);
+    // _getMyDeviceToken(me);
     _checkToken("8969xxwf-8wf8-pf89-9x6p-88p0wpp9ppfb");
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       RemoteNotification? notification = message.notification;
