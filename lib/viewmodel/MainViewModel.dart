@@ -26,7 +26,7 @@ class MainViewModel extends ChangeNotifier {
   }
 
   Future settingMainViewModel(String userId) async {
-    myGroup = []; settlementInfo = {};
+    myGroup = []; settlementInfo = {}; lock = true; isFetchFinished = false;
     fetchUser(userId);
     //fetchAlarm(userId);
   }

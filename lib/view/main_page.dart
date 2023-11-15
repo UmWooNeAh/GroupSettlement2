@@ -21,6 +21,8 @@ import '../design_element.dart';
 import '../viewmodel/MainViewModel.dart';
 import '../viewmodel/UserViewModel.dart';
 
+AnimatedDigitController controller = AnimatedDigitController(1);
+
 class mainPage extends ConsumerStatefulWidget {
   const mainPage({Key? key}) : super(key: key);
 
@@ -599,6 +601,7 @@ class SimpleSettlementerRes extends StatefulWidget {
 class _SimpleSettlementerResState extends State<SimpleSettlementerRes> {
   @override
   Widget build(BuildContext context) {
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       physics: const NeverScrollableScrollPhysics(),
@@ -621,6 +624,7 @@ class _SimpleSettlementerResState extends State<SimpleSettlementerRes> {
                   top: 25,
                   left: 80,
                   child: AnimatedDigitWidget(
+                    controller: controller,
                     fractionDigits: 2,
                     duration: Duration(seconds: 1),
                     value: widget.res,
