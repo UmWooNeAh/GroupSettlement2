@@ -74,6 +74,7 @@ class UserViewModel extends ChangeNotifier {
     settlement.settlementPapers.forEach((key, value) async {
       //SettlementPaper Fetch
       SettlementPaper temp = await SettlementPaper().getSettlementPaperByPaperId(value);
+      temp.userName = userData.name;
       mySettlementPapers.add(temp);
     });
     notifyListeners();
@@ -135,6 +136,17 @@ class UserViewModel extends ChangeNotifier {
 
     FireService().deleteDoc("alarmlist/" + userData.serviceUserId! + "/myalarmlist", removeAlarm.alarmId!);
     notifyListeners();
+  }
+
+  void addAccount(String bank, String accountNum, String holder) async {
+    String fullInfo = bank + " " + accountNum + " " + holder;
+    userData.accountInfo.add(fullInfo);
+    FireService().updateDoc("userlist", userData.serviceUserId!, userData.toJson());
+  }
+
+  void deleteAccount(int index) async {
+    userData.accountInfo.removeAt(index);
+    FireService().updateDoc("userlist", userData.serviceUserId!, userData.toJson());
   }
 
 }

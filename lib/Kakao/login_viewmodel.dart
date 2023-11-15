@@ -20,7 +20,9 @@ class MainViewModel {
     user = await UserApi.instance.me(); //사용자 정보 받아오기
     print('사용자 정보 요청 성공'
         '\n회원번호: ${user?.id}'
-        '\n닉네임: ${user?.kakaoAccount?.profile?.nickname}');
+        '\n닉네임: ${user?.kakaoAccount?.profile?.nickname}'
+        '\n아이디: ${user?.kakaoAccount?.legalName}'
+    );
   }
   Future logout() async {
     await _socialLogin.logout(); //로그아웃 실행

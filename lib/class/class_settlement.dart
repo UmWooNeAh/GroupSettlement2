@@ -15,7 +15,6 @@ class Settlement {
   Map<String, int> checkSent = <String, int> {};
   bool? isFinished;
   bool? isMerged;
-  List<String> mergedSettlement = <String> [];
   double totalPrice = 0;
   Timestamp? time;
 
@@ -38,7 +37,6 @@ class Settlement {
     checkSent = Map<String, int>.from(json['checksent']);
     isFinished = json['isfinished'];
     isMerged = json['ismerged'];
-    mergedSettlement= List<String>.from(json['mergedsettlement']);
     try {
       totalPrice = json['totalprice'];
     } catch(e){
@@ -58,7 +56,6 @@ class Settlement {
     'checksent' : checkSent,
     'isfinished' : isFinished,
     'ismerged' : isMerged,
-    'mergedsettlement' : mergedSettlement,
     'totalprice' : totalPrice,
     'time' : time,
   };
