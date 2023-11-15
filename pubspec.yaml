@@ -60,8 +60,10 @@ dependencies:
   camera: ^0.10.5+5
   path_provider: ^2.1.1
   path: ^1.8.3
-  firebase_analytics: ^10.6.3
   numberpicker: ^2.1.2
+  animated_digit: ^3.2.3
+  infinite_scroll_pagination: ^4.0.0
+  firebase_analytics: ^10.6.3
 
 dev_dependencies:
   flutter_test:

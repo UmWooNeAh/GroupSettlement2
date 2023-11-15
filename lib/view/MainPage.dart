@@ -214,6 +214,18 @@ class _MainPageState extends State<MainPage> {
                     context.push("/groupSelectPage/8969xxwf-8wf8-pf89-9x6p-88p0wpp9ppfb");
                   },
                 ),
+                ElevatedButton(
+                  child: const Text("Main Page"),
+                  onPressed: () {
+                    context.push("/mainPage");
+                  },
+                ),
+                ElevatedButton(
+                  child: const Text("kakao Page"),
+                  onPressed: () {
+                    context.push("/kakaoPage");
+                  },
+                )
               ],
             ),
           ],

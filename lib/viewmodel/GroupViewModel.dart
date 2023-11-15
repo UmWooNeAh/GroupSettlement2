@@ -29,12 +29,10 @@ class GroupViewModel extends ChangeNotifier {
     myGroup = await Group().getGroupByGroupId(groupId);
     notifyListeners();
 
-
     myGroup.serviceUsers.forEach((userid) async {
       serviceUsers.add(await ServiceUser().getUserByUserId(userid));
       notifyListeners();
     });
-
     myGroup.settlements.forEach((stmid) async {
       Settlement stm = await Settlement().getSettlementBySettlementId(stmid);
       settlementInGroup.add(stm);

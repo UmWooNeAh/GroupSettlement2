@@ -38,9 +38,10 @@ class SettlementCheckViewModel extends ChangeNotifier{
       settlementPapers[key] = stm;
       List<SettlementItem> items = [];
       stm.settlementItems.forEach((itemid) async {
-        SettlementItem item = await SettlementItem().getSettlementItemBySettlementItemId(itemid);
-        items.add(item);
-        notifyListeners();
+          SettlementItem item = await SettlementItem()
+              .getSettlementItemBySettlementItemId(itemid);
+          items.add(item);
+
       });
       settlementItems[key] = items;
       notifyListeners();
