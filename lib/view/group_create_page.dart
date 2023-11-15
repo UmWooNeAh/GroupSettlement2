@@ -23,7 +23,7 @@ class _GroupCreatePageState extends ConsumerState<GroupCreatePage> {
     final provider = ref.watch(groupCreateProvider);
     if(isFirst){
       Future((){
-        provider.settingGroupCreateViewModel(widget.me);
+        provider.settingGroupCreateViewModel(widget.me); 
       });
       isFirst = false;
     }
@@ -313,7 +313,7 @@ class _GroupCreatePageState extends ConsumerState<GroupCreatePage> {
                                   height: 50,
                                   child: OutlinedButton(
                                     onPressed: () {
-                                      Navigator.of(context).pop();
+                                      context.pop();
                                       inputName = "";
                                     },
                                     style: OutlinedButton.styleFrom(
@@ -395,8 +395,8 @@ class _GroupCreatePageState extends ConsumerState<GroupCreatePage> {
                                         child: ElevatedButton(
                                           child: const Text("확인"),
                                           onPressed: () {
-                                            context.pushReplacement(
-                                                "/groupSelectPage/${provider.userData.serviceUserId}");
+                                            context.pop();
+                                            context.pushReplacement("/SettlementGroupSelect");
                                           },
                                         ),
                                       )

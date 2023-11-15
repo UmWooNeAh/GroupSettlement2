@@ -37,22 +37,16 @@ class UserViewModel extends ChangeNotifier {
 
   Future<int> fetchUser(String userId) async {
     fetchReceipt(userData.savedReceipts);
-    fetchGroup(userData.serviceUserId!);
+    fetchGroup(userData);
     notifyListeners();
     return 1;
   }
 
-  Future<int> fetchGroup(String userId) async {
-    List<Group> groups = await Group().getGroupList();
+  Future<int> fetchGroup(ServiceUser me) async {
+    userData = me;
     myGroup = [];
-    for(var group in groups) {
-        for(var user in group.serviceUsers) {
-          if(user == userId){
-            //Group Fetch
-            myGroup.add(group);
-            // fetchSettlement(group);
-          }
-      }
+    for(var groupId in userData.groups){
+      myGroup.add(await Group().getGroupByGroupId(groupId));
     }
     notifyListeners();
     return 1;

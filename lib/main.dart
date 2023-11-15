@@ -74,51 +74,56 @@ final GoRouter _router = GoRouter(
               return const SplashView();
             }),
         GoRoute(
-            path: "GroupSelectPage",
+            path: "GroupSelect",
             builder: (context, state) {
               ServiceUser me = state.extra as ServiceUser;
-              return GroupSelectPage(
-                me: me,
-              );
+              return GroupSelectPage(me: me);
             },
             routes: [
               GoRoute(
-                  path: 'GroupMainPage',
+                  path: 'GroupMain',
                   builder: (context, state) {
                     List<dynamic> info = state.extra as List<dynamic>;
                     return GroupMainPage(info: info);
                   },
                   routes: [
                     GoRoute(
-                      path: "GroupSettlementListPage",
+                      path: "GroupSettlementList",
                       builder: (context, state) {
                         return const GroupSettlementListPage();
                       },
-                    ),
+                    )
                   ]),
             ]),
         GoRoute(
-          path: "GroupCreatePage",
-          builder: (context, state) {
-            ServiceUser me = state.extra as ServiceUser;
-            return GroupCreatePage(me: me,);
-          },
-        ),
-        GoRoute(
-            path: 'SettlementGroupSelectPage',
+            path: "GroupCreate",
             builder: (context, state) {
               ServiceUser me = state.extra as ServiceUser;
-              return SettlementGroupSelectPage(
-                me: me,
-              );
+              return GroupCreatePage(me: me);
             }),
         GoRoute(
-            path: 'SettlementInformationPage',
+            path: 'SettlementGroupSelect',
+            builder: (context, state) {
+              ServiceUser me = state.extra as ServiceUser;
+              return SettlementGroupSelectPage(me: me);
+            }),
+        GoRoute(
+            path: 'SettlementInformation',
             builder: (context, state) {
               List<dynamic> info = state.extra as List<dynamic>;
-              return SettlementInformationPage(
-                info: info,
-              );
+              return SettlementInformationPage(info: info);
+            }),
+        GoRoute(
+            path: 'SettlementCreate',
+            builder: (context, state) {
+              List<dynamic> info = state.extra as List<dynamic>;
+              return SettlementCreatePage(info: info);
+            }),
+        GoRoute(
+            path: 'ReceiptAdd',
+            builder: (context, state) {
+              Object camera = state.extra as Object;
+              return ReceiptAddPage(camera: camera);
             }),
         // GoRoute(
         //     path: 'ReceiptBoxPage',
@@ -140,15 +145,6 @@ final GoRouter _router = GoRouter(
         //     builder: (context, state) {
         //       return const clovaPage();
         //     }),
-        // GoRoute(
-        //     path: 'CreateNewSettlementPage/:groupId/:masterId/:accountInfo',
-        //     builder: (context, state) {
-        //       return CreateNewSettlement(
-        //         groupId: state.pathParameters["groupId"]!,
-        //         masterId: state.pathParameters["masterId"]!,
-        //         accountInfo: state.pathParameters["accountInfo"]!,
-        //       );
-        //     },
         //     routes: [
         //       GoRoute(
         //         path: 'EditReceiptPage/:modifyFlag',
@@ -160,10 +156,6 @@ final GoRouter _router = GoRouter(
         //           );
         //         },
         //       ),
-        // GoRoute(
-        //   path: 'cameraDetectPage',
-        //   builder: (context, state) => cameraDetectPage(camera: state.qu),
-        // ),
         //     ]),
         // GoRoute(
         //   path: "SettlementPage/:settlementId",

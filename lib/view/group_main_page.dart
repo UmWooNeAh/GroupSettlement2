@@ -190,7 +190,7 @@ class _GroupMainPageState extends ConsumerState<GroupMainPage> {
                         TextButton(
                           onPressed: () {
                             context.push(
-                                "/GroupSelectPage/GroupMainPage/GroupSettlementListPage");
+                                "/GroupSelect/GroupMain/GroupSettlementList");
                           },
                           child: const Text(
                             '자세히 보기 >',
@@ -652,7 +652,7 @@ class _StmItemState extends ConsumerState<StmItem> {
         GestureDetector(
           onTap: () {
             context.push(
-                "/SettlementInformationPage", extra: [widget.settlement, gvm.myGroup, gvm.userData]);
+                "/SettlementInformation", extra: [widget.settlement, gvm.myGroup, gvm.userData]);
           },
           child: Container(
             decoration: ShapeDecoration(

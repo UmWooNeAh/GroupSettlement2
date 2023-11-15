@@ -360,7 +360,7 @@ class _MainPage extends ConsumerState<MainPage> {
               GestureDetector(
                   onTap: () {
                     context
-                        .go("/GroupSelectPage", extra: mvm.userData);
+                        .go("/GroupSelect", extra: mvm.userData);
                   },
                   child: Padding(
                     padding: const EdgeInsets.only(left: 10, right: 10),
@@ -755,7 +755,7 @@ class _RecentSettlementState extends ConsumerState<RecentSettlement> {
         GestureDetector(
           onTap: () {
             context.go(
-                "/SettlementDetailPage/${widget.settlement.settlementId}/${mvm.getGroupName(widget.settlement)}/${mvm.userData.serviceUserId}");
+                "/SettlementInformation", extra: []);
           },
           child: Row(
             children: [

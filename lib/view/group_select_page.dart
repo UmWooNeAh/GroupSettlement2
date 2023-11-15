@@ -24,7 +24,8 @@ class _GroupSelectPage extends ConsumerState<GroupSelectPage> {
     final uvm = ref.watch(userProvider);
     if (isFirst) {
       Future(() {
-        uvm.fetchGroup(widget.me.serviceUserId!);
+        print(widget.me.groups);
+        uvm.fetchGroup(widget.me);
       });
       isFirst = false;
     }
@@ -45,7 +46,7 @@ class _GroupSelectPage extends ConsumerState<GroupSelectPage> {
               ),
               GestureDetector(
                 onTap: () {
-                  context.push("/groupCreatePage", extra: widget.me);
+                  context.push("/groupCreate", extra: widget.me);
                 },
                 child: Align(
                   alignment: Alignment.center,
@@ -118,7 +119,7 @@ class _OneGroupState extends ConsumerState<OneGroup> {
       children: [
         GestureDetector(
           onTap: () {
-            context.push("/GroupSelectPage/GroupMainPage",
+            context.push("/GroupSelect/GroupMain",
                 extra: [uvm.userData, widget.group.groupId!]);
           },
           child:

@@ -58,8 +58,9 @@ class GroupCreateViewModel extends ChangeNotifier {
     group.groupName = groupname;
     for (var user in serviceUsers) {
       group.serviceUsers.add(user.serviceUserId!);
-      if (user.kakaoId == null) {
+      if (user.kakaoId == "") {
         // 직접 추가하기로 추가한 그룹원
+        user.groups.add(group.groupId!);
         user.createUser(); //DB에 올림
       } else {
         //예몬 친구로 추가한 그룹원

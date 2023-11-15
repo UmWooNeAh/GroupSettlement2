@@ -25,7 +25,7 @@ class _SettlementGroupSelectPage
   Widget build(BuildContext context) {
     final uvm = ref.watch(userProvider);
     if(isFirst){
-      Future(() async => await uvm.fetchGroup(widget.me.serviceUserId!));
+      Future(() async => await uvm.fetchGroup(widget.me));
       isFirst = false;
     }
     return Scaffold(
@@ -46,7 +46,7 @@ class _SettlementGroupSelectPage
               ),
               GestureDetector(
                 onTap: () {
-                  context.push("/GroupCreatePage", extra: widget.me);
+                  context.push("/GroupCreate", extra: widget.me);
                 },
                 child: Align(
                   alignment: Alignment.center,
@@ -127,7 +127,7 @@ class _OneGroupState extends ConsumerState<OneGroup> {
         GestureDetector(
           onTap: () {
             context.go(
-                "/CreateNewSettlementPage/${widget.group.groupId}/${uvm.userData.serviceUserId}/${uvm.userData.accountInfo}");
+                "/SettlementCreate", extra: [widget.group, uvm.userData]);
           },
           child:
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [

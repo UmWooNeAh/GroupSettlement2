@@ -13,11 +13,11 @@ import '../class/class_user.dart';
 import '../clova/clova.dart';
 
 final stmCreateProvider = ChangeNotifierProvider<SettlementCreateViewModel>(
-    (ref) => SettlementCreateViewModel("1800d31d-6d49-4672-8ca7-d094b1a2e1d5",
-        "8969xxwf-8wf8-pf89-9x6p-88p0wpp9ppfb", ""));
+    (ref) => SettlementCreateViewModel());
 
 class SettlementCreateViewModel extends ChangeNotifier {
   // 0. Settlement 생성에 필요한 객체들 선언
+  ServiceUser userData = ServiceUser();
   Settlement                      settlement    = Settlement();
   Group                           myGroup       = Group();
   Map<String, Receipt>            receipts      = <String, Receipt> {};
@@ -26,27 +26,29 @@ class SettlementCreateViewModel extends ChangeNotifier {
   Clova                           clova         = Clova();
 
   // 1. 정산생성 이후에만 나머지 창 을 들어갈 수 있으므로 처음 만들어질 때 객체를 새롭게 생성한다
-  SettlementCreateViewModel(
-      String groupid, String masterid, String accountInfo) {
-    receipts = {}; receiptItems = {}; totalPrice = 0;
-    settlement = Settlement();
-  }
+  SettlementCreateViewModel();
 
   // 1-1. Settlement 객체 생성
-  void settingSettlementCreateViewModel(
-    String groupid, String masterid, String accountInfo) async {
+  Future<void> settingSettlementCreateViewModel(
+    Group group, ServiceUser me) async {
     receipts = {}; receiptItems = {}; totalPrice = 0;
-    settlement.groupId = groupid;
-    settlement.masterUserId = masterid;
-    settlement.accountInfo = accountInfo;
-    settlement.isFinished = false;
+    myGroup = group;
+    userData = me;
+    
+    settlement = Settlement();
+    settlement.groupId = myGroup.groupId;
+    settlement.masterUserId = userData.serviceUserId;
+    settlement.accountInfo = userData.accountInfo.isNotEmpty ? userData.accountInfo[0] : "";
 
-    myGroup = await Group().getGroupByGroupId(groupid);
     for(var user in myGroup.serviceUsers) {
-        if(user == settlement.masterUserId) continue;
+        if(user == settlement.masterUserId){
+          settlement.checkSent[user] = 3;
+          continue;
+        }
         settlement.checkSent[user] = 0;
       }
     notifyListeners();
+    return;
   }
 
   // Naver OCR 영수증 인식 후 Receipt/List<ReceiptItem> 리턴

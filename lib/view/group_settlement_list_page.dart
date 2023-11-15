@@ -237,7 +237,7 @@ class _OneSettlementState extends ConsumerState<OneSettlement> {
                 widget.callBack(widget.settlement, _isChecked);
               });
             }
-            context.push("/SettlementInformationPage", extra: [widget.settlement, provider.myGroup, provider.userData]);
+            context.push("/SettlementInformation", extra: [widget.settlement, provider.myGroup, provider.userData]);
           },
           child: Stack(
             children: [
@@ -408,7 +408,7 @@ class _MultipleSettlementState extends ConsumerState<MultipleSettlement> {
         const SizedBox(width: double.infinity, height: 30),
         GestureDetector(
           onTap: () {
-            context.push("/settlementDetailPage", extra: [widget.settlement, provider.myGroup, provider.userData]);
+            context.push("/SettlementInformation", extra: [widget.settlement, provider.myGroup, provider.userData]);
           },
           child: Stack(
             children: [

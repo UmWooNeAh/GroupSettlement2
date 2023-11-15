@@ -8,31 +8,29 @@ import 'package:groupsettlement2/view/shared_basic_widget.dart';
 import '../class/class_receipt.dart';
 import '../viewmodel/SettlementCreateViewModel.dart';
 
-class CreateNewSettlement extends ConsumerStatefulWidget {
-  String groupId;
-  String masterId;
-  String accountInfo;
-  CreateNewSettlement({super.key,required this.groupId,required this.masterId, required this.accountInfo});
+class SettlementCreatePage extends ConsumerStatefulWidget {
+  const SettlementCreatePage({super.key, required this.info});
+  final List<dynamic> info;
 
   @override
-  ConsumerState<CreateNewSettlement> createState() =>
+  ConsumerState<SettlementCreatePage> createState() =>
       _CreateNewSettlementState();
 }
 
-class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
+class _CreateNewSettlementState extends ConsumerState<SettlementCreatePage> {
   final TextEditingController _settlementNameController =
       TextEditingController(text: "asdfasdf");
-  bool isFirstBuild = true;
+  bool isFirst = true;
 
   @override
   Widget build(BuildContext context) {
     final provider = ref.watch(stmCreateProvider);
-    if(widget.groupId != "null" && isFirstBuild){
-      print("-- first initial --");
-      isFirstBuild = false;
-      provider.settingSettlementCreateViewModel(widget.groupId, widget.masterId, widget.accountInfo);
-    } else{
-      print("-- load data -- ");
+    if (isFirst) {
+      Future(() async {
+        await provider.settingSettlementCreateViewModel(
+            widget.info[0], widget.info[1]);
+      });
+      isFirst = false;
     }
     Size size = MediaQuery.of(context).size;
     _settlementNameController.text = provider.settlement.settlementName ?? "";
@@ -177,11 +175,15 @@ class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
                         height: 60,
                         margin: const EdgeInsets.fromLTRB(20, 0, 0, 0),
                         child: OutlinedButton(
-                          onPressed: () async {
-                            final cameras = await availableCameras();
-
-                            context.push('/cameraDetectPage',
-                                extra: cameras[0]);
+                          onPressed: () {
+                            List<Object> cameras = [];
+                            Future(() async {
+                              cameras = await availableCameras();
+                            }).then(
+                              (value) {
+                                context.push('/ReceiptAdd', extra: cameras[0]);
+                              },
+                            );
                           },
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(
@@ -219,9 +221,10 @@ class _CreateNewSettlementState extends ConsumerState<CreateNewSettlement> {
                     if (provider.receipts.isEmpty) {
                       return;
                     }
-                    provider.createSettlement(_settlementNameController.text).then((value) {
-                      context.go(
-                        '/SettlementPage/$value');
+                    provider
+                        .createSettlement(_settlementNameController.text)
+                        .then((value) {
+                      context.go('/SettlementPage/$value');
                     });
                   },
                   style: OutlinedButton.styleFrom(
@@ -284,7 +287,8 @@ class _CreateNewSettlementReceiptState
         });
         ReceiptContent receiptContent = ReceiptContent(
             provider.receipts[widget.id]!, provider.receiptItems[widget.id]!);
-        context.push('/CreateNewSettlementPage/null/null/null/EditReceiptPage/${widget.id}',
+        context.push(
+            '/CreateNewSettlementPage/null/null/null/EditReceiptPage/${widget.id}',
             extra: receiptContent);
       },
       onTapCancel: () {
