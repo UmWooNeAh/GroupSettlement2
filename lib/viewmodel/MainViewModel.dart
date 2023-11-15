@@ -17,10 +17,6 @@ class MainViewModel extends ChangeNotifier {
   ServiceUser userData = ServiceUser();
   List<Group> myGroup = <Group> [];
   Map<Settlement,List<SettlementPaper>> settlementInfo = {};
-  List<bool> newAlarm = []; //0: 받을 정산 알림, 1: 보낼 정산 알림, 2: 기타 알림
-  List<Alarm> receiveStmAlarm = <Alarm> [];
-  List<Alarm> sendStmAlarm = <Alarm> [];
-  List<Alarm> etcStmAlarm = <Alarm> [];
   bool isFetchFinished = false;
   bool lock = true;
   int stmNum = 0;
@@ -29,13 +25,8 @@ class MainViewModel extends ChangeNotifier {
     //settingMainViewModel(userId);
   }
 
-  void stmPlus(){
-    stmNum += 1;
-    notifyListeners();
-  }
-
   Future settingMainViewModel(String userId) async {
-    myGroup = []; settlementInfo = {}; newAlarm = []; receiveStmAlarm = []; sendStmAlarm = []; etcStmAlarm = [];
+    myGroup = []; settlementInfo = {};
     fetchUser(userId);
     //fetchAlarm(userId);
   }
@@ -93,37 +84,6 @@ class MainViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void fetchAlarm(String userId) async {
-    List<Alarm> allalarmlist = await Alarm().getAlarmListByUserId(userId);
-    classifyAlarm(allalarmlist);
-
-    for(int i=0; i<3;i++) {
-      newAlarm[i] = false;
-    }
-    notifyListeners();
-  }
-
-  void classifyAlarm(List<Alarm> allalarmlist) {
-
-    for(var alarm in allalarmlist) {
-      if(alarm.category == 0) {
-        receiveStmAlarm.add(alarm);
-      }
-      else if(alarm.category == 1) {
-        sendStmAlarm.add(alarm);
-      }
-      else if(alarm.category == 2) {
-        etcStmAlarm.add(alarm);
-      }
-    }
-    notifyListeners();
-  }
-
-  //해당 알림 클릭시 이동할 페이지 지정(미구현)
-  void linkAlarm() {
-
-  }
-
   double getCurrentMoney(Settlement settlement){
     double currentMoney = 0;
     settlementInfo[settlement]!.forEach((paper) {
@@ -165,21 +125,6 @@ class MainViewModel extends ChangeNotifier {
     return name;
   }
 
-  void deleteAlarm(int category, Alarm removeAlarm) async {
-
-    if(category == 0) {
-      receiveStmAlarm.remove(removeAlarm);
-    }
-    else if(category == 1) {
-      sendStmAlarm.remove(removeAlarm);
-    }
-    else if(category == 2) {
-      etcStmAlarm.remove(removeAlarm);
-    }
-
-    FireService().deleteDoc("alarmlist/" + userData.serviceUserId! + "/myalarmlist", removeAlarm.alarmId!);
-    notifyListeners();
-  }
 
 }
 

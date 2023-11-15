@@ -32,7 +32,7 @@ class _mainPageState extends ConsumerState<mainPage> {
   double settlementerRes = 0;
   bool _isCalculated = false;
   bool _isFirstBuild = true;
-  int maxSettlementCount = 1;
+  int maxSettlementCount = 2;
   int currentCount = 0;
   bool _isMore = false;
   List<Settlement> currentStms = [];
@@ -445,6 +445,7 @@ class _SimpleSettlementerState extends State<SimpleSettlementer> {
         width: widget.flag ? 0 : widget.size.width - 24,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
+          physics: const NeverScrollableScrollPhysics(),
           child: Padding(
             padding: const EdgeInsets.only(top:8.0),
             child: Row(
@@ -502,6 +503,7 @@ class _SimpleSettlementerState extends State<SimpleSettlementer> {
                   child: Padding(
                     padding: EdgeInsets.only(right: widget.size.width * 0.07),
                     child: SingleChildScrollView(
+                      physics: const NeverScrollableScrollPhysics(),
                       child: Column(
                         children: [
                           const Text("사람 수",
@@ -599,6 +601,7 @@ class _SimpleSettlementerResState extends State<SimpleSettlementerRes> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
+      physics: const NeverScrollableScrollPhysics(),
       child: AnimatedContainer(
           curve: Curves.fastEaseInToSlowEaseOut,
           duration: Duration(milliseconds: widget.flag ? 700 : 300),
@@ -616,8 +619,9 @@ class _SimpleSettlementerResState extends State<SimpleSettlementerRes> {
               ),
               Positioned(
                   top: 25,
-                  left: 110,
+                  left: 80,
                   child: AnimatedDigitWidget(
+                    fractionDigits: 2,
                     duration: Duration(seconds: 1),
                     value: widget.res,
                     enableSeparator: true,
