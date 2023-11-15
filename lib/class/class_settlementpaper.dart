@@ -12,26 +12,34 @@ class SettlementPaper {
   String? userName;
   String? accountInfo;
   List<String> settlementItems = <String> [];
+  List<String> sentSettlementItems = <String> [];
   double? totalPrice;
+  bool? isMerged;
+  double? discountedTotalPrice;
 
   SettlementPaper() {
     ModelUuid uuid = ModelUuid();
     totalPrice = 0;
+    discountedTotalPrice = 0;
     settlementPaperId = uuid.randomId;
+    isMerged = false;
   }
 
   SettlementPaper.fromJson(dynamic json) {
     settlementPaperId = json['settlementpaperid'];
     serviceUserId = json['serviceuserid'];
     settlementItems = List<String>.from(json["settlementitems"]);
+    sentSettlementItems = List<String>.from(json["sentsettlementitems"]);
     totalPrice = json['totalprice'];
     try{
       settlementId = json['settlementid'];
       accountInfo = json['accountinfo'];
-    }catch(e){
+    }catch(e) {
       settlementId = "";
       accountInfo = "";
     }
+    isMerged = json['ismerged'];
+    discountedTotalPrice = json['discountedtotalprice'];
   }
 
   Map<String, dynamic> toJson() => {
@@ -41,10 +49,13 @@ class SettlementPaper {
     'accountinfo' : accountInfo,
     'settlementitems' : settlementItems,
     'totalprice' : totalPrice,
+    'sentsettlementitems' : sentSettlementItems,
+    'ismerged' : isMerged,
+    'discountedtotalprice' : discountedTotalPrice,
   };
 
   void createSettlementPaper() async {
-    await FirebaseFirestore.instance.collection("settlementpaperlist").doc(this.settlementPaperId).set(toJson());
+    await FirebaseFirestore.instance.collection("settlementpaperlist").doc(settlementPaperId).set(toJson());
   }
 
   Future<List<SettlementPaper>> getSettlementPaperList() async {
@@ -63,15 +74,12 @@ class SettlementPaper {
     return papers;
   }
 
-  Future<SettlementPaper> getSettlementPaperByPaperId(String paperid) async{
+  Future<SettlementPaper> getSettlementPaperByPaperId(String paperid) async {
     DocumentSnapshot<Map<String, dynamic>> result =
     await FirebaseFirestore.instance.collection("settlementpaperlist")
         .doc(paperid).get();
-    //ServiceUser user = await ServiceUser().getUserByUserId(serviceUserId!);
-    //userName = user.name;
     SettlementPaper paper = SettlementPaper.fromSnapShot(result);
     return paper;
-
   }
 
   SettlementPaper.fromSnapShot(
@@ -81,6 +89,5 @@ class SettlementPaper {
   SettlementPaper.fromQuerySnapshot(
       QueryDocumentSnapshot<Map<String, dynamic>> snapshot)
       :this.fromJson(snapshot.data());
-
 
 }
