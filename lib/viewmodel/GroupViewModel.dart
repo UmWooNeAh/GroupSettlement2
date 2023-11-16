@@ -207,7 +207,7 @@ class GroupViewModel extends ChangeNotifier {
       user.settlementPapers.add(newMergedPaper.settlementPaperId!);
     });
 
-    //병합할 정산들에 대한 병합 과정 진행
+    //병합할 정산들에 대한 병합 과정 본격적 진행
     await Future.forEach(indexes, (index) async {
       newMergedSettlement.receipts.addAll(settlementInGroup[index].receipts);
 
@@ -227,13 +227,17 @@ class GroupViewModel extends ChangeNotifier {
 
           //이미 송금을 완료한 정산들에 대한 처리 -> sentSettlementItems에 저장
           if (settlementInGroup[index].checkSent[user.serviceUserId!] == 3) {
-            SettlementItem title = SettlementItem();
-            title.menuName = settlementInGroup[index].settlementName;
-            title.receiptItemId = "dummy"; //더미 구분 용도, 메뉴 이름: 정산 이름으로 대체
-            newMergedPapers[user.serviceUserId!]
-                ?.sentSettlementItems
-                .add(title.settlementItemId!);
-            title.createSettlementItem();
+
+            //개별 정산서에 병합 정산 자체의 이름은 포함되지 않음, 병합 정산 안에 존재하는 정산들의 이름들만 표기
+            if(settlementInGroup[index].isMerged == false) {
+              SettlementItem title = SettlementItem();
+              title.menuName = settlementInGroup[index].settlementName;
+              title.receiptItemId = "dummy"; //더미 구분 용도, 메뉴 이름: 정산 이름으로 대체
+              newMergedPapers[user.serviceUserId!]
+                  ?.sentSettlementItems
+                  .add(title.settlementItemId!);
+              title.createSettlementItem();
+            }
 
             await Future.forEach(paper.sentSettlementItems, (itemid) async {
               newMergedPapers[user.serviceUserId!]!
@@ -252,20 +256,22 @@ class GroupViewModel extends ChangeNotifier {
             }
             print(
                 "유저 ${user.name}의 정산서 할인된 합계 금액: ${newMergedPapers[user.serviceUserId!]!.discountedTotalPrice} ");
-          } else {
-            //그외 케이스들...
+          } //그외 케이스들...
+          else {
             if (settlementInGroup[index].checkSent[user.serviceUserId!] == 0) {
               newMergedSettlement.checkSent[user.serviceUserId!] = 0;
             }
-
-            SettlementItem title = SettlementItem();
-            title.menuName = settlementInGroup[index].settlementName;
-            title.receiptItemId = "dummy"; //더미 구분 용도, 메뉴 이름: 정산 이름으로 대체
-            newMergedPapers[user.serviceUserId!]
-                ?.settlementItems
-                .add(title.settlementItemId!);
-            title.createSettlementItem();
-
+            //개별 정산서에 병합 정산 자체의 이름은 포함되지 않음, 병합 정산 안에 존재하는 정산들의 이름들만 표기
+            if(settlementInGroup[index].isMerged == false) {
+              SettlementItem title = SettlementItem();
+              title.menuName = settlementInGroup[index].settlementName;
+              title.receiptItemId = "dummy"; //더미 구분 용도, 메뉴 이름: 정산 이름으로 대체
+              newMergedPapers[user.serviceUserId!]
+                  ?.settlementItems
+                  .add(title.settlementItemId!);
+              title.createSettlementItem();
+            }
+            
             await Future.forEach(paper.sentSettlementItems, (itemid) async {
               print("유저 ${user.name}의 정산항목: ${itemid} ");
               newMergedPapers[user.serviceUserId!]!.settlementItems.add(itemid);
