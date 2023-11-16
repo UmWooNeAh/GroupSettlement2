@@ -23,17 +23,26 @@ class UserViewModel extends ChangeNotifier {
   List<Alarm> sendStmAlarm = <Alarm> [];
   List<Alarm> etcStmAlarm = <Alarm> [];
   Map<String, String> firstReceiptItemName = <String, String>{};
+  Map<Settlement, List<SettlementPaper>> settlementInfo = {};
+  bool isFetchFinished = false;
+  bool lock = true;
 
   UserViewModel();
 
-  // Future<int> settingUserViewModel(ServiceUser me) async {
-  //   userData = me;
-  //   myGroup = []; myReceipts = []; mySettlements = []; mySettlementPapers = []; newAlarm = []; receiveStmAlarm = []; sendStmAlarm = []; etcStmAlarm = [];
-  //   fetchGroup(userData.serviceUserId!);
-  //   notifyListeners();
-  //   return 1;
-  //   //fetchAlarm(userId);
-  // }
+  Future<void> settingUserData(ServiceUser me) async {
+    userData = me;
+    myGroup = [];
+    settlementInfo = {};
+    lock = true;
+    isFetchFinished = false;
+    fetchUser(userData.serviceUserId!);
+    return;
+  }
+
+  void sortSettlementInfo() {
+    settlementInfo = Map.fromEntries(settlementInfo.entries.toList()
+      ..sort((e1, e2) => e2.key.time!.compareTo(e1.key.time!)));
+  }
 
   Future<int> fetchUser(String userId) async {
     userData = await ServiceUser().getUserByUserId(userId);
@@ -92,27 +101,29 @@ class UserViewModel extends ChangeNotifier {
     return 1;
   }
 
-  void fetchSettlement(Group group) async {
-    group.settlements.forEach((stmid) async {
-      Settlement stm = await Settlement().getSettlementBySettlementId(stmid);
-      mySettlements.add(stm);
-      try {
-        fetchStmPaper(stm);
-      }catch(e){
-        print("error!!!!! ${e}");
+  Future<void> fetchSettlement(int currentCount, int num) async {
+    if (isFetchFinished == false) {
+      for (int i = currentCount; i < currentCount + num; i++) {
+        if (i >= userData.settlements.length) {
+          isFetchFinished = true;
+          break;
+        }
+        Settlement stm = await Settlement().getSettlementBySettlementId(
+            userData.settlements[userData.settlements.length - (i + 1)]);
+        settlementInfo[stm] = [];
+        await fetchStmPaper(stm);
       }
-    });
+    }
     notifyListeners();
+    return;
   }
 
-  void fetchStmPaper(Settlement settlement) async {
-    settlement.settlementPapers.forEach((key, value) async {
-      //SettlementPaper Fetch
-      SettlementPaper temp = await SettlementPaper().getSettlementPaperByPaperId(value);
-      temp.userName = userData.name;
-      mySettlementPapers.add(temp);
+  Future<void> fetchStmPaper(Settlement settlement) async {
+    await Future.forEach(settlement.settlementPapers.values, (value) async {
+      settlementInfo[settlement]!
+          .add(await SettlementPaper().getSettlementPaperByPaperId(value));
     });
-    notifyListeners();
+    return;
   }
 
   Future<int> fetchReceipt(List<String> rcpIds) async {
@@ -185,6 +196,49 @@ class UserViewModel extends ChangeNotifier {
   void deleteAccount(int index) async {
     userData.accountInfo.removeAt(index);
     FireService().updateDoc("userlist", userData.serviceUserId!, userData.toJson());
+  }
+
+  void toggleLock() {
+    lock = !lock;
+    notifyListeners();
+  }
+
+  double getCurrentMoney(Settlement settlement) {
+    double currentMoney = 0;
+    settlementInfo[settlement]!.forEach((paper) {
+      if (settlement.checkSent[paper.serviceUserId] == 2) {
+        currentMoney = currentMoney + paper.totalPrice!;
+      }
+    });
+
+    return currentMoney;
+  }
+
+  double getTotalPrice(Settlement settlement) {
+    double totalPrice = 0;
+    settlementInfo[settlement]!.forEach((paper) {
+      totalPrice = totalPrice + paper.totalPrice!;
+    });
+    return totalPrice;
+  }
+
+  double getSendMoney(Settlement settlement) {
+    for (SettlementPaper paper in settlementInfo[settlement]!) {
+      if (paper.serviceUserId == userData.serviceUserId) {
+        return paper.totalPrice!;
+      }
+    }
+    return -1;
+  }
+
+  String getGroupName(Settlement settlement) {
+    String name = "null";
+    myGroup.forEach((group) {
+      if (group.groupId == settlement.groupId) {
+        name = group.groupName!;
+      }
+    });
+    return name;
   }
 
 }

@@ -534,7 +534,7 @@ class _MultipleSettlementState extends ConsumerState<MultipleSettlement> {
                                   ),
                                   TextSpan(
                                       text:
-                                          " 등 ${widget.settlement.mergedSettlement.length - 1}개",
+                                          " 등 ${1}개",
                                       style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w500,

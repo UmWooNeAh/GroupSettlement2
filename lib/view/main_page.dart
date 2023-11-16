@@ -8,7 +8,6 @@ import 'package:numberpicker/numberpicker.dart';
 import '../class/class_settlement.dart';
 import '../class/class_settlementpaper.dart';
 import '../design_element.dart';
-import '../viewmodel/MainViewModel.dart';
 import '../viewmodel/UserViewModel.dart';
 
 class MainPage extends ConsumerStatefulWidget {
@@ -21,55 +20,47 @@ class MainPage extends ConsumerStatefulWidget {
 class _MainPage extends ConsumerState<MainPage> {
   double settlementerRes = 0;
   bool _isCalculated = false;
-  bool _isFirstBuild = true;
   int maxSettlementCount = 2;
   int currentCount = 0;
-  bool _isMore = false;
   List<Settlement> currentStms = [];
   List<Settlement> allStms = [];
   ScrollController scrollController = ScrollController();
   
   simpleSettlementerCal(double res) {
-    this.settlementerRes = res;
-    this._isCalculated = true;
+    settlementerRes = res;
+    _isCalculated = true;
     setState(() {});
   }
 
   reCal() {
     setState(() {
-      this._isCalculated = false;
+      _isCalculated = false;
     });
   }
 
   @override
   void initState(){
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async{
-      var mvm = ref.watch(mainProvider);
-      await mvm.settingMainViewModel("bxxwb8xp-p90w-ppfp-bbw9-b9bwwx8bf9bf");
-
+      var mvm = ref.watch(userProvider);
       scrollController.addListener(() async{
         if(!mvm.isFetchFinished) {
           if (mvm.lock && scrollController.position.maxScrollExtent * 0.7 <
               scrollController.position.pixels) {
             mvm.toggleLock();
             await mvm.fetchSettlement(mvm.settlementInfo.length, maxSettlementCount);
-            await Future.delayed(Duration(milliseconds: 1000));
+            await Future.delayed(const Duration(milliseconds: 1000));
             mvm.toggleLock();
           }
         }
       });
     });
-
-
-
     super.initState();
-
   }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    var mvm = ref.watch(mainProvider);
+    var mvm = ref.watch(userProvider);
 
     return Scaffold(
       body: GestureDetector(
@@ -80,7 +71,7 @@ class _MainPage extends ConsumerState<MainPage> {
           child: Column(
             //crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height:50),
+              const SizedBox(height:50),
               Container(
                 height: 60,
                 decoration: BoxDecoration(color: Colors.white, boxShadow: [
@@ -89,11 +80,11 @@ class _MainPage extends ConsumerState<MainPage> {
                     blurRadius: 7,
                   )
                 ]),
-                child: Row(
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(right: 10),
+                      padding: EdgeInsets.only(right: 10),
                       child: CircleAvatar(),
                     ),
                     Text("Y'EMON"),
@@ -103,7 +94,7 @@ class _MainPage extends ConsumerState<MainPage> {
               Container(
                 width: double.infinity,
                 height: 1,
-                decoration: BoxDecoration(color: Color(0xFFF4F4F4)),
+                decoration: const BoxDecoration(color: Color(0xFFF4F4F4)),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 0, right: 0),
@@ -116,7 +107,7 @@ class _MainPage extends ConsumerState<MainPage> {
                         blurRadius: 7,
                       )
                     ]),
-                    child: Center(
+                    child: const Center(
                       child: Text("문구 들어갈 위치",
                           style: TextStyle(
                               color: Colors.red,
@@ -133,7 +124,7 @@ class _MainPage extends ConsumerState<MainPage> {
                         BoxShadow(
                           color: Colors.grey.withOpacity(0.7),
                         ),
-                        BoxShadow(
+                        const BoxShadow(
                           color: Color(0xFFF4F4F4),
                           spreadRadius: -2.0,
                           blurRadius: 12.0,
@@ -142,8 +133,8 @@ class _MainPage extends ConsumerState<MainPage> {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 15, top: 15),
+                        const Padding(
+                          padding: EdgeInsets.only(left: 15, top: 15),
                           child: Text("단순 정산기",
                               style: TextStyle(
                                 fontSize: 18,
@@ -154,7 +145,7 @@ class _MainPage extends ConsumerState<MainPage> {
                           padding: const EdgeInsets.only(
                               left: 8, right: 8, top: 10, bottom: 10),
                           child: AnimatedContainer(
-                              duration: Duration(milliseconds: 200),
+                              duration: const Duration(milliseconds: 200),
                               width: double.infinity,
                               height: 90,
                               decoration: BoxDecoration(
@@ -182,7 +173,7 @@ class _MainPage extends ConsumerState<MainPage> {
                               )),
                         )
                       ])),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Row(
                 children: [
                   Padding(
@@ -192,11 +183,11 @@ class _MainPage extends ConsumerState<MainPage> {
                         child: Container(
                             width: size.width * 0.45,
                             height: 120,
-                            padding: EdgeInsets.all(5),
+                            padding: const EdgeInsets.all(5),
                             decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: Color(0xFFD9D9D9)),
+                                border: Border.all(color: const Color(0xFFD9D9D9)),
                                 boxShadow: [
                                   BoxShadow(
                                     color: Colors.grey.withOpacity(0.7),
@@ -210,12 +201,12 @@ class _MainPage extends ConsumerState<MainPage> {
                                 left:70, top: 8,
                                 child: Stack(
                                   children: [
-                                    Container(
+                                    SizedBox(
                                       width: size.width * 0.3,
                                       height: 150,
                                       child: Image.asset(
                                         'images/getCameraYemon.png',
-                                        opacity: AlwaysStoppedAnimation(.5),
+                                        opacity: const AlwaysStoppedAnimation(.5),
                                         fit: BoxFit.cover,
                                         scale: 1,
                                       ),
@@ -337,9 +328,6 @@ class _MainPage extends ConsumerState<MainPage> {
                 child: Divider(thickness: 1, color: Color(0xFFD9D9D9)),
               ),
               SizedBox(height: 10),
-              ElevatedButton(onPressed: (){
-                context.go("/ReceiptBox");
-              }, child: const Text("receipt box")),
               GestureDetector(
                   onTap: () {
                     context
@@ -699,7 +687,7 @@ class _RecentSettlementState extends ConsumerState<RecentSettlement> {
 
   @override
   Widget build(BuildContext context) {
-    var mvm = ref.watch(mainProvider);
+    var mvm = ref.watch(userProvider);
     bool masterFlag =
         widget.settlement.masterUserId == mvm.userData.serviceUserId;
     barSize = widget.size.width * 0.67;

@@ -20,6 +20,7 @@ import 'package:groupsettlement2/view/settlement_group_select_page.dart';
 import 'package:groupsettlement2/view/settlement_information_page.dart';
 import 'package:groupsettlement2/view/settlement_matching_complete_page.dart';
 import 'package:groupsettlement2/view/settlement_matching_page.dart';
+import 'package:groupsettlement2/viewmodel/UserViewModel.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
 import 'package:groupsettlement2/view/viewmodelTest_page.dart';
@@ -58,7 +59,6 @@ void initializeNotification() async {
       alert: true, badge: true, sound: true);
 }
 
-final firstProvider = Provider((_) => 'Hello World');
 final GoRouter _router = GoRouter(
   initialLocation: "/SplashView",
   routes: <RouteBase>[
@@ -259,27 +259,26 @@ class MyApp extends ConsumerWidget {
   }
 }
 
-class SplashView extends StatefulWidget {
+class SplashView extends ConsumerStatefulWidget {
   const SplashView({super.key});
 
   @override
-  State<SplashView> createState() => _SplashViewState();
+  ConsumerState<SplashView> createState() => _SplashViewState();
 }
 
-class _SplashViewState extends State<SplashView> {
-  var messageString = "";
+class _SplashViewState extends ConsumerState<SplashView> {
   ServiceUser me = ServiceUser();
-
   void _getMyDeviceToken(ServiceUser user) async {
     final token = await FirebaseMessaging.instance.getToken();
-    print("내 디바이스 토큰: $token");
+    // print("내 디바이스 토큰: $token");
     user.fcmToken = token;
     user.tokenTimestamp = Timestamp.now();
     FireService().updateDoc("userlist", user.serviceUserId!, user.toJson());
   }
 
-  void _checkToken(String userid) async {
+  Future<void> _checkToken(String userid) async {
     ServiceUser user = await ServiceUser().getUserByUserId(userid);
+    ref.watch(userProvider).settingUserData(user);
     var nowtime = DateTime.now().millisecondsSinceEpoch;
     //DateTime prevtime = DateTime.parse(user.tokenTimestamp!.toDate().toString());
     if (user.fcmToken == "") {
@@ -291,12 +290,13 @@ class _SplashViewState extends State<SplashView> {
         28) {
       _getMyDeviceToken(user);
     }
+    return;
   }
 
   @override
   void initState() {
     super.initState();
-    // _getMyDeviceToken(me);
+    // 사용하고 싶은 유저의 userId
     _checkToken("8969xxwf-8wf8-pf89-9x6p-88p0wpp9ppfb");
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       RemoteNotification? notification = message.notification;
@@ -314,8 +314,8 @@ class _SplashViewState extends State<SplashView> {
             ),
           ),
         );
-        messageString = message.notification!.body!;
-        print("Foreground 메시지 수신: $messageString");
+        // String messageString = message.notification!.body!;
+        // print("Foreground 메시지 수신: $messageString");
       }
     });
 

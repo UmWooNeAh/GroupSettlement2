@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:groupsettlement2/viewmodel/MainViewModel.dart';
+import 'package:groupsettlement2/viewmodel/UserViewModel.dart';
 import 'package:intl/intl.dart';
 
 var priceToString = NumberFormat.currency(locale: 'ko_KR', symbol: "");
@@ -21,7 +21,7 @@ class _CustomBottomNavigationBarState
     extends ConsumerState<CustomBottomNavigationBar> {
   @override
   Widget build(BuildContext context) {
-    final provider = ref.watch(mainProvider);
+    final provider = ref.watch(userProvider);
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       elevation: 10,
@@ -41,10 +41,9 @@ class _CustomBottomNavigationBarState
         if (!widget.isIn || widget.index != value) {
           switch (value) {
             case 0:
-              context.go('/mp');
+              context.go('/');
             case 1:
-              context.go('/mp');
-            // context.go('/ReceiptBox');
+              context.go('/ReceiptBox');
             case 2:
               context.go('/SettlementGroupSelect',extra: provider.userData);
             case 3:

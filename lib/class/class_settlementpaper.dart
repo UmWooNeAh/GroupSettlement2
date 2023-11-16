@@ -27,7 +27,7 @@ class SettlementPaper {
     settlementPaperId = json['settlementpaperid'];
     serviceUserId = json['serviceuserid'];
     settlementItems = List<String>.from(json["settlementitems"]);
-    sentSettlementItems = List<String>.from(json["sentsettlementitems"]);
+    // sentSettlementItems = List<String>.from(json["sentsettlementitems"]);
     totalPrice = json['totalprice'];
     try{
       settlementId = json['settlementid'];
@@ -69,15 +69,15 @@ class SettlementPaper {
       userName = user.name;
       papers.add(paper);
     });
-    return papers;
+    return papers; 
   }
 
   Future<SettlementPaper> getSettlementPaperByPaperId(String paperid) async {
     DocumentSnapshot<Map<String, dynamic>> result =
     await FirebaseFirestore.instance.collection("settlementpaperlist")
         .doc(paperid).get();
-    ServiceUser user = await ServiceUser().getUserByUserId(serviceUserId!);
-    userName = user.name;
+    // ServiceUser user = await ServiceUser().getUserByUserId(serviceUserId!);
+    // userName = user.name;
     SettlementPaper paper = SettlementPaper.fromSnapShot(result);
     return paper;
   }
