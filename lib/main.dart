@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -38,25 +39,42 @@ import 'Kakao/kakao_login_page.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("백그라운드 메시지 처리.. ${message.notification!.body!}");
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  initializeNotification();
 }
 
 void initializeNotification() async {
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
+      AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(const AndroidNotificationChannel(
-          'hight_importance_channel', 'high_importance_notification',
-          importance: Importance.max));
+      'hight_importance_channel', 'high_importance_notification',
+      importance: Importance.max));
 
-  await flutterLocalNotificationsPlugin.initialize(const InitializationSettings(
-    android: AndroidInitializationSettings("@mipmap/ic_launcher"),
-  ));
+  await flutterLocalNotificationsPlugin.initialize(
+    const InitializationSettings(
+      android: AndroidInitializationSettings("@drawable/ic_cashfi_noti"),
+    ),
+    onDidReceiveNotificationResponse: (NotificationResponse details) async { // 여기서 핸들링!
+      if(details.payload != null) {
+        Map<String, dynamic> data = jsonDecode(details.payload ?? "");
+        _router.push(data["route"]);
+      }
+    },
+    onDidReceiveBackgroundNotificationResponse: (NotificationResponse details) async { // 여기서 핸들링!
+      if(details.payload != null) {
+        Map<String, dynamic> data = jsonDecode(details.payload ?? "");
+        _router.push(data["route"]);
+      }
+    },
+  );
 
   await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-      alert: true, badge: true, sound: true);
+      alert: true, badge: true, sound: true
+  );
+
 }
 
 final GoRouter _router = GoRouter(
@@ -237,6 +255,38 @@ void main() async {
   KakaoSdk.init(
       nativeAppKey: '00b83bf69fba554145c773d6737772fc',
       javaScriptAppKey: 'aa3a51d84f03c87a103a1a127dfcd8f9');
+
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+    RemoteNotification? notification = message.notification;
+    if (notification != null) {
+      FlutterLocalNotificationsPlugin().show(
+        notification.hashCode,
+        notification.title,
+        notification.body,
+        payload: jsonEncode(message.data),
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'hight_importance_channel',
+            'high_importance_notification',
+            importance: Importance.max,
+          ),
+        ),
+      );
+      var messageString = message.notification!.body!;
+      print("Foreground 메시지 수신: $messageString");
+    }
+  });
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    _router.push(message.data["route"]);
+  });
+  FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
+    if (message != null) {
+      _router.push(message.data["route"]);
+    }
+  });
+  initializeNotification();
+
   runApp(
     const ProviderScope(child: MyApp()),
   );
@@ -298,27 +348,6 @@ class _SplashViewState extends ConsumerState<SplashView> {
     super.initState();
     // 사용하고 싶은 유저의 userId
     _checkToken("8969xxwf-8wf8-pf89-9x6p-88p0wpp9ppfb");
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      RemoteNotification? notification = message.notification;
-
-      if (notification != null) {
-        FlutterLocalNotificationsPlugin().show(
-          notification.hashCode,
-          notification.title,
-          notification.body,
-          const NotificationDetails(
-            android: AndroidNotificationDetails(
-              'hight_importance_channel',
-              'high_importance_notification',
-              importance: Importance.max,
-            ),
-          ),
-        );
-        // String messageString = message.notification!.body!;
-        // print("Foreground 메시지 수신: $messageString");
-      }
-    });
-
     Timer(
       const Duration(seconds: 2),
       () {
