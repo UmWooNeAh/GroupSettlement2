@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:groupsettlement2/class/class_receiptContent.dart';
@@ -37,13 +38,7 @@ import 'package:go_router/go_router.dart';
 import 'dart:math';
 import 'Kakao/kakao_login_page.dart';
 
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print("백그라운드 메시지 처리.. ${message.notification!.body!}");
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  initializeNotification();
-}
-
-void initializeNotification() async {
+Future<void> initializeNotification() async {
 
   final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   await flutterLocalNotificationsPlugin
@@ -51,30 +46,56 @@ void initializeNotification() async {
       AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(const AndroidNotificationChannel(
       'hight_importance_channel', 'high_importance_notification',
-      importance: Importance.max));
+      importance: Importance.high));
 
   await flutterLocalNotificationsPlugin.initialize(
     const InitializationSettings(
-      android: AndroidInitializationSettings("@drawable/ic_cashfi_noti"),
+      android: AndroidInitializationSettings("@mipmap/ic_launcher"),
     ),
-    onDidReceiveNotificationResponse: (NotificationResponse details) async { // 여기서 핸들링!
-      if(details.payload != null) {
-        Map<String, dynamic> data = jsonDecode(details.payload ?? "");
-        _router.push(data["route"]);
-      }
-    },
-    onDidReceiveBackgroundNotificationResponse: (NotificationResponse details) async { // 여기서 핸들링!
-      if(details.payload != null) {
-        Map<String, dynamic> data = jsonDecode(details.payload ?? "");
-        _router.push(data["route"]);
-      }
-    },
+    onDidReceiveNotificationResponse: onSelectNotification,
+    onDidReceiveBackgroundNotificationResponse: onSelectNotification,
   );
 
   await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
       alert: true, badge: true, sound: true
   );
 
+}
+
+void onSelectNotification(NotificationResponse details) async { // 여기서 핸들링!
+    if(details.payload != null) {
+      Map<String, dynamic> data = jsonDecode(details.payload ?? "");
+      _router.push(data["route"]);
+    }
+}
+
+void showFlutterNotificaiton(RemoteMessage message) {
+  RemoteNotification? notification = message.notification;
+  AndroidNotification? android = message.notification?.android;
+  if (notification != null && android != null && !kIsWeb) {
+    FlutterLocalNotificationsPlugin().show(
+      notification.hashCode,
+      notification.title,
+      notification.body,
+      payload: jsonEncode(message.data),
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'hight_importance_channel',
+          'high_importance_notification',
+          importance: Importance.high,
+        ),
+      ),
+    );
+    var messageString = message.notification!.body!;
+    print("Foreground 메시지 수신: $messageString");
+  }
+}
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  print("백그라운드 메시지 처리.. ${message.notification!.body!}");
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await initializeNotification();
 }
 
 final GoRouter _router = GoRouter(
@@ -196,12 +217,12 @@ final GoRouter _router = GoRouter(
         //     builder: (context, state) {
         //       return const SettlementFinalCheckPage();
         //     }),
-        // GoRoute(
-        //   path: "MyPage",
-        //   builder: (context, state) {
-        //     return const myPage();
-        //   },
-        // ),
+         GoRoute(
+           path: "MyPage",
+           builder: (context, state) {
+             return const myPage();
+           },
+         ),
         // GoRoute(
         //   path: "NotificationPage",
         //   builder: (context, state) {
@@ -247,7 +268,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  initializeNotification();
   // KakaoSdk 초기화
   // final nativeKey = await File("./Kakao/kakaoKey.txt").readAsString();
   // final jsKey = await File("./Kakao/kakaoJsKey.txt").readAsString();
@@ -257,26 +277,7 @@ void main() async {
       javaScriptAppKey: 'aa3a51d84f03c87a103a1a127dfcd8f9');
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-    RemoteNotification? notification = message.notification;
-    if (notification != null) {
-      FlutterLocalNotificationsPlugin().show(
-        notification.hashCode,
-        notification.title,
-        notification.body,
-        payload: jsonEncode(message.data),
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'hight_importance_channel',
-            'high_importance_notification',
-            importance: Importance.max,
-          ),
-        ),
-      );
-      var messageString = message.notification!.body!;
-      print("Foreground 메시지 수신: $messageString");
-    }
-  });
+  FirebaseMessaging.onMessage.listen(showFlutterNotificaiton);
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
     _router.push(message.data["route"]);
   });
@@ -285,8 +286,9 @@ void main() async {
       _router.push(message.data["route"]);
     }
   });
-  initializeNotification();
-
+  if(!kIsWeb) {
+    await initializeNotification();
+  }
   runApp(
     const ProviderScope(child: MyApp()),
   );
