@@ -40,13 +40,17 @@ import 'Kakao/kakao_login_page.dart';
 
 Future<void> initializeNotification() async {
 
+  const AndroidNotificationChannel androidNotificationChannel = AndroidNotificationChannel(
+    'high_importance_channel', // 임의의 id
+    'High Importance Notifications', // 설정에 보일 채널명
+    importance: Importance.max,
+  );
+
   final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
       AndroidFlutterLocalNotificationsPlugin>()
-      ?.createNotificationChannel(const AndroidNotificationChannel(
-      'hight_importance_channel', 'high_importance_notification',
-      importance: Importance.high));
+      ?.createNotificationChannel(androidNotificationChannel);
 
   await flutterLocalNotificationsPlugin.initialize(
     const InitializationSettings(
@@ -82,7 +86,6 @@ void showFlutterNotificaiton(RemoteMessage message) {
         android: AndroidNotificationDetails(
           'hight_importance_channel',
           'high_importance_notification',
-          importance: Importance.high,
         ),
       ),
     );
