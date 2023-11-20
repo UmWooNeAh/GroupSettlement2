@@ -34,6 +34,7 @@ exports.sendNtf_requestedFriend  = functions.region("asia-northeast3").firestore
                         },
                         data: {
                             route: "/MyPage",
+                            topic: "RequestFriend",
                         },
                         token: now.fcmtoken,
                     };
@@ -42,7 +43,6 @@ exports.sendNtf_requestedFriend  = functions.region("asia-northeast3").firestore
                         alarmid: alarmId,
                         title: alarmTitle,
                         body: alarmBody,
-                        route: "/MyPage",
                         category: 1
                   };
 
@@ -91,6 +91,7 @@ exports.sendNtf_acceptFriend  = functions.region("asia-northeast3").firestore
                               },
                               data: {
                                 route: "/MyPage",
+                                topic: "AcceptFriend",
                               },
                               token: now.fcmtoken,
                           };
@@ -99,7 +100,6 @@ exports.sendNtf_acceptFriend  = functions.region("asia-northeast3").firestore
                               alarmid: alarmId,
                               title: alarmTitle,
                               body: alarmBody,
-                              route: "/MyPage",
                               category: 1
                         };
 
@@ -128,6 +128,7 @@ exports.sendNtf_acceptFriend  = functions.region("asia-northeast3").firestore
                                   },
                                   data: {
                                     route: "/MyPage",
+                                    topic: "AcceptFriend",
                                     },
                                   token: now.fcmtoken,
                               };
@@ -136,7 +137,6 @@ exports.sendNtf_acceptFriend  = functions.region("asia-northeast3").firestore
                                   alarmid: alarmId,
                                   title: alarmTitle,
                                   body: alarmBody,
-                                  route: "/MyPage",
                                   category: 1
                             };
 

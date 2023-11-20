@@ -26,6 +26,8 @@ import 'package:groupsettlement2/viewmodel/UserViewModel.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
 import 'package:groupsettlement2/view/viewmodelTest_page.dart';
+import 'class/class_group.dart';
+import 'class/class_settlement.dart';
 import 'clova/clovaPage.dart';
 import 'design_element.dart';
 import 'firebase_options.dart';
@@ -69,7 +71,46 @@ Future<void> initializeNotification() async {
 void onSelectNotification(NotificationResponse details) async { // 여기서 핸들링!
     if(details.payload != null) {
       Map<String, dynamic> data = jsonDecode(details.payload ?? "");
-      _router.push(data["route"]);
+
+      if(data["topic"] != null ) {
+        if(data["topic"] == "GroupCreate") {
+          ServiceUser user = await ServiceUser().getUserByUserId(data["arg0"]);
+          _router.push(data["route"], extra: [user, data["arg1"]]);
+        }
+        else if(data["topic"] == "SettlementCreate" ) {
+          Settlement stm = await Settlement().getSettlementBySettlementId(data["arg0"]);
+          Group group = await Group().getGroupByGroupId(data["arg1"]);
+          ServiceUser user = await ServiceUser().getUserByUserId(data["arg2"]);
+          _router.push(data["route"], extra: [stm, group, user]);
+        }
+        else if(data["topic"] == "SendStmPaper" ) {
+          Settlement stm = await Settlement().getSettlementBySettlementId(data["arg0"]);
+          Group group = await Group().getGroupByGroupId(data["arg1"]);
+          ServiceUser user = await ServiceUser().getUserByUserId(data["arg2"]);
+          _router.push(data["route"], extra: [stm, group, user]);
+        }
+        else if(data["topic"] == "RequestCheckSent" ) {
+          Settlement stm = await Settlement().getSettlementBySettlementId(data["arg0"]);
+          Group group = await Group().getGroupByGroupId(data["arg1"]);
+          ServiceUser user = await ServiceUser().getUserByUserId(data["arg2"]);
+          _router.push(data["route"], extra: [stm, group, user]);
+        }
+        else if(data["topic"] == "finishSettlement" ) {
+          Settlement stm = await Settlement().getSettlementBySettlementId(data["arg0"]);
+          Group group = await Group().getGroupByGroupId(data["arg1"]);
+          ServiceUser user = await ServiceUser().getUserByUserId(data["arg2"]);
+          _router.push(data["route"], extra: [stm, group, user]);
+        }
+        else if(data["topic"] == "RequestFriend" ) {
+          _router.push(data["route"]);
+        }
+        else if(data["topic"] == "acceptFriend" ) {
+          _router.push(data["route"]);
+        }
+      }
+      else {
+        print("Error 발생.");
+      }
     }
 }
 

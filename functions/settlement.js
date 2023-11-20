@@ -34,6 +34,13 @@ exports.sendNtf_CreateSettlement  = functions.region("asia-northeast3").firestor
               notification: {
                   title: alarmTitle,
                   body: alarmBody,
+                  data: {
+                      route: "/SettlementInformation",
+                      topic: "SettlementCreate",
+                      arg0: newvalue.settlementid,
+                      arg1: newvalue.groupid,
+                      arg2: userid,
+                  },
                 },
                 token: masterDoc.data().fcmtoken,
             };
@@ -66,6 +73,13 @@ exports.sendNtf_CreateSettlement  = functions.region("asia-northeast3").firestor
           notification: {
               title: alarmTitle,
               body: alarmBody,
+              data: {
+                    route: "/SettlementInformation",
+                    topic: "SettlementCreate",
+                    arg0: newvalue.settlementid,
+                    arg1: newvalue.groupid,
+                    arg2: userid,
+                },
             },
             token: userDoc.data().fcmtoken,
         };
@@ -119,6 +133,13 @@ exports.sendNtf_SendSettlementPaper  = functions.region("asia-northeast3").fires
           notification: {
               title: alarmTitle,
               body: alarmBody,
+              data: {
+                  route: "/SettlementInformation",
+                  topic: "SendStmPaper",
+                  arg0: settlementDoc.data().settlementid,
+                  arg1: settlementDoc.data().groupid,
+                  arg2: userDoc.data().serviceuserid,
+              },
             },
             token: userDoc.data().fcmtoken,
         };
@@ -177,6 +198,10 @@ exports.sendNtf_CheckSent  = functions.region("asia-northeast3").firestore
                     notification: {
                         title: alarmTitle,
                         body: alarmBody,
+                        data: {
+                          route: "/SettlementInformation",
+                          topic: "RequestCheckSent",
+                        },
                       },
                       token: userDoc.data().fcmtoken,
                   };
@@ -207,6 +232,10 @@ exports.sendNtf_CheckSent  = functions.region("asia-northeast3").firestore
                     notification: {
                         title: alarmTitle,
                         body: alarmBody,
+                        data: {
+                          route: "/SettlementInformation",
+                          topic: "RequestCheckSent",
+                        },
                       },
                       token: userDoc.data().fcmtoken,
                   };
@@ -237,6 +266,10 @@ exports.sendNtf_CheckSent  = functions.region("asia-northeast3").firestore
                     notification: {
                         title: alarmTitle,
                         body: alarmBody,
+                        data: {
+                          route: "/SettlementInformation",
+                          topic: "RequestCheckSent",
+                        },
                       },
                       token: userDoc.data().fcmtoken,
                   };
@@ -294,6 +327,10 @@ exports.sendNtf_finishSettlement  = functions.region("asia-northeast3").firestor
                   notification: {
                       title: alarmTitle,
                       body: alarmBody,
+                    },
+                    data: {
+                      route: "/SettlementInformation",
+                      topic: "finishSettlement",
                     },
                     token: userDoc.data().fcmtoken,
                 };
