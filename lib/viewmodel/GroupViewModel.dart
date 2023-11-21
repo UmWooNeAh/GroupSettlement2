@@ -10,6 +10,7 @@ import '../class/class_settlementitem.dart';
 import '../class/class_settlementpaper.dart';
 import '../class/class_user.dart';
 
+final FirebaseFirestore db = FirebaseFirestore.instance;
 final groupProvider = ChangeNotifierProvider<GroupViewModel>((ref) =>
     GroupViewModel());
 
@@ -97,16 +98,26 @@ class GroupViewModel extends ChangeNotifier {
   }
 
   void updateUserName(String userId, String newName) async {
-    ServiceUser user = await ServiceUser().getUserByUserId(userId);
 
-    if (user.kakaoId == null) {
-      user.name = newName;
-      FireService().updateDoc("userlist", user.serviceUserId!, user.toJson());
-      //user.UpdateUser();
-    } else {
-      print("카카오톡으로 추가한 유저의 이름은 변경할 수 없습니다.");
-    }
-    notifyListeners();
+    db.runTransaction((transaction) async {
+      ServiceUser user = await ServiceUser().getUserByUserId(userId);
+
+      if (user.kakaoId == null) {
+        user.name = newName;
+        FireService().updateDoc("userlist", user.serviceUserId!, user.toJson());
+        //user.UpdateUser();
+      } else {
+        print("카카오톡으로 추가한 유저의 이름은 변경할 수 없습니다.");
+      }
+    }).then(
+          (value) {
+            print("DocumentSnapshot successfully updated!");
+            notifyListeners();
+          },
+      onError: (e) => print("Error updating document $e"),
+    );
+
+
   }
 
   bool checkMaster(int index) {

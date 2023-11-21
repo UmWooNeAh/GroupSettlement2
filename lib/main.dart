@@ -68,49 +68,52 @@ Future<void> initializeNotification() async {
 
 }
 
+void parsingRoute(Map<String, dynamic> data) async {
+  if(data["topic"] != null ) {
+    if(data["topic"] == "GroupCreate") {
+      ServiceUser user = await ServiceUser().getUserByUserId(data["arg0"]);
+      _router.push(data["route"], extra: [user, data["arg1"]]);
+    }
+    else if(data["topic"] == "SettlementCreate" ) {
+      Settlement stm = await Settlement().getSettlementBySettlementId(data["arg0"]);
+      Group group = await Group().getGroupByGroupId(data["arg1"]);
+      ServiceUser user = await ServiceUser().getUserByUserId(data["arg2"]);
+      _router.push(data["route"], extra: [stm, group, user]);
+    }
+    else if(data["topic"] == "SendStmPaper" ) {
+      Settlement stm = await Settlement().getSettlementBySettlementId(data["arg0"]);
+      Group group = await Group().getGroupByGroupId(data["arg1"]);
+      ServiceUser user = await ServiceUser().getUserByUserId(data["arg2"]);
+      _router.push(data["route"], extra: [stm, group, user]);
+    }
+    else if(data["topic"] == "RequestCheckSent" ) {
+      Settlement stm = await Settlement().getSettlementBySettlementId(data["arg0"]);
+      Group group = await Group().getGroupByGroupId(data["arg1"]);
+      ServiceUser user = await ServiceUser().getUserByUserId(data["arg2"]);
+      _router.push(data["route"], extra: [stm, group, user]);
+    }
+    else if(data["topic"] == "finishSettlement" ) {
+      Settlement stm = await Settlement().getSettlementBySettlementId(data["arg0"]);
+      Group group = await Group().getGroupByGroupId(data["arg1"]);
+      ServiceUser user = await ServiceUser().getUserByUserId(data["arg2"]);
+      _router.push(data["route"], extra: [stm, group, user]);
+    }
+    else if(data["topic"] == "RequestFriend" ) {
+      _router.push(data["route"]);
+    }
+    else if(data["topic"] == "acceptFriend" ) {
+      _router.push(data["route"]);
+    }
+  }
+  else {
+    print("Error 발생.");
+  }
+}
+
 void onSelectNotification(NotificationResponse details) async { // 여기서 핸들링!
     if(details.payload != null) {
       Map<String, dynamic> data = jsonDecode(details.payload ?? "");
-
-      if(data["topic"] != null ) {
-        if(data["topic"] == "GroupCreate") {
-          ServiceUser user = await ServiceUser().getUserByUserId(data["arg0"]);
-          _router.push(data["route"], extra: [user, data["arg1"]]);
-        }
-        else if(data["topic"] == "SettlementCreate" ) {
-          Settlement stm = await Settlement().getSettlementBySettlementId(data["arg0"]);
-          Group group = await Group().getGroupByGroupId(data["arg1"]);
-          ServiceUser user = await ServiceUser().getUserByUserId(data["arg2"]);
-          _router.push(data["route"], extra: [stm, group, user]);
-        }
-        else if(data["topic"] == "SendStmPaper" ) {
-          Settlement stm = await Settlement().getSettlementBySettlementId(data["arg0"]);
-          Group group = await Group().getGroupByGroupId(data["arg1"]);
-          ServiceUser user = await ServiceUser().getUserByUserId(data["arg2"]);
-          _router.push(data["route"], extra: [stm, group, user]);
-        }
-        else if(data["topic"] == "RequestCheckSent" ) {
-          Settlement stm = await Settlement().getSettlementBySettlementId(data["arg0"]);
-          Group group = await Group().getGroupByGroupId(data["arg1"]);
-          ServiceUser user = await ServiceUser().getUserByUserId(data["arg2"]);
-          _router.push(data["route"], extra: [stm, group, user]);
-        }
-        else if(data["topic"] == "finishSettlement" ) {
-          Settlement stm = await Settlement().getSettlementBySettlementId(data["arg0"]);
-          Group group = await Group().getGroupByGroupId(data["arg1"]);
-          ServiceUser user = await ServiceUser().getUserByUserId(data["arg2"]);
-          _router.push(data["route"], extra: [stm, group, user]);
-        }
-        else if(data["topic"] == "RequestFriend" ) {
-          _router.push(data["route"]);
-        }
-        else if(data["topic"] == "acceptFriend" ) {
-          _router.push(data["route"]);
-        }
-      }
-      else {
-        print("Error 발생.");
-      }
+      parsingRoute(data);
     }
 }
 
@@ -213,94 +216,94 @@ final GoRouter _router = GoRouter(
             builder: (context, state) {
               return const ReceiptBoxPage();
             }),
-        // GoRoute(
-        //     path: 'VMTestPage',
-        //     builder: (context, state) {
-        //       return const VMTestPage();
-        //     }),
-        // GoRoute(
-        //     path: 'KakaoLoginPage',
-        //     builder: (context, state) {
-        //       return const kakaoLoginPage();
-        //     }),
-        // GoRoute(
-        //     path: 'clovaPage',
-        //     builder: (context, state) {
-        //       return const clovaPage();
-        //     }),
-        //     routes: [
-        //       GoRoute(
-        //         path: 'EditReceiptPage/:modifyFlag',
-        //         builder: (context, state) {
-        //           ReceiptContent content = state.extra as ReceiptContent;
-        //           return EditReceiptPage(
-        //             receiptContent: content,
-        //             modifyFlag: state.pathParameters["modifyFlag"]!,
-        //           );
-        //         },
-        //       ),
-        //     ]),
-        // GoRoute(
-        //   path: "SettlementPage/:settlementId",
-        //   builder: (context, state) {
-        //     return SettlementPage(
-        //       settlementId: state.pathParameters["settlementId"]!,
-        //     );
-        //   },
-        //   routes: <RouteBase>[
-        //     GoRoute(
-        //       path: 'CompleteSettlementMatching',
-        //       builder: (context, state) {
-        //         return const CompleteSettlementMatching();
-        //       },
-        //     ),
-        //   ],
-        // ),
-        // GoRoute(
-        //     path: 'SettlementFinalCheckPage',
-        //     builder: (context, state) {
-        //       return const SettlementFinalCheckPage();
-        //     }),
+        GoRoute(
+            path: 'VMTestPage',
+            builder: (context, state) {
+              return const VMTestPage();
+            }),
+        GoRoute(
+            path: 'KakaoLoginPage',
+            builder: (context, state) {
+              return const kakaoLoginPage();
+            }),
+        GoRoute(
+            path: 'clovaPage',
+            builder: (context, state) {
+              return const clovaPage();
+            },
+            routes: [
+              GoRoute(
+                path: 'EditReceiptPage/:modifyFlag',
+                builder: (context, state) {
+                  ReceiptContent content = state.extra as ReceiptContent;
+                  return EditReceiptPage(
+                    receiptContent: content,
+                    modifyFlag: state.pathParameters["modifyFlag"]!,
+                  );
+                },
+              ),
+            ]),
+        GoRoute(
+          path: "SettlementPage/:settlementId",
+          builder: (context, state) {
+            return SettlementPage(
+              settlementId: state.pathParameters["settlementId"]!,
+            );
+          },
+          routes: <RouteBase>[
+            GoRoute(
+              path: 'CompleteSettlementMatching',
+              builder: (context, state) {
+                return const CompleteSettlementMatching();
+              },
+            ),
+          ],
+        ),
+        GoRoute(
+            path: 'SettlementFinalCheckPage',
+            builder: (context, state) {
+              return const SettlementFinalCheckPage();
+            }),
          GoRoute(
            path: "MyPage",
            builder: (context, state) {
              return const myPage();
            },
          ),
-        // GoRoute(
-        //   path: "NotificationPage",
-        //   builder: (context, state) {
-        //     return const notificationPage();
-        //   },
-        // ),
-        // GoRoute(
-        //   path: "cameraDetectPage",
-        //   builder: (context, state) {
-        //     CameraDescription camera = state.extra as CameraDescription;
-        //     return cameraDetectPage(extra: camera);
-        //   },
-        // ),
-        // GoRoute(
-        //   path: "scanedRecieptPage",
-        //   builder: (context, state) {
-        //     ReceiptContent content = state.extra as ReceiptContent;
-        //     return CheckScannedReceiptPge(
-        //       receiptContent: content,
-        //     );
-        //   },
-        // ),
-        // GoRoute(
-        //   path: "mp",
-        //   builder: (context, state) {
-        //     return MainPage();
-        //   },
-        // ),
-        // GoRoute(
-        //   path: "kakaoPage",
-        //   builder: (context, state) {
-        //     return kakaoLoginPage();
-        //   },
-        // )
+        GoRoute(
+          path: "NotificationPage",
+          builder: (context, state) {
+            return const notificationPage();
+          },
+        ),
+        GoRoute(
+          path: "cameraDetectPage",
+          builder: (context, state) {
+            CameraDescription camera = state.extra as CameraDescription;
+            return ReceiptAddPage(camera: camera);
+          },
+        ),
+        GoRoute(
+          path: "scanedRecieptPage",
+          builder: (context, state) {
+            ReceiptContent content = state.extra as ReceiptContent;
+            return CheckScannedReceiptPge(
+              receiptContent: content,
+            );
+          },
+        ),
+        GoRoute(
+          path: "mp",
+          builder: (context, state) {
+            return MainPage();
+          },
+        ),
+        GoRoute(
+          path: "kakaoPage",
+          builder: (context, state) {
+            return kakaoLoginPage();
+          },
+        )
       ],
     ),
   ],
@@ -323,11 +326,11 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   FirebaseMessaging.onMessage.listen(showFlutterNotificaiton);
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-    _router.push(message.data["route"]);
+    parsingRoute(message.data);
   });
   FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
     if (message != null) {
-      _router.push(message.data["route"]);
+      parsingRoute(message.data);
     }
   });
   if(!kIsWeb) {
