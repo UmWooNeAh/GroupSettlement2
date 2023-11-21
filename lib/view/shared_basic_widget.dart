@@ -43,9 +43,9 @@ class _CustomBottomNavigationBarState
             case 0:
               context.go('/');
             case 1:
-              context.go('/ReceiptBox');
+              context.go('/ReceiptBox', extra: provider.userData);
             case 2:
-              context.go('/SettlementGroupSelect',extra: provider.userData);
+              context.go('/SettlementGroupSelect', extra: provider.userData);
             case 3:
               1;
             // context.go('/Notification');

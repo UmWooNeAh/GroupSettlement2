@@ -3,7 +3,6 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../class/class_receiptContent.dart';
 import '../viewmodel/SettlementCreateViewModel.dart';
 
 class ReceiptAddPage extends ConsumerStatefulWidget {
@@ -17,12 +16,6 @@ class ReceiptAddPage extends ConsumerStatefulWidget {
 class _ReceiptAddPageState extends ConsumerState<ReceiptAddPage> {
   late CameraController _controller;
   late Future<void> _initializeControllerFuture;
-
-  @override
-  void dispose(){
-    _controller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,15 +34,15 @@ class _ReceiptAddPageState extends ConsumerState<ReceiptAddPage> {
                 children: [
                   Container(
                     width:double.infinity,height:double.infinity,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       color:Colors.black
                     ),
                   ),
                   Column(
                     children: [
                       CameraPreview(_controller),
-                      SizedBox(height:30),
-                      Text("보다 정확한 인식을 위하여 어두운 배경에서 촬영해주세요",
+                      const SizedBox(height:30),
+                      const Text("보다 정확한 인식을 위하여 어두운 배경에서 촬영해주세요",
                         style: TextStyle(
                             color:Colors.white,
                             fontWeight: FontWeight.w600,
@@ -61,7 +54,7 @@ class _ReceiptAddPageState extends ConsumerState<ReceiptAddPage> {
                 ],
               );
             } else{
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             }
           }
         ),
@@ -73,15 +66,20 @@ class _ReceiptAddPageState extends ConsumerState<ReceiptAddPage> {
                 alignment: Alignment.bottomLeft,
                 child: FloatingActionButton(
                   heroTag: null,
-                  child: Icon(Icons.image),
-                  onPressed: () async{
+                  child: const Icon(Icons.image),
+                  onPressed: (){
                     try {
                       _controller.dispose();
-                      await stmcvm.clova.pickPicture();
-                      final analyzeResult = await stmcvm.clova.analyze();
-                      ReceiptContent receiptContent = stmcvm.createReceiptFromNaverOCR(analyzeResult);
-
-                      context.push("/scanedRecieptPage",extra: receiptContent);
+                      dynamic analyzeResult;
+                      Future(() async {
+                        await stmcvm.clova.pickPicture().then((value) {
+                          context.push('/ReceiptAdd/WaitingAnalyze');
+                        });
+                        analyzeResult = await stmcvm.clova.analyze();
+                      }).then((value) {
+                        stmcvm.createReceiptFromNaverOCR(analyzeResult);
+                        context.pushReplacement("/ReceiptAdd/ReceiptCheckScanned");
+                      });
                     }catch(e){
                       print(e);
                     }
@@ -95,19 +93,17 @@ class _ReceiptAddPageState extends ConsumerState<ReceiptAddPage> {
                 alignment: Alignment.bottomRight,
                 child: FloatingActionButton(
                   heroTag: null,
-                  child: Icon(Icons.camera_alt),
+                  child: const Icon(Icons.camera_alt),
                   onPressed: () async{
                     try {
                       _controller.dispose();
                       await _initializeControllerFuture;
-
                       final image = await _controller.takePicture();
                       if (!mounted) return;
                       stmcvm.clova.getImageByFile(File(image.path));
                       final analyzeResult = stmcvm.clova.analyze();
-                      ReceiptContent receiptContent = stmcvm.createReceiptFromNaverOCR(analyzeResult);
-
-                      context.push("/scanedRecieptPage",extra: receiptContent);
+                      stmcvm.createReceiptFromNaverOCR(analyzeResult);
+                      context.go("/ReceiptAdd/ReceiptCheckScanned");
                     }catch(e){
                       print(e);
                     }
@@ -118,5 +114,19 @@ class _ReceiptAddPageState extends ConsumerState<ReceiptAddPage> {
           ],
         ),
     );
+  }
+}
+
+class WaitingAnalyzePage extends StatefulWidget {
+  const WaitingAnalyzePage({super.key});
+
+  @override
+  State<WaitingAnalyzePage> createState() => _WaitingAnalyzePageState();
+}
+
+class _WaitingAnalyzePageState extends State<WaitingAnalyzePage> {
+  @override
+  Widget build(BuildContext context) {
+    return const Center(child: Text("Scanning..."),);
   }
 }

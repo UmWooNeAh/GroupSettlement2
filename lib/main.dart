@@ -15,11 +15,12 @@ import 'package:groupsettlement2/view/receipt_box_page.dart';
 import 'package:groupsettlement2/view/receipt_check_scanned_page.dart';
 import 'package:groupsettlement2/view/receipt_edit_page.dart';
 import 'package:groupsettlement2/view/settlement_create_page.dart';
-import 'package:groupsettlement2/view/settlement_final_check.dart';
 import 'package:groupsettlement2/view/settlement_group_select_page.dart';
 import 'package:groupsettlement2/view/settlement_information_page.dart';
 import 'package:groupsettlement2/view/settlement_matching_complete_page.dart';
 import 'package:groupsettlement2/view/settlement_matching_page.dart';
+import 'package:groupsettlement2/view/settlement_result_check_page.dart';
+import 'package:groupsettlement2/view/test_gun_page.dart';
 import 'package:groupsettlement2/viewmodel/UserViewModel.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
@@ -124,100 +125,54 @@ final GoRouter _router = GoRouter(
             builder: (context, state) {
               Object camera = state.extra as Object;
               return ReceiptAddPage(camera: camera);
-            }),
+            },
+            routes: <RouteBase>[
+              GoRoute(
+                path: 'ReceiptCheckScanned',
+                builder: (context, state) {
+                  return const ReceiptCheckScannedPage();
+                },
+              ),
+              GoRoute(
+                path: 'WaitingAnalyze',
+                builder: (context, state) {
+                  return const WaitingAnalyzePage();
+                },
+              )
+            ]),
+        GoRoute(
+          path: 'ReceiptEdit',
+          builder: (context, state) {
+            return const ReceiptEditPage();
+          },
+        ),
         GoRoute(
             path: 'ReceiptBox',
             builder: (context, state) {
-              return const ReceiptBoxPage();
+              ServiceUser me = state.extra as ServiceUser;
+              return ReceiptBoxPage(me: me);
             }),
-        // GoRoute(
-        //     path: 'VMTestPage',
-        //     builder: (context, state) {
-        //       return const VMTestPage();
-        //     }),
-        // GoRoute(
-        //     path: 'KakaoLoginPage',
-        //     builder: (context, state) {
-        //       return const kakaoLoginPage();
-        //     }),
-        // GoRoute(
-        //     path: 'clovaPage',
-        //     builder: (context, state) {
-        //       return const clovaPage();
-        //     }),
-        //     routes: [
-        //       GoRoute(
-        //         path: 'EditReceiptPage/:modifyFlag',
-        //         builder: (context, state) {
-        //           ReceiptContent content = state.extra as ReceiptContent;
-        //           return EditReceiptPage(
-        //             receiptContent: content,
-        //             modifyFlag: state.pathParameters["modifyFlag"]!,
-        //           );
-        //         },
-        //       ),
-        //     ]),
-        // GoRoute(
-        //   path: "SettlementPage/:settlementId",
-        //   builder: (context, state) {
-        //     return SettlementPage(
-        //       settlementId: state.pathParameters["settlementId"]!,
-        //     );
-        //   },
-        //   routes: <RouteBase>[
-        //     GoRoute(
-        //       path: 'CompleteSettlementMatching',
-        //       builder: (context, state) {
-        //         return const CompleteSettlementMatching();
-        //       },
-        //     ),
-        //   ],
-        // ),
-        // GoRoute(
-        //     path: 'SettlementFinalCheckPage',
-        //     builder: (context, state) {
-        //       return const SettlementFinalCheckPage();
-        //     }),
-        // GoRoute(
-        //   path: "MyPage",
-        //   builder: (context, state) {
-        //     return const myPage();
-        //   },
-        // ),
-        // GoRoute(
-        //   path: "NotificationPage",
-        //   builder: (context, state) {
-        //     return const notificationPage();
-        //   },
-        // ),
-        // GoRoute(
-        //   path: "cameraDetectPage",
-        //   builder: (context, state) {
-        //     CameraDescription camera = state.extra as CameraDescription;
-        //     return cameraDetectPage(extra: camera);
-        //   },
-        // ),
-        // GoRoute(
-        //   path: "scanedRecieptPage",
-        //   builder: (context, state) {
-        //     ReceiptContent content = state.extra as ReceiptContent;
-        //     return CheckScannedReceiptPge(
-        //       receiptContent: content,
-        //     );
-        //   },
-        // ),
-        // GoRoute(
-        //   path: "mp",
-        //   builder: (context, state) {
-        //     return MainPage();
-        //   },
-        // ),
-        // GoRoute(
-        //   path: "kakaoPage",
-        //   builder: (context, state) {
-        //     return kakaoLoginPage();
-        //   },
-        // )
+        GoRoute(
+          path: 'SettlementMatching',
+          builder: (context, state) {
+            List<dynamic> info = state.extra as List<dynamic>;
+            return SettlementMatchingPage(
+              info: info,
+            );
+          },
+        ),
+        GoRoute(
+          path: 'SettlementMatchingComplete',
+          builder: (context, state) {
+            return const SettlementMatchingCompletePage();
+          },
+          routes: <RouteBase>[
+            GoRoute(path: 'SettlementResultCheck',
+            builder: (context, state) {
+              return const SettlementResultCheckPage();
+            },)
+          ]
+        )
       ],
     ),
   ],
@@ -251,7 +206,10 @@ class MyApp extends ConsumerWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.white,
+            primary: Colors.grey,
+            secondary: Colors.black),
         useMaterial3: true,
       ),
       routerConfig: _router,
@@ -297,7 +255,7 @@ class _SplashViewState extends ConsumerState<SplashView> {
   void initState() {
     super.initState();
     // 사용하고 싶은 유저의 userId
-    _checkToken("8969xxwf-8wf8-pf89-9x6p-88p0wpp9ppfb");
+    _checkToken("b9998w80-p0bf-px89-w9x9-ww6f9xbpb06b");
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       RemoteNotification? notification = message.notification;
 

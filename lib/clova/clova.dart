@@ -94,14 +94,14 @@ class Clova {
   Future<void> pickPicture() async {
     final XFile? images = await picker.pickImage(source: ImageSource.gallery);
     if (images != null) {
-      this.imageFile = File(images.path);
+      imageFile = File(images.path);
     }
   }
 
   Future<void> takePicture() async {
     final XFile? images = await picker.pickImage(source: ImageSource.camera);
     if (images != null) {
-      this.imageFile = File(images.path);
+      imageFile = File(images.path);
     }
   }
 

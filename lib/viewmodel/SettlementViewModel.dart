@@ -14,14 +14,13 @@ final stmProvider =
     ChangeNotifierProvider<SettlementViewModel>((ref) => SettlementViewModel());
 
 class SettlementViewModel extends ChangeNotifier {
-  // Information
+  ServiceUser userData = ServiceUser();
   Group group = Group();
   Settlement settlement = Settlement();
   List<ServiceUser> settlementUsers = <ServiceUser>[];
   Map<String, Receipt> receipts = <String, Receipt>{};
   Map<String, List<ReceiptItem>> receiptItems = <String, List<ReceiptItem>>{};
 
-  // Management
   List<String> finalSettlement = <String>[];
   Map<String, List<String>> subGroups = <String, List<String>>{};
   Map<String, SettlementPaper> settlementPapers = <String, SettlementPaper>{};
@@ -30,55 +29,39 @@ class SettlementViewModel extends ChangeNotifier {
 
   SettlementViewModel();
 
-  void settingSettlementViewModel(String settlementId) async {
-    group = Group();
-    settlement = Settlement();
+  Future<void> settingSettlementViewModel(ServiceUser me, Group myGroup, String settlementId) async {
+    userData = me;
+    group = myGroup;
+    settlement = await Settlement().getSettlementBySettlementId(settlementId);
     settlementUsers = <ServiceUser>[];
     receipts = <String, Receipt>{};
     receiptItems = <String, List<ReceiptItem>>{};
 
-    // Management
     finalSettlement = <String>[];
     subGroups = <String, List<String>>{};
     settlementPapers = <String, SettlementPaper>{};
     settlementItems = <String, List<SettlementItem>>{};
 
-    settlement = await Settlement().getSettlementBySettlementId(settlementId);
-    group = await Group().getGroupByGroupId(settlement.groupId!);
-    //log("정산 이름: ${settlement.settlementName}");
-    //정산자 제외하고 그룹의 유저 목록 불러오기
-
-    ServiceUser muser =
-        await ServiceUser().getUserByUserId(settlement.masterUserId!);
-    settlementUsers.add(muser);
-
     for (var userid in group.serviceUsers) {
-      if (userid == settlement.masterUserId) {
-        continue;
-      }
       ServiceUser user = await ServiceUser().getUserByUserId(userid);
       settlementUsers.add(user);
     }
 
-    settlement.receipts.forEach((receipt) async {
-      // Settlement -> Receipt 하나씩 불러오기
-      Receipt newReceipt = await Receipt().getReceiptByReceiptId(receipt);
-      receipts[receipt] = newReceipt;
-
-      receipts[receipt]!.receiptItems.forEach((receiptitemid) async {
-        // Receipt -> ReceiptItem 하나씩 불러오기
-        ReceiptItem newReceiptItem =
-            await ReceiptItem().getReceiptItemByReceiptItemId(receiptitemid);
-        if (receiptItems[receipt] == null) {
-          receiptItems[receipt] = [newReceiptItem];
-        } else {
-          receiptItems[receipt]!.add(newReceiptItem);
+    for(var receiptId in settlement.receipts){
+      Receipt newReceipt = await Receipt().getReceiptByReceiptId(receiptId);
+      receipts[receiptId] = newReceipt;
+      for(var receiptItemId in newReceipt.receiptItems){
+        ReceiptItem newReceiptItem = await ReceiptItem().getReceiptItemByReceiptItemId(receiptItemId);
+        if (receiptItems[receiptId] == null){
+          receiptItems[receiptId] = [newReceiptItem];
         }
-        notifyListeners();
-      });
-      notifyListeners();
-    });
+        else{
+          receiptItems[receiptId]!.add(newReceiptItem);
+        }
+      }
+    }
     notifyListeners();
+    return;
   }
 
   void addSettlementItem(
@@ -265,12 +248,12 @@ class SettlementViewModel extends ChangeNotifier {
         "settlementlist", settlement.settlementId!, settlement.toJson());
 
     // SettlementPaper Create
-    for(var stmpaper in settlementPapers!.entries) {
+    for(var stmpaper in settlementPapers.entries) {
       settlement.totalPrice += stmpaper.value.totalPrice!;
       stmpaper.value.createSettlementPaper();
     }
     // SettlementItem Create
-    for(var stmitemlist in settlementItems!.entries) {
+    for(var stmitemlist in settlementItems.entries) {
       for(var stmitem in stmitemlist.value) {
         stmitem.createSettlementItem();
       }
