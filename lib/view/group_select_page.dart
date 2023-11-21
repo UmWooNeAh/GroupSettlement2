@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:groupsettlement2/class/class_user.dart';
+import 'package:groupsettlement2/view/shared_basic_widget.dart';
 import '../class/class_group.dart';
 import '../design_element.dart';
 import '../viewmodel/UserViewModel.dart';
@@ -24,7 +25,6 @@ class _GroupSelectPage extends ConsumerState<GroupSelectPage> {
     final uvm = ref.watch(userProvider);
     if (isFirst) {
       Future(() {
-        print(widget.me.groups);
         uvm.fetchGroup(widget.me);
       });
       isFirst = false;
@@ -99,6 +99,7 @@ class _GroupSelectPage extends ConsumerState<GroupSelectPage> {
           ),
         ),
       ),
+      bottomNavigationBar: const CustomBottomNavigationBar(index: 1, isIn: false,),
     );
   }
 }

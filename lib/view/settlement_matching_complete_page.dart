@@ -7,16 +7,16 @@ import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import '../viewmodel/SettlementViewModel.dart';
 import 'dart:math';
 
-class CompleteSettlementMatching extends ConsumerStatefulWidget {
-  const CompleteSettlementMatching({super.key});
+class SettlementMatchingCompletePage extends ConsumerStatefulWidget {
+  const SettlementMatchingCompletePage({super.key});
 
   @override
-  ConsumerState<CompleteSettlementMatching> createState() =>
+  ConsumerState<SettlementMatchingCompletePage> createState() =>
       _CompleteSettlementMatchingState();
 }
 
 class _CompleteSettlementMatchingState
-    extends ConsumerState<CompleteSettlementMatching>
+    extends ConsumerState<SettlementMatchingCompletePage>
     with TickerProviderStateMixin {
   late final AnimationController _animation;
   @override
@@ -170,7 +170,6 @@ class _CompleteSettlementMatchingState
                       onPressed: () async {
                         await UserApi.instance
                             .loginWithNewScopes(["friends", "talk_message"]);
-
                         try {
                           List<ItemInfo> itemList = [];
                           for (var element
@@ -287,7 +286,7 @@ class _CompleteSettlementMatchingState
                   ),
                   TextButton(
                     onPressed: () {
-                      context.go('/SettlementFinalCheckPage');
+                      context.push('/SettlementMatchingComplete/SettlementResultCheck');
                     },
                     child: const Text(
                       "정산결과확인하기",

@@ -2,10 +2,8 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:groupsettlement2/class/class_receiptContent.dart';
 import 'package:groupsettlement2/design_element.dart';
 import 'package:groupsettlement2/view/shared_basic_widget.dart';
-import '../class/class_receipt.dart';
 import '../viewmodel/SettlementCreateViewModel.dart';
 
 class SettlementCreatePage extends ConsumerStatefulWidget {
@@ -128,7 +126,7 @@ class _CreateNewSettlementState extends ConsumerState<SettlementCreatePage> {
                       child: Row(
                         children: List.generate(
                             provider.settlement.receipts.length, (index) {
-                          return CreateNewSettlementReceipt(
+                          return OneReceipt(
                             id: provider.settlement.receipts[index],
                             index: (index + 1).toString(),
                           );
@@ -217,14 +215,16 @@ class _CreateNewSettlementState extends ConsumerState<SettlementCreatePage> {
                 margin: const EdgeInsets.all(10),
                 width: double.infinity,
                 child: OutlinedButton(
-                  onPressed: () async {
+                  onPressed: () {
                     if (provider.receipts.isEmpty) {
                       return;
                     }
                     provider
                         .createSettlement(_settlementNameController.text)
                         .then((value) {
-                      context.go('/SettlementPage/$value');
+                      context.go('/SettlementMatching', extra: [
+                        provider.userData, provider.myGroup, provider.settlement.settlementId
+                      ]);
                     });
                   },
                   style: OutlinedButton.styleFrom(
@@ -258,23 +258,19 @@ class _CreateNewSettlementState extends ConsumerState<SettlementCreatePage> {
   }
 }
 
-class CreateNewSettlementReceipt extends ConsumerStatefulWidget {
-  const CreateNewSettlementReceipt(
-      {super.key, required this.id, required this.index});
+class OneReceipt extends ConsumerStatefulWidget {
+  const OneReceipt({super.key, required this.id, required this.index});
   final String id;
   final String index;
   @override
-  ConsumerState<CreateNewSettlementReceipt> createState() =>
-      _CreateNewSettlementReceiptState();
+  ConsumerState<OneReceipt> createState() => _CreateNewSettlementReceiptState();
 }
 
-class _CreateNewSettlementReceiptState
-    extends ConsumerState<CreateNewSettlementReceipt> {
+class _CreateNewSettlementReceiptState extends ConsumerState<OneReceipt> {
   bool isTapDown = false;
   @override
   Widget build(BuildContext context) {
     final provider = ref.watch(stmCreateProvider);
-    Receipt? receipt = provider.receipts[widget.id];
     return GestureDetector(
       onTapDown: (details) {
         setState(() {
@@ -285,11 +281,9 @@ class _CreateNewSettlementReceiptState
         setState(() {
           isTapDown = !isTapDown;
         });
-        ReceiptContent receiptContent = ReceiptContent(
-            provider.receipts[widget.id]!, provider.receiptItems[widget.id]!);
-        context.push(
-            '/CreateNewSettlementPage/null/null/null/EditReceiptPage/${widget.id}',
-            extra: receiptContent);
+        provider.newReceipt = provider.receipts[widget.id]!;
+        provider.newReceiptItems = provider.receiptItems[widget.id]!;
+        context.push('/ReceiptEdit');
       },
       onTapCancel: () {
         setState(() {
@@ -330,7 +324,7 @@ class _CreateNewSettlementReceiptState
               top: 20,
               left: 10,
               child: Text(
-                receipt?.receiptName ?? "영수증 ${widget.index}",
+                provider.receipts[widget.id]!.receiptName ?? "영수증 ${widget.index}",
                 style: const TextStyle(
                   fontSize: 25,
                 ),
@@ -352,7 +346,7 @@ class _CreateNewSettlementReceiptState
                         ),
                       ),
                       TextSpan(
-                        text: " 등 ${receipt?.receiptItems.length ?? "X"} 항목",
+                        text: " 등 ${provider.receipts[widget.id]!.receiptItems.length} 항목",
                         style: TextStyle(
                           fontSize: 17,
                           color: Colors.grey[600],

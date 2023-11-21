@@ -5,16 +5,16 @@ import 'package:groupsettlement2/view/shared_basic_widget.dart';
 import 'package:kakao_flutter_sdk/kakao_flutter_sdk.dart';
 import '../viewmodel/SettlementViewModel.dart';
 
-class SettlementFinalCheckPage extends ConsumerStatefulWidget {
-  const SettlementFinalCheckPage({super.key});
+class SettlementResultCheckPage extends ConsumerStatefulWidget {
+  const SettlementResultCheckPage({super.key});
 
   @override
-  ConsumerState<SettlementFinalCheckPage> createState() =>
+  ConsumerState<SettlementResultCheckPage> createState() =>
       _SettlementFinalCheckPage();
 }
 
 class _SettlementFinalCheckPage
-    extends ConsumerState<SettlementFinalCheckPage> {
+    extends ConsumerState<SettlementResultCheckPage> {
   @override
   Widget build(BuildContext context) {
     final provider = ref.watch(stmProvider.notifier);
