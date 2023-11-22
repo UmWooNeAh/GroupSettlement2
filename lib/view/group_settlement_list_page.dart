@@ -199,31 +199,47 @@ class _GroupSettlementListPageState
                                                             title: const Text(
                                                                 "계좌 선택",
                                                                 style: TextStyle(
-                                                                    fontWeight: FontWeight.w600,
+                                                                    fontWeight: FontWeight.w400,
                                                                     fontSize: 18)),
                                                             backgroundColor: Colors.white,
                                                             shape: RoundedRectangleBorder(
                                                                 borderRadius: BorderRadius.circular(10)
                                                             ),
                                                             content: SizedBox(
-                                                              height:size.height * 0.05 + (size.height * 0.05 * account.length),
+                                                              height:size.height * 0.01 + (size.height * 0.05 * account.length),
                                                               child: Column(
                                                                   children: List.generate(
                                                                       account.length, (index) {
-                                                                    return CheckboxListTile(
-                                                                        title: Text(
-                                                                            account.toList()[index]),
-                                                                        value: selected[index],
-                                                                        onChanged: (value) {
-                                                                          setState(() {
-                                                                            for(int i=0;i<selected.length;i++){
-                                                                              selected[i] = false;
-                                                                            }
-                                                                            selected[index] = true;
-                                                                            realAccount = account.toList()[index];
-                                                                          });
-                                                                        }
-                                                                    );
+                                                                        return Row(
+                                                                          mainAxisAlignment: MainAxisAlignment.start,
+                                                                          children: [
+                                                                            Transform.scale(
+                                                                              scale:1.2,
+                                                                              child: Checkbox(
+                                                                                value: selected[index],
+                                                                                shape: RoundedRectangleBorder(
+                                                                                  borderRadius: BorderRadius.circular(10)
+                                                                                ),
+                                                                                activeColor: color2,
+                                                                                onChanged: (value){
+                                                                                  setState((){
+                                                                                    for(int i=0;i<selected.length;i++){
+                                                                                      selected[i] = false;
+                                                                                    }
+                                                                                    selected[index] = !selected[index];
+                                                                                    realAccount = account.toList()[index];
+                                                                                  });
+                                                                                }
+                                                                              ),
+                                                                            ),
+                                                                            Text(account.toList()[index],
+                                                                              style: TextStyle(
+                                                                                fontWeight: FontWeight.w600,
+                                                                                fontSize: 17,
+                                                                              ),
+                                                                            )
+                                                                          ],
+                                                                        );
                                                                   })
                                                               ),
                                                             ),
@@ -232,9 +248,10 @@ class _GroupSettlementListPageState
                                                                 .spaceBetween,
                                                             actions: [
                                                               SizedBox(
-                                                                height: 50, width: size.width*0.3,
+                                                                height: 50, width: size.width*0.4,
                                                                 child: OutlinedButton(
                                                                   onPressed: () async{
+                                                                    if(!selected.contains(true)) return;
                                                                     for(int i in indices){
                                                                       stms[i].accountInfo = realAccount;
                                                                     }
@@ -246,6 +263,7 @@ class _GroupSettlementListPageState
                                                                     }
                                                                     flag = !flag;
                                                                     ischecked = {};
+                                                                    selected = [];
                                                                     Navigator.of(
                                                                         context)
                                                                         .pop();
@@ -255,9 +273,9 @@ class _GroupSettlementListPageState
                                                                   },
                                                                   style: OutlinedButton
                                                                       .styleFrom(
-                                                                    backgroundColor: color1,
-                                                                    side: const BorderSide(
-                                                                      color: color1,
+                                                                    backgroundColor: !selected.contains(true) ? Color(0xFFD9D9D9) : color1,
+                                                                    side: BorderSide(
+                                                                      color: !selected.contains(true) ? Color(0xFFD9D9D9) : color1,
                                                                     ),
                                                                     shape:
                                                                     RoundedRectangleBorder(
@@ -267,20 +285,21 @@ class _GroupSettlementListPageState
                                                                           5),
                                                                     ),
                                                                   ),
-                                                                  child: const Text(
-                                                                    "계좌 선택 완료",
+                                                                  child: Text(
+                                                                    !selected.contains(true) ? "계좌를 선택해 주세요": "계좌 선택 완료",
                                                                     style: TextStyle(
                                                                         fontSize: 12,
                                                                         fontWeight: FontWeight.w600,
-                                                                        color: Colors
+                                                                        color: !selected.contains(true) ? Color(0xFF838383) : Colors
                                                                             .white),
                                                                   ),
                                                                 ),
                                                               ),
                                                               SizedBox(
-                                                                height: 50, width: size.width*0.3,
+                                                                height: 50, width: size.width*0.2,
                                                                 child: OutlinedButton(
                                                                   onPressed: () {
+                                                                    selected = [];
                                                                     Navigator.of(
                                                                         context)
                                                                         .pop();
@@ -602,7 +621,7 @@ class _OneSettlementState extends ConsumerState<OneSettlement> {
                 decoration: ShapeDecoration(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
-                    side: BorderSide(width: 3, color: color),
+                    side: BorderSide(width: 3, color: _isChecked ? Color(0xFFD77872): color),
                   ),
                   shadows: [
                     BoxShadow(
@@ -613,80 +632,94 @@ class _OneSettlementState extends ConsumerState<OneSettlement> {
                     )
                   ],
                 ),
-                child: Column(children: [
-                  Container(
-                      width: double.infinity,
-                      height: 23,
-                      color: color,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left: 10),
-                            child: Text(widget.masterFlag ? "받을 정산" : "보낼 정산",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w400)),
+                child: Stack(
+                  children: [
+                    Column(children: [
+                      Container(
+                          width: double.infinity,
+                          height: 23,
+                          decoration: BoxDecoration(
+                            color: color,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(4),
+                              topRight: Radius.circular(4)
+                            )
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(right: 10),
-                            child: Text(DateFormat("yyyy/MM/dd").format(dt),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 10),
+                                child: Text(widget.masterFlag ? "받을 정산" : "보낼 정산",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w400)),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(right: 10),
+                                child: Text(DateFormat("yyyy/MM/dd").format(dt),
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w400)),
+                              )
+                            ],
+                          )),
+                      Container(
+                        width: double.infinity,
+                        height: 70,
+                        decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(10),
+                                bottomRight: Radius.circular(10))),
+                        child: Stack(
+                          children: [
+                            Align(
+                              alignment: Alignment(-0.9, 0),
+                              child: Text(
+                                widget.settlement.settlementName!,
                                 style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w400)),
-                          )
-                        ],
-                      )),
-                  Container(
-                    width: double.infinity,
-                    height: 70,
-                    decoration: BoxDecoration(
-                        color: !widget.flag ? _canMerge ? Colors.white : Color(0xFFD9D9D9) : Colors.white,
-                        borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(10),
-                            bottomRight: Radius.circular(10))),
-                    child: Stack(
-                      children: [
-                        Align(
-                          alignment: Alignment(-0.9, 0),
-                          child: Text(
-                            widget.settlement.settlementName!,
-                            style: TextStyle(
-                                fontSize: 25, fontWeight: FontWeight.w700),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment(0.9, 0),
-                          child: widget.flag ? Text.rich(
-                            TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: currentStmComplete.toString(),
-                                  style: TextStyle(
-                                    color: color,
-                                    fontSize: 25,
-                                    fontWeight: FontWeight.w600,
-                                    height: 0,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text:
-                                      ' / ${widget.settlement.checkSent.length}명',
-                                  style: TextStyle(
-                                    color: Color(0xFF838383),
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
-                                    height: 0,
-                                  ),
-                                ),
-                              ],
+                                    fontSize: 25, fontWeight: FontWeight.w700),
+                              ),
                             ),
-                          ) : Icon(Icons.chevron_right),
+                            Align(
+                              alignment: Alignment(0.9, 0),
+                              child: widget.flag ? Text.rich(
+                                TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: currentStmComplete.toString(),
+                                      style: TextStyle(
+                                        color: color,
+                                        fontSize: 25,
+                                        fontWeight: FontWeight.w600,
+                                        height: 0,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text:
+                                          ' / ${widget.settlement.checkSent.length}명',
+                                      style: TextStyle(
+                                        color: Color(0xFF838383),
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w600,
+                                        height: 0,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ) : Icon(Icons.chevron_right),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                ]),
+                      ),
+                    ]),
+                    _isChecked ? Container(
+                      height:93, width: double.infinity,
+                      color: Colors.grey.withOpacity(0.4)
+                    ) : SizedBox.shrink()
+                  ],
+                ),
               ),
             ],
           ),
