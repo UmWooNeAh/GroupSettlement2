@@ -205,8 +205,9 @@ class UserViewModel extends ChangeNotifier {
 
   double getCurrentMoney(Settlement settlement) {
     double currentMoney = 0;
+
     settlementInfo[settlement]!.forEach((paper) {
-      if (settlement.checkSent[paper.serviceUserId] == 2) {
+      if (settlement.checkSent[paper.serviceUserId] == 3) {
         currentMoney = currentMoney + paper.totalPrice!;
       }
     });

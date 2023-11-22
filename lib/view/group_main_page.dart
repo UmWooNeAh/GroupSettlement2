@@ -635,7 +635,7 @@ class _StmItemState extends ConsumerState<StmItem> {
   Widget build(BuildContext context) {
     bool masterFlag = widget.settlement.masterUserId == widget.userId;
     Color color =
-        masterFlag ? const Color(0xFF07BEB8) : const Color(0xFFFE5F55);
+        masterFlag ? const Color(0xFFFE5F55) : const Color(0xFF07BEB8);
     int currentStmComplete = 0;
     DateTime dt;
 
