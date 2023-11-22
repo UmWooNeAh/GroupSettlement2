@@ -567,7 +567,7 @@ class _OneSettlementState extends ConsumerState<OneSettlement> {
         SizedBox(width: double.infinity, height: 30),
         GestureDetector(
           onTap: () {
-            if (!widget.flag) {
+            if (!widget.flag && _canMerge) {
               setState(() {
                 _isChecked = !_isChecked;
                 widget.callBack(widget.settlement, _isChecked);
@@ -605,8 +605,8 @@ class _OneSettlementState extends ConsumerState<OneSettlement> {
                       value: _canMerge ? _isChecked : false,
                       onChanged: (value) {
                         setState(() {
-                          _isChecked = value!;
                           if (_canMerge)
+                            _isChecked = value!;
                             widget.callBack(widget.settlement, value);
                         });
                       },

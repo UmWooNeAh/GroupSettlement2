@@ -26,6 +26,7 @@ class UserViewModel extends ChangeNotifier {
   Map<Settlement, List<SettlementPaper>> settlementInfo = {};
   bool isFetchFinished = false;
   bool lock = true;
+  int initialStmCount = 2;
 
   UserViewModel();
 
@@ -36,6 +37,7 @@ class UserViewModel extends ChangeNotifier {
     lock = true;
     isFetchFinished = false;
     fetchUser(userData.serviceUserId!);
+    fetchSettlement(0, initialStmCount);
     return;
   }
 
@@ -102,15 +104,21 @@ class UserViewModel extends ChangeNotifier {
   }
 
   Future<void> fetchSettlement(int currentCount, int num) async {
+
     if (isFetchFinished == false) {
+      print(1);
       for (int i = currentCount; i < currentCount + num; i++) {
+        print(2);
+        print(userData.settlements.length);
         if (i >= userData.settlements.length) {
           isFetchFinished = true;
           break;
         }
+        print(3);
         Settlement stm = await Settlement().getSettlementBySettlementId(
             userData.settlements[userData.settlements.length - (i + 1)]);
         settlementInfo[stm] = [];
+        print(4);
         await fetchStmPaper(stm);
       }
     }

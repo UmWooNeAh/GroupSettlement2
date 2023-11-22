@@ -61,7 +61,8 @@ class _MainPage extends ConsumerState<MainPage> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     var mvm = ref.watch(userProvider);
-
+    //print(mvm.settlementInfo.length);
+    //mvm.fetchSettlement(mvm.settlementInfo.length, maxSettlementCount).then((value) => )
     return Scaffold(
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
