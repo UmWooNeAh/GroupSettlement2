@@ -59,6 +59,19 @@ class GroupViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void sortStms(int index){
+    if(index == 0){
+      print("0");
+      settlementInGroup.sort((a,b) => a.settlementName!.compareTo(b.settlementName!));
+    } else if(index == 1){
+
+    } else{
+      settlementInGroup.sort((a,b) => b.time!.compareTo(a.time!));
+    }
+    notifyListeners();
+    return;
+  }
+
   void addByKakaoFriends() async {
     var params = PickerFriendRequestParams(
       title: 'Multi Picker',
@@ -160,10 +173,10 @@ class GroupViewModel extends ChangeNotifier {
   }
 
   //앞의 병합 조건들을 모두 만족했다는 전제 하에 해당 메소드 호출하도록
-  void mergeSettlements(List<int> indexes, String newName) async {
+  Future<bool> mergeSettlements(List<int> indexes, String newName) async {
     if (indexes.length > 10) {
       print("최대 10개까지만 담을 수 있습니다.");
-      return;
+      return false;
     }
 
     Map<String, SettlementPaper> newMergedPapers = <String, SettlementPaper>{};
@@ -306,5 +319,9 @@ class GroupViewModel extends ChangeNotifier {
     FireService().updateDoc("grouplist", myGroup.groupId!, myGroup.toJson());
     newMergedSettlement.time = Timestamp.now();
     newMergedSettlement.createSettlement();
+
+    return true;
   }
+
+
 }
