@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/common_fireservice.dart';
 import '../class/class_receipt.dart';
 import '../class/class_group.dart';
-import '../class/class_receiptContent.dart';
 import '../class/class_receiptitem.dart';
 import '../class/class_settlement.dart';
 import '../class/class_user.dart';
@@ -100,12 +99,6 @@ class SettlementCreateViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  //직접 추가 후 Receipt/List<ReceiptItem> 리턴
-  ReceiptContent createReceiptFromTyping() {
-    Receipt newReceipt = Receipt();
-    List<ReceiptItem> newReceiptItems = [];
-    return ReceiptContent(newReceipt, newReceiptItems);
-  }
 
   void completeEditReceipt(String receiptId) {
     if (receipts.containsKey(newReceipt.receiptId!)) {
@@ -115,25 +108,6 @@ class SettlementCreateViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  //영수증 항목 추가하기
-  void addReceiptItem(ReceiptContent rcpContent, ReceiptItem item) {
-    rcpContent.receipt!.receiptItems.add(item.receiptItemId!);
-    rcpContent.receiptItems.add(item);
-  }
-
-  //영수증 항목 편집하기
-  void editReceiptItem(
-      ReceiptContent rcpContent, ReceiptItem edittedItem, int index) {
-    edittedItem.receiptItemId = rcpContent.receiptItems[index].receiptItemId;
-    rcpContent.receiptItems[index] = edittedItem;
-  }
-
-  //영수증 항목 삭제하기
-  void removeReceiptItem(
-      ReceiptContent rcpContent, String rcpItemId, int index) {
-    rcpContent.receipt!.receiptItems.remove(rcpItemId);
-    rcpContent.receiptItems.removeAt(index);
-  }
 
   // 영수증/영수증항목 뷰모델에 추가하기
   void addReceipt() {

@@ -58,6 +58,7 @@ class UserViewModel extends ChangeNotifier {
     userData = me;
     myGroup = [];
     for(var groupId in userData.groups){
+      print(groupId);
       myGroup.add(await Group().getGroupByGroupId(groupId));
     }
     notifyListeners();

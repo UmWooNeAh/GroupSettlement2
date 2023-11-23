@@ -22,6 +22,7 @@ class SettlementCheckViewModel extends ChangeNotifier {
       <String, List<SettlementItem>>{};
   Map<String, Receipt> receipts = <String, Receipt>{};
   Map<String, List<ReceiptItem>> receiptItems = <String, List<ReceiptItem>>{};
+  double completedPrice = 0;
 
   SettlementCheckViewModel();
 
@@ -30,15 +31,19 @@ class SettlementCheckViewModel extends ChangeNotifier {
     settlement = rSettlement;
     group = rGroup;
     userData = me;
+    completedPrice = 0;
     notifyListeners();
+
     // settlementPaper, 이에딸린 settlementItem전부 가져오기
     settlement.settlementPapers.forEach((key, value) async {
       SettlementPaper stm =
           await SettlementPaper().getSettlementPaperByPaperId(value);
       settlementPapers[key] = stm;
+      if (settlement.checkSent[stm.serviceUserId] == 3){
+        completedPrice += stm.totalPrice ?? 0;
+      }
       List<SettlementItem> items = [];
       for(var itemId in stm.settlementItems){
-        print(itemId);
         items.add(await SettlementItem().getSettlementItemBySettlementItemId(itemId));
       }
       settlementItems[key] = items;

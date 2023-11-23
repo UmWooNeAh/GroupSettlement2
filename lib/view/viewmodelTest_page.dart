@@ -12,7 +12,6 @@ import 'package:groupsettlement2/viewmodel/GroupViewModel.dart';
 import '../class/class_alarm.dart';
 import '../class/class_friend.dart';
 import '../class/class_group.dart';
-import '../class/class_receiptContent.dart';
 import '../class/class_settlement.dart';
 import '../clova/clova.dart';
 import '../main.dart';
@@ -41,7 +40,6 @@ class _VMTestPageState extends ConsumerState<VMTestPage> {
 
   bool textFlag = false;
   bool flag = false;
-  late ReceiptContent rcpcontent;
   late Future<bool> nicknameexisted;
 
   Friend me = Friend();
