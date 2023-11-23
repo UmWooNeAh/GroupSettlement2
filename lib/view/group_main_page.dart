@@ -607,7 +607,7 @@ class _GroupMainPageState extends ConsumerState<GroupMainPage> {
       ),
       bottomNavigationBar: const CustomBottomNavigationBar(
         index: 0,
-        isIn: true,
+        isIn: false,
       ),
     );
   }

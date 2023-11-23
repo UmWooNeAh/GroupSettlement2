@@ -705,7 +705,12 @@ class _RecentSettlementState extends ConsumerState<RecentSettlement> {
         GestureDetector(
           onTap: () {
             context.go(
-                "/SettlementInformation", extra: []);
+                "/SettlementInformation", extra: [widget.settlement, mvm.myGroup[mvm.myGroup.indexWhere((group) {
+                  if (group.groupId == widget.settlement.groupId){
+                    return true;
+                  }
+                  return false;
+                })], mvm.userData]);
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,

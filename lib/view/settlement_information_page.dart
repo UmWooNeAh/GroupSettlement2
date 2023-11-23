@@ -1,9 +1,8 @@
 import 'dart:math';
-import 'package:flutter/material.dart' hide BoxDecoration, BoxShadow;
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/design_element.dart';
 import 'package:groupsettlement2/view/shared_basic_widget.dart';
-import 'package:flutter_inset_box_shadow/flutter_inset_box_shadow.dart';
 import 'package:groupsettlement2/viewmodel/SettlementCheckViewModel.dart';
 import 'package:intl/intl.dart';
 import '../class/class_user.dart';
@@ -329,41 +328,34 @@ class _SettlementInformationReceiverState
                           boxShadow: const [
                             BoxShadow(
                               color: Colors.grey,
-                              blurRadius: 2,
-                              inset: true,
                             ),
                             BoxShadow(
-                              color: Colors.grey,
-                              blurRadius: 2,
-                              inset: true,
-                            ),
+                                color: Color(0xFFDCDCDC),
+                                spreadRadius: 0,
+                                blurRadius: 7,
+                                offset: Offset(0, 5)),
                           ],
-                          color: Colors.grey[300],
                           borderRadius: BorderRadius.circular(50),
                         ),
                       ),
                       Container(
                         height: 40,
-                        width:
-                            size.width * provider.settlement.checkSent.length !=
-                                    0
-                                ? provider.settlement.checkSent.values
-                                        .toList()
-                                        .where((number) => number == 3)
-                                        .toList()
-                                        .length /
-                                    provider.settlement.checkSent.length
-                                : 0,
+                        width: size.width *
+                            provider.completedPrice /
+                            provider.settlement.totalPrice,
                         decoration: BoxDecoration(
                           color: color1,
                           borderRadius: BorderRadius.circular(50),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.grey,
-                              blurRadius: 2,
-                              offset: Offset(2, 2),
-                            ),
-                          ],
+                          boxShadow: (provider.completedPrice != 0)
+                              ? [
+                                  const BoxShadow(
+                                    color: Colors.grey,
+                                    blurRadius: 2,
+                                    spreadRadius: -2,
+                                    offset: Offset(5, 0),
+                                  ),
+                                ]
+                              : [],
                         ),
                       ),
                       SizedBox(
@@ -372,7 +364,7 @@ class _SettlementInformationReceiverState
                         child: Align(
                             alignment: const Alignment(-0.9, 0.0),
                             child: Text(
-                              "${size.width * provider.settlement.checkSent.length != 0 ? provider.settlement.checkSent.values.toList().where((number) => number == 3).toList().length / provider.settlement.checkSent.length * 100 : 0}%",
+                              "${(provider.completedPrice / provider.settlement.totalPrice * 100).toInt()}%",
                               style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 25,
@@ -404,7 +396,9 @@ class _SettlementInformationReceiverState
                       return Column(
                         children: List.generate(
                           min(provider.settlementPapers.length - index * 3, 3),
-                          (iindex) => Container(
+                          (iindex) {
+                            String serviceUserId = provider.settlementPapers.keys.toList()[index * 3 + iindex];
+                            return Container(
                             margin: const EdgeInsets.all(5),
                             height: 70,
                             width: 140,
@@ -428,19 +422,18 @@ class _SettlementInformationReceiverState
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        provider.settlementPapers.values
-                                                .toList()[index * 3 + iindex]
-                                                .userName ??
+                                        provider.settlementPapers[serviceUserId]!.userName ??
                                             "user",
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.w800,
+                                          color: (provider.settlement.checkSent[serviceUserId] == 3) ? Colors.black : Colors.grey,
                                         ),
                                       ),
                                       Text(
-                                        "${priceToString.format(provider.settlementPapers.values.toList()[index * 3 + iindex].totalPrice)}원",
-                                        style: const TextStyle(
-                                          color: color1,
+                                        "${priceToString.format(provider.settlementPapers[serviceUserId]!.totalPrice)}원",
+                                        style: TextStyle(
+                                          color: (provider.settlement.checkSent[serviceUserId] == 3) ? color1 : Colors.grey,
                                           fontSize: 15,
                                         ),
                                       )
@@ -449,7 +442,7 @@ class _SettlementInformationReceiverState
                                 ),
                               ],
                             ),
-                          ),
+                          );}
                         ), //
                       );
                     },
@@ -537,8 +530,8 @@ class _SettlementInformationReceiverState
                     )),
                 Column(
                   children: List.generate(
-                      provider.settlementPapers[provider.userData.serviceUserId]?.settlementItems
-                              .length ??
+                      provider.settlementPapers[provider.userData.serviceUserId]
+                              ?.settlementItems.length ??
                           0, (index) {
                     return Container(
                       width: size.width,
@@ -549,7 +542,9 @@ class _SettlementInformationReceiverState
                           SizedBox(
                             width: 180,
                             child: Text(
-                              provider.settlementItems[provider.userData.serviceUserId]?[index]
+                              provider
+                                      .settlementItems[provider
+                                          .userData.serviceUserId]?[index]
                                       .menuName ??
                                   "menu",
                               style: const TextStyle(
@@ -851,8 +846,8 @@ class _SettlementDetailPageSenderState
                     )),
                 Column(
                   children: List.generate(
-                      provider.settlementPapers[provider.userData.serviceUserId]?.settlementItems
-                              .length ??
+                      provider.settlementPapers[provider.userData.serviceUserId]
+                              ?.settlementItems.length ??
                           0, (index) {
                     return Container(
                       width: size.width,
@@ -863,7 +858,9 @@ class _SettlementDetailPageSenderState
                           SizedBox(
                             width: 180,
                             child: Text(
-                              provider.settlementItems[provider.userData.serviceUserId]?[index]
+                              provider
+                                      .settlementItems[provider
+                                          .userData.serviceUserId]?[index]
                                       .menuName ??
                                   "menu",
                               style: const TextStyle(
@@ -998,12 +995,12 @@ class _SettlementDetailPageSenderState
                             BoxShadow(
                               color: Colors.grey,
                               blurRadius: 2,
-                              inset: true,
+                              // inset: true,
                             ),
                             BoxShadow(
                               color: Colors.grey,
                               blurRadius: 2,
-                              inset: true,
+                              // inset: true,
                             ),
                           ],
                           color: Colors.grey[300],
@@ -1052,13 +1049,13 @@ class _SettlementDetailPageSenderState
                 color: Colors.grey[200],
                 boxShadow: const [
                   BoxShadow(
-                    inset: true,
+                    // inset: true,
                     color: Color(0xffcccccc),
                     blurRadius: 2,
                     offset: Offset(2, 2),
                   ),
                   BoxShadow(
-                    inset: true,
+                    // inset: true,
                     color: Color(0xffcccccc),
                     blurRadius: 2,
                     offset: Offset(2, -2),
