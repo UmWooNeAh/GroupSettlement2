@@ -578,9 +578,11 @@ class SimpleSettlementerRes extends StatefulWidget {
 }
 
 class _SimpleSettlementerResState extends State<SimpleSettlementerRes> {
+
   @override
   Widget build(BuildContext context) {
-
+    bool isRealNum = widget.res == widget.res.toInt();
+    double res = widget.res * 1;
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       physics: const NeverScrollableScrollPhysics(),
@@ -602,17 +604,45 @@ class _SimpleSettlementerResState extends State<SimpleSettlementerRes> {
               Positioned(
                   top: 25,
                   left: 80,
-                  child: AnimatedDigitWidget(
-                    fractionDigits: 2,
-                    duration: Duration(seconds: 1),
-                    value: widget.res,
-                    enableSeparator: true,
-                    suffix: "원",
-                    textStyle: TextStyle(
-                      fontSize: 30,
-                      fontWeight: FontWeight.w600,
-                      color: color1,
-                    ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.ideographic,
+                    children: [
+                      AnimatedDigitWidget(
+                        fractionDigits: 0,
+                        duration: Duration(seconds: 1),
+                        value: isRealNum ? res : res.toInt(),
+                        enableSeparator: true,
+                        suffix: isRealNum ? "원" : ".",
+                        textStyle: TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.w600,
+                          color: color1,
+                        ),
+                      ),
+                      isRealNum && (res * 100 % 100) / 10 > 1? SizedBox.shrink() : AnimatedDigitWidget(
+                        value: 0,
+                        textStyle: TextStyle(
+                          textBaseline: TextBaseline.alphabetic,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      isRealNum ? SizedBox.shrink() : AnimatedDigitWidget(
+                        duration: Duration(seconds: 1),
+                        value : res * 100 % 100,
+                        enableSeparator: true,
+                        suffix: "원",
+                        textStyle: TextStyle(
+                          textBaseline: TextBaseline.alphabetic,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey,
+                        ),
+                      )
+                    ],
                   )
                   // child: Text("${priceToString.format(widget.res)}원",
                   //   textAlign: TextAlign.start,
