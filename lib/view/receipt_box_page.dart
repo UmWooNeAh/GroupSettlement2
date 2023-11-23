@@ -2,13 +2,16 @@ import 'dart:math';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:groupsettlement2/class/class_receipt.dart';
+import 'package:groupsettlement2/class/class_user.dart';
 import 'package:groupsettlement2/design_element.dart';
 import 'package:groupsettlement2/view/shared_basic_widget.dart';
 import 'package:groupsettlement2/viewmodel/UserViewModel.dart';
 
 class ReceiptBoxPage extends ConsumerStatefulWidget {
-  const ReceiptBoxPage({super.key});
+  const ReceiptBoxPage({super.key, required this.me});
+  final ServiceUser me;
 
   @override
   ConsumerState<ReceiptBoxPage> createState() => _ReceiptBoxPageState();
@@ -21,7 +24,7 @@ class _ReceiptBoxPageState extends ConsumerState<ReceiptBoxPage> {
     final provider = ref.watch(userProvider);
     if (isFirst) {
       Future(() async {
-        await provider.fetchUser("8969xxwf-8wf8-pf89-9x6p-88p0wpp9ppfb");
+        await provider.fetchUser(widget.me.serviceUserId!);
       });
       isFirst = false;
     }

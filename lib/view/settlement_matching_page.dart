@@ -1,10 +1,8 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:groupsettlement2/design_element.dart';
-import 'dart:math' as math;
 import 'shared_basic_widget.dart';
 import '../viewmodel/SettlementViewModel.dart';
 
@@ -161,40 +159,35 @@ final readMoreProvider = StateNotifierProvider((ref) => ReadMore());
 final isReceiptOpenedProvider =
     ChangeNotifierProvider((ref) => IsReceiptOpened());
 
-class SettlementPage extends ConsumerStatefulWidget {
-  const SettlementPage({super.key, required this.settlementId});
-  final String settlementId;
+class SettlementMatchingPage extends ConsumerStatefulWidget {
+  const SettlementMatchingPage({super.key, required this.info});
+  final List<dynamic> info;
 
   @override
-  ConsumerState<SettlementPage> createState() => _SettlementPageState();
+  ConsumerState<SettlementMatchingPage> createState() => _SettlementPageState();
 }
 
-class _SettlementPageState extends ConsumerState<SettlementPage> {
-  bool isFirstBuild = true;
-  @override
-  void initState() {
-    super.initState();
-    isFirstBuild = true;
-  }
+class _SettlementPageState extends ConsumerState<SettlementMatchingPage> {
+  bool isFirst = true;
 
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    // final provider = ref.watch(stmProvider);
     final bottomsheetprovider = ref.watch(bottomSheetSliderProvider);
-    final providerMethod = ref.watch(stmProvider.notifier);
     final receiptprovider = ref.watch(isReceiptOpenedProvider);
     final checkprovider = ref.watch(checkSettlementPaperProvider);
+    final provider = ref.watch(stmProvider);
 
-    if (isFirstBuild) {
-      bottomsheetprovider.setBottomSheetSlider(0.0, 0.0, size.height * 0.7);
-      providerMethod.settingSettlementViewModel(widget.settlementId);
-      checkprovider.setting();
-      isFirstBuild = false;
-      // while (provider.receipts.isEmpty) {
-      //   Future.delayed(const Duration(milliseconds: 100));
-      // }
-      Future(() => receiptprovider.initializeReceiptPosition(size));
+    if (isFirst) {
+      Future(() async {
+        await provider.settingSettlementViewModel(
+            widget.info[0], widget.info[1], widget.info[2]);
+      }).then((value) {
+        bottomsheetprovider.setBottomSheetSlider(0.0, 0.0, size.height * 0.7);
+        receiptprovider.initializeReceiptPosition(size);
+        checkprovider.setting();
+      });
+      isFirst = false;
     }
 
     return Scaffold(
@@ -352,7 +345,7 @@ class _ReadMoreWidgetState extends ConsumerState<ReadMoreWidget> {
                             (index) {
                               return Row(
                                 children: List.generate(
-                                  math.min(
+                                  min(
                                       4,
                                       provider.settlementUsers.length -
                                           4 * index),
@@ -677,11 +670,14 @@ class _CustomBottomSheetState extends ConsumerState<CustomBottomSheet> {
                                       height: 50,
                                       width: size.width,
                                       child: OutlinedButton(
-                                        onPressed: () async {
-                                          await provider.completeSettlement();
-                                          Navigator.of(context).pop();
-                                          context.go(
-                                              "/SettlementPage/:settlementId/CompleteSettlementMatching");
+                                        onPressed: () {
+                                          Future(() async {
+                                            await provider.completeSettlement();
+                                          }).then((value) {
+                                            context.pop();
+                                            context.go(
+                                                "/SettlementMatchingComplete");
+                                          });
                                         },
                                         style: OutlinedButton.styleFrom(
                                           backgroundColor: color1,
@@ -1070,7 +1066,7 @@ class _SlidableAdderWidgetState extends ConsumerState<SlidableAdderWidget> {
             child: Transform(
               transform: Matrix4.identity()
                 ..setEntry(3, 2, 0.001)
-                ..rotateZ(-math.pi /
+                ..rotateZ(-pi /
                     40 *
                     ((ref.watch(slidableAdderStateNotifierProvider) as double) -
                         5)),
@@ -1211,7 +1207,7 @@ class _SettlementPageReceiptItemState
                                           (ndex) {
                                             return Column(
                                               children: List.generate(
-                                                math.min(
+                                                min(
                                                     2,
                                                     ((provider
                                                                         .receiptItems[
@@ -1230,7 +1226,7 @@ class _SettlementPageReceiptItemState
                                                     mainAxisAlignment:
                                                         MainAxisAlignment.start,
                                                     children: List.generate(
-                                                      math.min(
+                                                      min(
                                                           4,
                                                           ((provider
                                                                       .receiptItems[
@@ -1345,7 +1341,7 @@ class _SettlementPageReceiptItemState
                                         horizontal: 10),
                                     child: Row(
                                       children: List.generate(
-                                          math.min(
+                                          min(
                                               provider
                                                       .receiptItems[
                                                           openedprovider

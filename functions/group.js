@@ -26,6 +26,12 @@ exports.sendNtf_CreateGroup  = functions.region("asia-northeast3").firestore
                   title: alarmTitle,
                   body: alarmBody,
                 },
+                data: {
+                    route: "/GroupSelect/GroupMain",
+                    topic: "GroupCreate",
+                    arg0: userDoc.data().serviceuserid,
+                    arg1: newvalue.groupid
+                },
                 token: userDoc.data().fcmtoken,
             };
             const alarm = {

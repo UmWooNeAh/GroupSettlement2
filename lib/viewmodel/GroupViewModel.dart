@@ -10,6 +10,7 @@ import '../class/class_settlementitem.dart';
 import '../class/class_settlementpaper.dart';
 import '../class/class_user.dart';
 
+final FirebaseFirestore db = FirebaseFirestore.instance;
 final groupProvider = ChangeNotifierProvider<GroupViewModel>((ref) =>
     GroupViewModel());
 
@@ -110,6 +111,7 @@ class GroupViewModel extends ChangeNotifier {
   }
 
   void updateUserName(String userId, String newName) async {
+
     ServiceUser user = await ServiceUser().getUserByUserId(userId);
 
     if (user.kakaoId == null) {
@@ -119,7 +121,7 @@ class GroupViewModel extends ChangeNotifier {
     } else {
       print("카카오톡으로 추가한 유저의 이름은 변경할 수 없습니다.");
     }
-    notifyListeners();
+
   }
 
   bool checkMaster(int index) {
