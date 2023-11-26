@@ -25,7 +25,8 @@ class _SettlementGroupSelectPage
   @override
   Widget build(BuildContext context) {
     final uvm = ref.watch(userProvider);
-    if(isFirst){
+    Size size = MediaQuery.of(context).size;
+    if (isFirst) {
       Future(() async => await uvm.fetchGroup(widget.me));
       isFirst = false;
     }
@@ -36,64 +37,56 @@ class _SettlementGroupSelectPage
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "정산할 그룹 선택",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  context.push("/GroupCreate", extra: widget.me);
-                },
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Column(
-                    children: [
-                      Stack(
-                        children: [
-                          const Positioned(
-                            left: 15,
-                            top: 0,
-                            child: Text(
-                              "+",
-                              style: TextStyle(
-                                fontSize: 35,
-                                color: Color(0xFF838383),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            child: Container(
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    width: 2,
-                                    color: const Color(0xFF838383),
-                                  ),
-                                  shape: BoxShape.circle,
-                                )),
-                          ),
-                        ],
-                      ),
-                      const Padding(
-                        padding: EdgeInsets.only(top: 5),
-                        child: Text(
-                          "새 그룹 만들기",
-                          style: TextStyle(
-                              color: Color(0xFF838383),
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ],
+              SizedBox(
+                width: size.width,
+                child: const Text(
+                  "정산할 그룹 선택",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
+              ),
+              Column(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      context.push("/GroupCreate", extra: widget.me);
+                    },
+                    child: Container(
+                      width: 50,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          width: 2,
+                          color: const Color(0xFF838383),
+                        ),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Center(
+                        child: Text(
+                          "+",
+                          style: TextStyle(
+                            fontSize: 35,
+                            color: Color(0xFF838383),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(top: 5),
+                    child: Text(
+                      "새 그룹 만들기",
+                      style: TextStyle(
+                          color: Color(0xFF838383),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w500),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ],
               ),
               Column(
                 children: List.generate(
@@ -107,7 +100,10 @@ class _SettlementGroupSelectPage
           ),
         ),
       ),
-      bottomNavigationBar: const CustomBottomNavigationBar(index: 2, isIn: true,),
+      bottomNavigationBar: const CustomBottomNavigationBar(
+        index: 2,
+        isIn: true,
+      ),
     );
   }
 }
@@ -128,8 +124,8 @@ class _OneGroupState extends ConsumerState<OneGroup> {
       children: [
         GestureDetector(
           onTap: () {
-            context.go(
-                "/SettlementCreate", extra: [widget.group, uvm.userData]);
+            context
+                .go("/SettlementCreate", extra: [widget.group, uvm.userData]);
           },
           child:
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -188,6 +184,7 @@ class _OneGroupState extends ConsumerState<OneGroup> {
             )
           ]),
         ),
+        const Divider(),
       ],
     );
   }

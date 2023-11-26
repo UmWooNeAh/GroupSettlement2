@@ -3,7 +3,6 @@ import '../modeluuid.dart';
 
 
 class Receipt {
-
   String? receiptId;
   String? receiptName;
   String? settlementId;

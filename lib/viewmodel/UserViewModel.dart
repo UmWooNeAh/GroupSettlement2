@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/class/class_receiptitem.dart';
+import 'package:groupsettlement2/viewmodel/master_viewmodel.dart';
 import '../class/class_group.dart';
 import '../class/class_settlement.dart';
 import '../class/class_settlementpaper.dart';
@@ -10,9 +11,12 @@ import '../class/class_receipt.dart';
 import '../common_fireservice.dart';
 
 final userProvider = ChangeNotifierProvider<UserViewModel>(
-        (ref) => UserViewModel());
+        (ref) {
+          return UserViewModel(ref.watch(masterProvider));
+        });
 
 class UserViewModel extends ChangeNotifier {
+  MasterViewModel provider;
   ServiceUser userData = ServiceUser();
   List<Group> myGroup = <Group> [];
   List<Receipt> myReceipts = <Receipt> [];
@@ -27,8 +31,15 @@ class UserViewModel extends ChangeNotifier {
   bool isFetchFinished = false;
   bool lock = true;
   int initialStmCount = 2;
+  // String testString = "";
 
-  UserViewModel();
+  UserViewModel(this.provider);
+
+  // void masterProviderTest(){
+  //   provider.valueChangeTest("jytcjc");
+  //   testString = provider.testString;
+  //   notifyListeners();
+  // }
 
   Future<void> settingUserData(ServiceUser me) async {
     userData = me;

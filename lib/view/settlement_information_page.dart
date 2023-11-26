@@ -362,15 +362,16 @@ class _SettlementInformationReceiverState
                         height: 40,
                         width: size.width,
                         child: Align(
-                            alignment: const Alignment(-0.9, 0.0),
-                            child: Text(
-                              "${(provider.completedPrice / provider.settlement.totalPrice * 100).toInt()}%",
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 25,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            )),
+                          alignment: const Alignment(-0.9, 0.0),
+                          child: Text(
+                            "${(provider.completedPrice / provider.settlement.totalPrice * 100).toInt()}%",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 25,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -395,10 +396,11 @@ class _SettlementInformationReceiverState
                     (index) {
                       return Column(
                         children: List.generate(
-                          min(provider.settlementPapers.length - index * 3, 3),
-                          (iindex) {
-                            String serviceUserId = provider.settlementPapers.keys.toList()[index * 3 + iindex];
-                            return Container(
+                            min(provider.settlementPapers.length - index * 3,
+                                3), (iindex) {
+                          String serviceUserId = provider.settlementPapers.keys
+                              .toList()[index * 3 + iindex];
+                          return Container(
                             margin: const EdgeInsets.all(5),
                             height: 70,
                             width: 140,
@@ -422,18 +424,29 @@ class _SettlementInformationReceiverState
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
-                                        provider.settlementPapers[serviceUserId]!.userName ??
+                                        provider
+                                                .settlementPapers[
+                                                    serviceUserId]!
+                                                .userName ??
                                             "user",
                                         style: TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.w800,
-                                          color: (provider.settlement.checkSent[serviceUserId] == 3) ? Colors.black : Colors.grey,
+                                          color: (provider.settlement.checkSent[
+                                                      serviceUserId] ==
+                                                  3)
+                                              ? Colors.black
+                                              : Colors.grey,
                                         ),
                                       ),
                                       Text(
                                         "${priceToString.format(provider.settlementPapers[serviceUserId]!.totalPrice)}원",
                                         style: TextStyle(
-                                          color: (provider.settlement.checkSent[serviceUserId] == 3) ? color1 : Colors.grey,
+                                          color: (provider.settlement.checkSent[
+                                                      serviceUserId] ==
+                                                  3)
+                                              ? color1
+                                              : Colors.grey,
                                           fontSize: 15,
                                         ),
                                       )
@@ -442,8 +455,8 @@ class _SettlementInformationReceiverState
                                 ),
                               ],
                             ),
-                          );}
-                        ), //
+                          );
+                        }), //
                       );
                     },
                   ),
@@ -655,8 +668,6 @@ class SettlementInformationSender extends ConsumerStatefulWidget {
 
 class _SettlementDetailPageSenderState
     extends ConsumerState<SettlementInformationSender> {
-  String inputName = '';
-
   @override
   Widget build(BuildContext context) {
     final provider = ref.watch(stmCheckProvider);
@@ -874,31 +885,31 @@ class _SettlementDetailPageSenderState
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                Text.rich(
-                                  TextSpan(
-                                    children: [
-                                      TextSpan(
-                                          text:
-                                              "${provider.settlementItems[provider.userData.serviceUserId]?[index].menuCount}명 ",
-                                          style: const TextStyle(
-                                            color: color2,
-                                            fontSize: 17,
-                                          )),
-                                      TextSpan(
-                                        text: "/ ${4}명",
-                                        style: TextStyle(
-                                          fontSize: 17,
-                                          color: Colors.grey[600],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                // Text.rich(
+                                //   TextSpan(
+                                //     children: [
+                                //       TextSpan(
+                                //           text:
+                                //               "${provider.settlementItems[provider.userData.serviceUserId]?[index].menuCount}명 ",
+                                //           style: const TextStyle(
+                                //             color: color2,
+                                //             fontSize: 17,
+                                //           )),
+                                //       TextSpan(
+                                //         text: "/ ${4}명",
+                                //         style: TextStyle(
+                                //           fontSize: 17,
+                                //           color: Colors.grey[600],
+                                //         ),
+                                //       ),
+                                //     ],
+                                //   ),
+                                // ),
                                 const SizedBox(
                                   width: 30,
                                 ),
                                 Text(
-                                  "${priceToString.format(80000000)}원",
+                                  "${priceToString.format(provider.settlementItems[provider.userData.serviceUserId]?[index].price)}원",
                                   style: const TextStyle(
                                     fontWeight: FontWeight.w800,
                                     fontSize: 20,
@@ -994,47 +1005,50 @@ class _SettlementDetailPageSenderState
                           boxShadow: const [
                             BoxShadow(
                               color: Colors.grey,
-                              blurRadius: 2,
-                              // inset: true,
                             ),
                             BoxShadow(
-                              color: Colors.grey,
-                              blurRadius: 2,
-                              // inset: true,
-                            ),
+                                color: Color(0xFFDCDCDC),
+                                spreadRadius: 0,
+                                blurRadius: 7,
+                                offset: Offset(0, 5)),
                           ],
-                          color: Colors.grey[300],
                           borderRadius: BorderRadius.circular(50),
                         ),
                       ),
                       Container(
                         height: 40,
-                        width: size.width * 0.6,
+                        width: size.width *
+                            provider.completedPrice /
+                            provider.settlement.totalPrice,
                         decoration: BoxDecoration(
-                          color: color2,
+                          color: color1,
                           borderRadius: BorderRadius.circular(50),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.grey,
-                              blurRadius: 2,
-                              offset: Offset(2, 2),
-                            ),
-                          ],
+                          boxShadow: (provider.completedPrice != 0)
+                              ? [
+                                  const BoxShadow(
+                                    color: Colors.grey,
+                                    blurRadius: 2,
+                                    spreadRadius: -2,
+                                    offset: Offset(5, 0),
+                                  ),
+                                ]
+                              : [],
                         ),
                       ),
                       SizedBox(
                         height: 40,
                         width: size.width,
-                        child: const Align(
-                            alignment: Alignment(-0.9, 0.0),
-                            child: Text(
-                              "${60}%",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 25,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            )),
+                        child: Align(
+                          alignment: const Alignment(-0.9, 0.0),
+                          child: Text(
+                            "${(provider.completedPrice / provider.settlement.totalPrice * 100).toInt()}%",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 25,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),

@@ -353,7 +353,7 @@ class _SplashViewState extends ConsumerState<SplashView> {
   void initState() {
     super.initState();
     // 사용하고 싶은 유저의 userId
-    _checkToken("8969xxwf-8wf8-pf89-9x6p-88p0wpp9ppfb");
+    _checkToken("b9998w80-p0bf-px89-w9x9-ww6f9xbpb06b");
     Timer(
       const Duration(seconds: 2),
       () {

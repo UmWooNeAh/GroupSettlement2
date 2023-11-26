@@ -92,6 +92,7 @@ class Clova {
   }
 
   Future<void> pickPicture() async {
+    imageFile = null;
     final XFile? images = await picker.pickImage(source: ImageSource.gallery);
     if (images != null) {
       imageFile = File(images.path);
@@ -99,6 +100,7 @@ class Clova {
   }
 
   Future<void> takePicture() async {
+    imageFile = null;
     final XFile? images = await picker.pickImage(source: ImageSource.camera);
     if (images != null) {
       imageFile = File(images.path);

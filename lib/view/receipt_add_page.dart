@@ -69,14 +69,22 @@ class _ReceiptAddPageState extends ConsumerState<ReceiptAddPage> {
                   child: const Icon(Icons.image),
                   onPressed: (){
                     try {
-                      _controller.dispose();
                       dynamic analyzeResult;
                       Future(() async {
                         await stmcvm.clova.pickPicture().then((value) {
-                          context.push('/ReceiptAdd/WaitingAnalyze');
+                          if (stmcvm.clova.imageFile != null){
+                            context.push('/ReceiptAdd/WaitingAnalyze');                          
+                          }
                         });
+                        if(stmcvm.clova.imageFile == null){
+                          return;
+                        }
                         analyzeResult = await stmcvm.clova.analyze();
                       }).then((value) {
+                        if(stmcvm.clova.imageFile == null){
+                          return;
+                        }
+                        _controller.dispose();  
                         stmcvm.createReceiptFromNaverOCR(analyzeResult);
                         context.pushReplacement("/ReceiptAdd/ReceiptCheckScanned");
                       });
@@ -94,19 +102,24 @@ class _ReceiptAddPageState extends ConsumerState<ReceiptAddPage> {
                 child: FloatingActionButton(
                   heroTag: null,
                   child: const Icon(Icons.camera_alt),
-                  onPressed: () async{
-                    try {
-                      _controller.dispose();
-                      await _initializeControllerFuture;
-                      final image = await _controller.takePicture();
-                      if (!mounted) return;
-                      stmcvm.clova.getImageByFile(File(image.path));
-                      final analyzeResult = stmcvm.clova.analyze();
-                      stmcvm.createReceiptFromNaverOCR(analyzeResult);
-                      context.go("/ReceiptAdd/ReceiptCheckScanned");
-                    }catch(e){
-                      print(e);
-                    }
+                  onPressed: () async {
+                    await _initializeControllerFuture;
+                    dynamic analyzeResult;
+                    Future(() async {
+                      await _controller.takePicture().then((value) {
+                        print(stmcvm.clova.imageFile);
+                        context.push('/ReceiptAdd/WaitingAnalyze');
+                      });
+                      if (!mounted || stmcvm.clova.imageFile == null) return;
+                      analyzeResult = stmcvm.clova.analyze();
+                    }).then((value) {
+                      context.pushReplacement("/ReceiptAdd/ReceiptCheckScanned");
+                      if (stmcvm.clova.imageFile != null){
+                        _controller.dispose();
+                        stmcvm.createReceiptFromNaverOCR(analyzeResult);
+                        context.go("/ReceiptAdd/ReceiptCheckScanned");
+                      }
+                    });
                   },
                 ),
               ),
