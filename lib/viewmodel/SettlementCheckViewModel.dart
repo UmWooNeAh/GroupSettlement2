@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/class/class_group.dart';
@@ -8,7 +9,7 @@ import '../class/class_settlement.dart';
 import '../class/class_settlementitem.dart';
 import '../class/class_settlementpaper.dart';
 import '../class/class_user.dart';
-
+final FirebaseFirestore db = FirebaseFirestore.instance;
 final stmCheckProvider = ChangeNotifierProvider<SettlementCheckViewModel>(
     (ref) => SettlementCheckViewModel());
 
@@ -66,26 +67,55 @@ class SettlementCheckViewModel extends ChangeNotifier {
   }
 
   void requestCheckMySent(String userId) {
-    settlement.checkSent[userId] = 1;
-    FireService().updateDoc(
-        "settlementlist", settlement.settlementId!, settlement.toJson());
+    final stmRef = db.collection("settlementlist").doc(settlement.settlementId);
+    db.runTransaction((transaction) async {
+      settlement.checkSent[userId] = 1;
+      transaction.update(stmRef, settlement.toJson()); //transaction을 거친 문서 업데이트, 모델을 다시 json형태로 변환하여 db에 올려야함
+    }).then(
+          (value) {
+        print("DocumentSnapshot successfully updated!"); //성공 메시지
+      },
+      onError: (e) => print("Error updating document $e"), //실패 메시지
+    );
   }
 
   void requestSendAgain(String userId) {
-    settlement.checkSent[userId] = 2;
-    FireService().updateDoc(
-        "settlementlist", settlement.settlementId!, settlement.toJson());
+    final stmRef = db.collection("settlementlist").doc(settlement.settlementId);
+    db.runTransaction((transaction) async {
+      settlement.checkSent[userId] = 2;
+      transaction.update(stmRef, settlement.toJson()); //transaction을 거친 문서 업데이트, 모델을 다시 json형태로 변환하여 db에 올려야함
+    }).then(
+          (value) {
+        print("DocumentSnapshot successfully updated!"); //성공 메시지
+      },
+      onError: (e) => print("Error updating document $e"), //실패 메시지
+    );
   }
 
   void confirmSent(String userId) {
-    settlement.checkSent[userId] = 3;
-    FireService().updateDoc(
-        "settlementlist", settlement.settlementId!, settlement.toJson());
+    final stmRef = db.collection("settlementlist").doc(settlement.settlementId);
+    db.runTransaction((transaction) async {
+      settlement.checkSent[userId] = 3;
+      transaction.update(stmRef, settlement.toJson()); //transaction을 거친 문서 업데이트, 모델을 다시 json형태로 변환하여 db에 올려야함
+    }).then(
+          (value) {
+        print("DocumentSnapshot successfully updated!"); //성공 메시지
+      },
+      onError: (e) => print("Error updating document $e"), //실패 메시지
+    );
   }
 
   void finishSettlement() {
-    settlement.isFinished = true;
-    FireService().updateDoc(
-        "settlementlist", settlement.settlementId!, settlement.toJson());
+    final stmRef = db.collection("settlementlist").doc(settlement.settlementId);
+    db.runTransaction((transaction) async {
+      settlement.isFinished = true;
+      transaction.update(stmRef, settlement.toJson());
+    }).then(
+          (value) {
+        print("DocumentSnapshot successfully updated!"); //성공 메시지
+      },
+      onError: (e) => print("Error updating document $e"), //실패 메시지
+    );
   }
+
 }
