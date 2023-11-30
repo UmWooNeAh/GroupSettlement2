@@ -48,10 +48,9 @@ class _CustomBottomNavigationBarState
               context.go('/SettlementGroupSelect', extra: provider.userData);
             case 3:
               1;
-            // context.go('/Notification');
+              context.go('/NotificationPage');
             case 4:
-              1;
-            // context.go('/Mypage');
+              context.go('/MyPage');
           }
         }
       },

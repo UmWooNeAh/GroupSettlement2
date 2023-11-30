@@ -38,12 +38,19 @@ class UserViewModel extends ChangeNotifier {
     isFetchFinished = false;
     fetchUser(userData.serviceUserId!);
     fetchSettlement(0, initialStmCount);
+    fetchAlarm(userData.serviceUserId!);
     return;
   }
 
   void sortSettlementInfo() {
     settlementInfo = Map.fromEntries(settlementInfo.entries.toList()
       ..sort((e1, e2) => e2.key.time!.compareTo(e1.key.time!)));
+  }
+
+  Future<void> editUsername(String newName) async{
+    userData.name = newName;
+    FireService().updateDoc("userlist", userData.serviceUserId!, userData.toJson());
+    notifyListeners();
   }
 
   Future<int> fetchUser(String userId) async {
@@ -180,7 +187,7 @@ class UserViewModel extends ChangeNotifier {
 
   }
 
-  void deleteAlarm(int category, Alarm removeAlarm) async {
+  Future<void> deleteAlarm(int category, Alarm removeAlarm) async {
 
     if(category == 0) {
       receiveStmAlarm.remove(removeAlarm);

@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:groupsettlement2/view/account_add_page.dart';
 import 'package:groupsettlement2/view/group_create_page.dart';
 import 'package:groupsettlement2/view/group_main_page.dart';
 import 'package:groupsettlement2/view/group_select_page.dart';
@@ -182,6 +183,25 @@ final GoRouter _router = GoRouter(
                   ]),
             ]),
         GoRoute(
+          path: "MyPage",
+          builder: (context, state) {
+            return MyPage();
+          },
+          routes: [
+            GoRoute(path: 'AddAccount',
+              builder: (context,state) {
+              return AccountAddPage();
+              }
+            )
+          ]
+        ),
+        GoRoute(
+          path: "NotificationPage",
+          builder: (context,state){
+            return NotificationPage();
+          }
+        ),
+        GoRoute(
             path: "GroupCreate",
             builder: (context, state) {
               ServiceUser me = state.extra as ServiceUser;
@@ -336,7 +356,6 @@ class _SplashViewState extends ConsumerState<SplashView> {
     ServiceUser user = await ServiceUser().getUserByUserId(userid);
     ref.watch(userProvider).settingUserData(user);
     var nowtime = DateTime.now().millisecondsSinceEpoch;
-    //DateTime prevtime = DateTime.parse(user.tokenTimestamp!.toDate().toString());
     if (user.fcmToken == "") {
       _getMyDeviceToken(user);
     } else if ((nowtime -
@@ -353,13 +372,14 @@ class _SplashViewState extends ConsumerState<SplashView> {
   void initState() {
     super.initState();
     // 사용하고 싶은 유저의 userId
-    _checkToken("8969xxwf-8wf8-pf89-9x6p-88p0wpp9ppfb");
-    Timer(
-      const Duration(seconds: 2),
-      () {
-        context.go("/");
-      },
-    );
+    _checkToken("bxxwb8xp-p90w-ppfp-bbw9-b9bwwx8bf9bf").then((value){
+      Timer(
+        const Duration(seconds: 2),
+            () {
+          context.go("/");
+        },
+      );
+    });
   }
 
   @override
