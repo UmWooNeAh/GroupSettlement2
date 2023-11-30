@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/class/class_receiptitem.dart';
@@ -8,7 +9,7 @@ import '../class/class_user.dart';
 import '../class/class_alarm.dart';
 import '../class/class_receipt.dart';
 import '../common_fireservice.dart';
-
+final FirebaseFirestore db = FirebaseFirestore.instance;
 final userProvider = ChangeNotifierProvider<UserViewModel>(
         (ref) => UserViewModel());
 
@@ -182,29 +183,56 @@ class UserViewModel extends ChangeNotifier {
 
   void deleteAlarm(int category, Alarm removeAlarm) async {
 
-    if(category == 0) {
-      receiveStmAlarm.remove(removeAlarm);
-    }
-    else if(category == 1) {
-      sendStmAlarm.remove(removeAlarm);
-    }
-    else if(category == 2) {
-      etcStmAlarm.remove(removeAlarm);
-    }
+    final alarmRef = db.collection("alarmlist/" + userData.serviceUserId! + "/myalarmlist");
+    db.runTransaction((transaction) async {
+      if(category == 0) {
+        receiveStmAlarm.remove(removeAlarm);
+      }
+      else if(category == 1) {
+        sendStmAlarm.remove(removeAlarm);
+      }
+      else if(category == 2) {
+        etcStmAlarm.remove(removeAlarm);
+      }
+      transaction.delete(alarmRef.doc(removeAlarm.alarmId));
+    }).then(
+          (value) {
+        notifyListeners();
+        print("DocumentSnapshot successfully updated!"); //성공 메시지
+      },
+      onError: (e) => print("Error updating document $e"), //실패 메시지
+    );
+    //FireService().deleteDoc("alarmlist/" + userData.serviceUserId! + "/myalarmlist", removeAlarm.alarmId!);
 
-    FireService().deleteDoc("alarmlist/" + userData.serviceUserId! + "/myalarmlist", removeAlarm.alarmId!);
-    notifyListeners();
   }
 
   void addAccount(String bank, String accountNum, String holder) async {
     String fullInfo = bank + " " + accountNum + " " + holder;
-    userData.accountInfo.add(fullInfo);
-    FireService().updateDoc("userlist", userData.serviceUserId!, userData.toJson());
+    final userRef = db.collection("userlist").doc(userData.serviceUserId);
+
+    db.runTransaction((transaction) async {
+      userData.accountInfo.add(fullInfo);
+      transaction.update(userRef, userData.toJson());
+    }).then(
+          (value) {
+        print("DocumentSnapshot successfully updated!"); //성공 메시지
+      },
+      onError: (e) => print("Error updating document $e"), //실패 메시지
+    );
+
   }
 
   void deleteAccount(int index) async {
-    userData.accountInfo.removeAt(index);
-    FireService().updateDoc("userlist", userData.serviceUserId!, userData.toJson());
+    final userRef = db.collection("userlist").doc(userData.serviceUserId);
+    db.runTransaction((transaction) async {
+      userData.accountInfo.removeAt(index);
+      transaction.update(userRef, userData.toJson());
+    }).then(
+          (value) {
+        print("DocumentSnapshot successfully updated!"); //성공 메시지
+      },
+      onError: (e) => print("Error updating document $e"), //실패 메시지
+    );
   }
 
   void toggleLock() {

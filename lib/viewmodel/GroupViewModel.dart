@@ -112,16 +112,23 @@ class GroupViewModel extends ChangeNotifier {
 
   void updateUserName(String userId, String newName) async {
 
-    ServiceUser user = await ServiceUser().getUserByUserId(userId);
-
-    if (user.kakaoId == null) {
-      user.name = newName;
-      FireService().updateDoc("userlist", user.serviceUserId!, user.toJson());
-      //user.UpdateUser();
-    } else {
-      print("카카오톡으로 추가한 유저의 이름은 변경할 수 없습니다.");
-    }
-
+    final userRef = db.collection("userlist").doc(userId);
+    db.runTransaction((transaction) async {
+      final snapshot = await transaction.get(userRef);
+      ServiceUser user = ServiceUser.fromSnapShot(snapshot);
+      if (user.kakaoId == null) {
+        user.name = newName;
+        transaction.update(userRef, user.toJson()); //transaction을 거친 문서 업데이트, 모델을 다시 json형태로 변환하여 db에 올려야함
+        //user.UpdateUser();
+      } else {
+        print("카카오톡으로 추가한 유저의 이름은 변경할 수 없습니다.");
+      }
+    }).then(
+          (value) {
+        print("user's name successfully updated!"); //성공 메시지
+      },
+      onError: (e) => print("Error updating user name $e"), //실패 메시지
+    );
   }
 
   bool checkMaster(int index) {
@@ -209,121 +216,162 @@ class GroupViewModel extends ChangeNotifier {
       user.settlementPapers.add(newMergedPaper.settlementPaperId!);
     });
 
-    //병합할 정산들에 대한 병합 과정 본격적 진행
-    await Future.forEach(indexes, (index) async {
-      newMergedSettlement.receipts.addAll(settlementInGroup[index].receipts);
+    final groupRef = db.collection("grouplist").doc(myGroup.groupId!);
+    List<DocumentReference<Map<String, dynamic>>> userRefs = [];
+    for(var user in serviceUsers) {
+      userRefs.add( db.collection("userlist").doc(user.serviceUserId!));
+    }
+    List<DocumentReference<Map<String, dynamic>>> rcpRefs = [];
+    List<DocumentReference<Map<String, dynamic>>> stmpaperRefs = [];
+    List<Receipt> rcps = [];
+    List<SettlementItem> dummys = [];
 
-      settlementInGroup[index].receipts.forEach((rcpid) async {
-        Receipt rcp = await Receipt().getReceiptByReceiptId(rcpid);
-        rcp.settlementId = newMergedSettlement.settlementId;
-        FireService().updateDoc("receiptlist", rcpid!, rcp.toJson());
+    //병합할 정산들에 대한 병합 과정 본격적 진행
+    var res = await db.runTransaction((transaction) async {
+
+      await Future.forEach(indexes, (index) async {
+        newMergedSettlement.receipts.addAll(settlementInGroup[index].receipts);
+
+        await Future.forEach(settlementInGroup[index].receipts, (rcpid) async {
+          rcpRefs.add(db.collection("receiptlist").doc(rcpid));
+          final snapshot = await transaction.get(rcpRefs.last);
+          Receipt rcp = Receipt.fromSnapShot(snapshot);
+          rcp.settlementId = newMergedSettlement.settlementId;
+          rcps.add(rcp);
+        });
+
+        await Future.forEach(serviceUsers, (user) async {
+          //해당 정산에 참여하지 않는 유저는 skip
+          if (settlementInGroup[index].settlementPapers[user.serviceUserId] != null) {
+            final stmpaperRef = db.collection("settlementpaperlist").doc(
+                settlementInGroup[index]
+                    .settlementPapers[user.serviceUserId]!);
+            stmpaperRefs.add(stmpaperRef);
+
+              final snapshot = await transaction.get(stmpaperRef);
+              SettlementPaper paper = SettlementPaper.fromSnapShot(snapshot);
+              //이미 송금을 완료한 정산들에 대한 처리 -> sentSettlementItems에 저장
+              if (settlementInGroup[index].checkSent[user.serviceUserId!] == 3) {
+                //개별 정산서에 병합 정산 자체의 이름은 포함되지 않음, 병합 정산 안에 존재하는 정산들의 이름들만 표기
+                if (settlementInGroup[index].isMerged == false) {
+                  SettlementItem title = SettlementItem();
+                  title.menuName = settlementInGroup[index].settlementName;
+                  title.receiptItemId = "dummy"; //더미 구분 용도, 메뉴 이름: 정산 이름으로 대체
+                  newMergedPapers[user.serviceUserId!]
+                      ?.sentSettlementItems
+                      .add(title.settlementItemId!);
+                  dummys.add(title);
+                }
+
+                await Future.forEach(paper.sentSettlementItems, (itemid) async {
+                  newMergedPapers[user.serviceUserId!]!
+                      .sentSettlementItems
+                      .add(itemid);
+                  print("유저 ${user.name}의 정산항목: ${itemid} ");
+                });
+                if (newMergedPapers[user.serviceUserId!]!.discountedTotalPrice ==
+                    0) {
+                  newMergedPapers[user.serviceUserId!]!.discountedTotalPrice =
+                  paper.discountedTotalPrice!;
+                } else {
+                  newMergedPapers[user.serviceUserId!]!.discountedTotalPrice =
+                      newMergedPapers[user.serviceUserId!]!
+                          .discountedTotalPrice! +
+                          paper.discountedTotalPrice!;
+                }
+                print(
+                    "유저 ${user.name}의 정산서 할인된 합계 금액: ${newMergedPapers[user
+                        .serviceUserId!]!.discountedTotalPrice} ");
+              }
+              else { //그외 케이스들...
+                if (settlementInGroup[index].checkSent[user.serviceUserId!] ==
+                    0) {
+                  newMergedSettlement.checkSent[user.serviceUserId!] = 0;
+                }
+                //개별 정산서에 병합 정산 자체의 이름은 포함되지 않음, 병합 정산 안에 존재하는 정산들의 이름들만 표기
+                if (settlementInGroup[index].isMerged == false) {
+                  SettlementItem title = SettlementItem();
+                  title.menuName = settlementInGroup[index].settlementName;
+                  title.receiptItemId = "dummy"; //더미 구분 용도, 메뉴 이름: 정산 이름으로 대체
+                  newMergedPapers[user.serviceUserId!]
+                      ?.settlementItems
+                      .add(title.settlementItemId!);
+                  dummys.add(title);
+                }
+
+                await Future.forEach(paper.sentSettlementItems, (itemid) async {
+                  print("유저 ${user.name}의 정산항목: ${itemid} ");
+                  newMergedPapers[user.serviceUserId!]!.settlementItems.add(
+                      itemid);
+                });
+              }
+
+              if (newMergedPapers[user.serviceUserId!]!.totalPrice == 0) {
+                newMergedPapers[user.serviceUserId!]!.totalPrice =
+                paper.totalPrice!;
+              } else {
+                newMergedPapers[user.serviceUserId!]!.totalPrice =
+                    newMergedPapers[user.serviceUserId!]!.totalPrice! +
+                        paper.totalPrice!;
+              }
+              print(
+                  "유저 ${user.name}의 정산서 합계 금액: ${newMergedPapers[user
+                      .serviceUserId!]!.totalPrice} ");
+
+              user.settlements.remove(settlementInGroup[index].settlementId!);
+          }
+        });
+
+        if (totalPrice == 0) {
+          totalPrice = settlementInGroup[index].totalPrice;
+        } else {
+          totalPrice += settlementInGroup[index].totalPrice;
+        }
+        userData.settlements.remove(settlementInGroup[index].settlementId!);
+        myGroup.settlements.remove(settlementInGroup[index].settlementId!);
+
+      });
+
+      await Future.forEach(settlementInGroup, (stm) async {
+        final stmRef = db.collection("settlementlist").doc(stm.settlementId!);
+        transaction.delete(stmRef); //transaction을 거친 문서 업데이트, 모델을 다시 json형태로 변환하여 db에 올려야함
+      });
+
+      await Future.forEach(stmpaperRefs, (stmpaperRef) async {
+        transaction.delete(stmpaperRef);
+      });
+
+      await Future.forEach(newMergedPapers.entries, (entry) async {
+        entry.value.createSettlementPaper();
+      });
+
+      await Future.forEach(dummys, (dummyitem) async {
+        dummyitem.createSettlementItem();
       });
 
       await Future.forEach(serviceUsers, (user) async {
-        //해당 정산에 참여하지 않는 유저는 skip
-        if (settlementInGroup[index].settlementPapers[user.serviceUserId] !=
-            null) {
-          SettlementPaper paper = await SettlementPaper()
-              .getSettlementPaperByPaperId(settlementInGroup[index]
-                  .settlementPapers[user.serviceUserId]!);
-
-          //이미 송금을 완료한 정산들에 대한 처리 -> sentSettlementItems에 저장
-          if (settlementInGroup[index].checkSent[user.serviceUserId!] == 3) {
-
-            //개별 정산서에 병합 정산 자체의 이름은 포함되지 않음, 병합 정산 안에 존재하는 정산들의 이름들만 표기
-            if(settlementInGroup[index].isMerged == false) {
-              SettlementItem title = SettlementItem();
-              title.menuName = settlementInGroup[index].settlementName;
-              title.receiptItemId = "dummy"; //더미 구분 용도, 메뉴 이름: 정산 이름으로 대체
-              newMergedPapers[user.serviceUserId!]
-                  ?.sentSettlementItems
-                  .add(title.settlementItemId!);
-              title.createSettlementItem();
-            }
-
-            await Future.forEach(paper.sentSettlementItems, (itemid) async {
-              newMergedPapers[user.serviceUserId!]!
-                  .sentSettlementItems
-                  .add(itemid);
-              print("유저 ${user.name}의 정산항목: ${itemid} ");
-            });
-            if (newMergedPapers[user.serviceUserId!]!.discountedTotalPrice ==
-                0) {
-              newMergedPapers[user.serviceUserId!]!.discountedTotalPrice =
-                  paper.discountedTotalPrice!;
-            } else {
-              newMergedPapers[user.serviceUserId!]!.discountedTotalPrice =
-                  newMergedPapers[user.serviceUserId!]!.discountedTotalPrice! +
-                      paper.discountedTotalPrice!;
-            }
-            print(
-                "유저 ${user.name}의 정산서 할인된 합계 금액: ${newMergedPapers[user.serviceUserId!]!.discountedTotalPrice} ");
-          } //그외 케이스들...
-          else {
-            if (settlementInGroup[index].checkSent[user.serviceUserId!] == 0) {
-              newMergedSettlement.checkSent[user.serviceUserId!] = 0;
-            }
-            //개별 정산서에 병합 정산 자체의 이름은 포함되지 않음, 병합 정산 안에 존재하는 정산들의 이름들만 표기
-            if(settlementInGroup[index].isMerged == false) {
-              SettlementItem title = SettlementItem();
-              title.menuName = settlementInGroup[index].settlementName;
-              title.receiptItemId = "dummy"; //더미 구분 용도, 메뉴 이름: 정산 이름으로 대체
-              newMergedPapers[user.serviceUserId!]
-                  ?.settlementItems
-                  .add(title.settlementItemId!);
-              title.createSettlementItem();
-            }
-            
-            await Future.forEach(paper.sentSettlementItems, (itemid) async {
-              print("유저 ${user.name}의 정산항목: ${itemid} ");
-              newMergedPapers[user.serviceUserId!]!.settlementItems.add(itemid);
-            });
-          }
-
-          if (newMergedPapers[user.serviceUserId!]!.totalPrice == 0) {
-            newMergedPapers[user.serviceUserId!]!.totalPrice =
-                paper.totalPrice!;
-          } else {
-            newMergedPapers[user.serviceUserId!]!.totalPrice =
-                newMergedPapers[user.serviceUserId!]!.totalPrice! +
-                    paper.totalPrice!;
-          }
-          print(
-              "유저 ${user.name}의 정산서 합계 금액: ${newMergedPapers[user.serviceUserId!]!.totalPrice} ");
-
-          user.settlements.remove(settlementInGroup[index].settlementId!);
-          FireService().deleteDoc("settlementpaperlist",
-              settlementInGroup[index].settlementPapers[user.serviceUserId!]!);
-        }
+        final userRef = db.collection("userlist").doc(user.serviceUserId!);
+        transaction.update(userRef, user.toJson());
       });
 
-      if (totalPrice == 0) {
-        totalPrice = settlementInGroup[index].totalPrice;
-      } else {
-        totalPrice += settlementInGroup[index].totalPrice;
-      }
-      userData.settlements.remove(settlementInGroup[index].settlementId!);
-      myGroup.settlements.remove(settlementInGroup[index].settlementId!);
-      FireService()
-          .deleteDoc("settlementlist", settlementInGroup[index].settlementId!);
+      int i = 0;
+      await Future.forEach(rcps, (rcp) async {
+        transaction.update(rcpRefs[i++], rcp.toJson()); //transaction을 거친 문서 업데이트, 모델을 다시 json형태로 변환하여 db에 올려야함
+      });
+
+      myGroup.settlements.add(newMergedSettlement.settlementId!);
+      transaction.update(groupRef, myGroup.toJson());
+
+      newMergedSettlement.totalPrice = totalPrice;
+      newMergedSettlement.time = Timestamp.now();
+      newMergedSettlement.createSettlement();
+      return true;
+    }).catchError((e) {
+      print(e);
+      return false;
     });
 
-    await Future.forEach(newMergedPapers.entries, (entry) async {
-      entry.value.createSettlementPaper();
-    });
-
-    await Future.forEach(serviceUsers, (user) async {
-      FireService().updateDoc("userlist", user.serviceUserId!, user.toJson());
-    });
-
-    newMergedSettlement.totalPrice = totalPrice;
-    myGroup.settlements.add(newMergedSettlement.settlementId!);
-    FireService().updateDoc("grouplist", myGroup.groupId!, myGroup.toJson());
-    newMergedSettlement.time = Timestamp.now();
-    newMergedSettlement.createSettlement();
-
-    return true;
+    notifyListeners();
+    return res!;
   }
-
-
 }

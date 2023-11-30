@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/class/class_group.dart';
@@ -9,7 +10,7 @@ import '../class/class_receiptitem.dart';
 import '../class/class_settlement.dart';
 import '../class/class_settlementitem.dart';
 import '../class/class_settlementpaper.dart';
-
+final FirebaseFirestore db = FirebaseFirestore.instance;
 final stmProvider =
     ChangeNotifierProvider<SettlementViewModel>((ref) => SettlementViewModel());
 
@@ -243,46 +244,66 @@ class SettlementViewModel extends ChangeNotifier {
   }
 
   Future<int> completeSettlement() async {
-    // settlement Create
-    FireService().updateDoc(
-        "settlementlist", settlement.settlementId!, settlement.toJson());
 
-    // SettlementPaper Create
-    for(var stmpaper in settlementPapers.entries) {
-      settlement.totalPrice += stmpaper.value.totalPrice!;
-      stmpaper.value.createSettlementPaper();
-    }
-    // SettlementItem Create
-    for(var stmitemlist in settlementItems.entries) {
-      for(var stmitem in stmitemlist.value) {
-        stmitem.createSettlementItem();
+    List<DocumentReference<Map<String, dynamic>>> userRefs = [];
+    List<ServiceUser> users = [];
+    final stmRef = db.collection("settlementlist").doc(settlement.settlementId);
+
+    var res = await db.runTransaction((transaction) async {
+
+      await Future.forEach(settlementUsers, (stmuser) async {
+        final userRef = db.collection("userlist").doc(stmuser.serviceUserId);
+        userRefs.add(userRef);
+        final snapshot = await transaction.get(userRef); //transaction을 거친 문서 읽어오기
+        ServiceUser user = ServiceUser.fromSnapShot(snapshot); //snapshot(json)형태를 model 형식에 맞게 파싱
+        for (var stmpaper in settlementPapers.entries) {
+          user.settlementPapers.add(stmpaper.value.settlementPaperId!);
+        }
+        users.add(user);
+      });
+
+      // SettlementPaper Create
+      for(var stmpaper in settlementPapers.entries) {
+        settlement.totalPrice += stmpaper.value.totalPrice!;
+        stmpaper.value.createSettlementPaper();
       }
-    }
-
-    // User Update(송금자만 업데이트)
-    for (var stmuser in settlementUsers) {
-      ServiceUser user =
-          await ServiceUser().getUserByUserId(stmuser.serviceUserId!);
-      for (var stmpaper in settlementPapers.entries) {
-        user.settlementPapers.add(stmpaper.value.settlementPaperId!);
+      // SettlementItem Create
+      for(var stmitemlist in settlementItems.entries) {
+        for(var stmitem in stmitemlist.value) {
+          stmitem.createSettlementItem();
+        }
       }
-      FireService().updateDoc("userlist", user.serviceUserId!, user.toJson());
-    }
 
-    // Receipt Update
-    for (var rcp in receipts.entries) {
-      FireService().updateDoc("receiptlist", rcp.key, rcp.value.toJson());
-    }
+      // settlement Update
+      transaction.update(stmRef, settlement.toJson());
 
-    // ReceiptItem Update
-    for (var rcpitemlist in receiptItems.entries) {
-      for (var rcpitem in rcpitemlist.value) {
-        FireService().updateDoc(
-            "receiptitemlist", rcpitem.receiptItemId!, rcpitem.toJson());
+      //ServiceUser Update
+      int i = 0;
+      await Future.forEach(userRefs, (userRef) async {
+        transaction.update(userRef, users[i++].toJson());
+      });
+
+      // Receipt Update
+      for (var rcp in receipts.entries) {
+        final rcpRef = db.collection("receiptlist").doc(rcp.key);
+        transaction.update(rcpRef, rcp.value.toJson());
       }
-    }
+
+      // ReceiptItem Update
+      for (var rcpitemlist in receiptItems.entries) {
+        for (var rcpitem in rcpitemlist.value) {
+          final rcpitemRef = db.collection("receiptitemlist").doc(rcpitem.receiptItemId);
+          transaction.update(rcpitemRef, rcpitem.toJson());
+        }
+      }
+      return 1;
+    }).catchError((e) {
+      print(e);
+      return 0;
+    });
+
     notifyListeners();
-    return 1;
+    return res!;
   }
 
   void requestSettlement() async {

@@ -8,7 +8,7 @@ import '../class/class_receiptitem.dart';
 import '../class/class_settlement.dart';
 import '../class/class_user.dart';
 import '../clova/clova.dart';
-
+final FirebaseFirestore db = FirebaseFirestore.instance;
 final stmCreateProvider = ChangeNotifierProvider<SettlementCreateViewModel>(
     (ref) => SettlementCreateViewModel());
 
@@ -134,27 +134,47 @@ class SettlementCreateViewModel extends ChangeNotifier {
   // 5. 정산 최종 생성하기, DB 접근이 이루어지는 시점
   Future<String> createSettlement(String stmname) async {
     settlement.settlementName = stmname;
-    myGroup.settlements.add(settlement.settlementId!);
-    FireService().updateDoc("grouplist", myGroup.groupId!, myGroup.toJson());
+    final groupRef = db.collection("grouplist").doc(myGroup.groupId);
+    List<DocumentReference<Map<String, dynamic>>> userRefs = [];
+    List<ServiceUser> users = [];
 
-    for (var userid in myGroup.serviceUsers) {
-      ServiceUser user = await ServiceUser().getUserByUserId(userid);
-      user.settlements.add(settlement.settlementId!);
-      FireService().updateDoc("userlist", user.serviceUserId!, user.toJson());
+    var res = await db.runTransaction((transaction) async {
+      myGroup.settlements.add(settlement.settlementId!);
+      await Future.forEach(myGroup.serviceUsers, (userid) async {
+        final userRef = db.collection("userlist").doc(userid);
+        userRefs.add(userRef);
+        final snapshot = await transaction.get(userRef); //transaction을 거친 문서 읽어오기
+        ServiceUser user = ServiceUser.fromSnapShot(snapshot); //snapshot(json)형태를 model 형식에 맞게 파싱
+        user.settlements.add(settlement.settlementId!);
+        users.add(user);
+      });
 
-      for (var receipt in receipts.entries) {
+      await Future.forEach(receipts.entries, (receipt) async {
         receipt.value.createReceipt();
-      }
-      for (var receiptitems in receiptItems.entries) {
-        for (var item in receiptitems.value) {
-          item.createReceiptItem();
-        }
-      }
-    }
-    settlement.time = Timestamp.now();
-    settlement.createSettlement();
-    notifyListeners();
+      });
 
-    return settlement.settlementId ?? "error";
+      await Future.forEach(receiptItems.entries, (receiptitems) async {
+        await Future.forEach(receiptitems.value, (item) async {
+          item.createReceiptItem();
+        });
+      });
+
+      int i = 0;
+      await Future.forEach(userRefs, (userRef) async {
+        transaction.update(userRef, users[i++].toJson());
+      });
+
+      transaction.update(groupRef, myGroup.toJson());
+      settlement.time = Timestamp.now();
+      settlement.createSettlement();
+      return settlement.settlementId;
+    }).catchError((e) {
+      print(e);
+      return "error";
+    });
+    
+    notifyListeners();
+    return res!;
   }
+
 }
