@@ -621,7 +621,7 @@ class _SimpleSettlementerResState extends State<SimpleSettlementerRes> {
                           color: color1,
                         ),
                       ),
-                      isRealNum && (res * 100 % 100) / 10 > 1? SizedBox.shrink() : AnimatedDigitWidget(
+                      isRealNum && (res * 100 % 100) / 10 < 1 ? SizedBox.shrink() : AnimatedDigitWidget(
                         value: 0,
                         textStyle: TextStyle(
                           textBaseline: TextBaseline.alphabetic,
