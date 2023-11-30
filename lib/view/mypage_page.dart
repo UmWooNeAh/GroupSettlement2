@@ -1,594 +1,301 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-class myPage extends StatefulWidget {
-  const myPage({Key? key}) : super(key: key);
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:groupsettlement2/view/shared_basic_widget.dart';
+import 'package:flutter/services.dart';
+
+import '../design_element.dart';
+import '../viewmodel/UserViewModel.dart';
+class MyPage extends ConsumerStatefulWidget {
+  const MyPage({Key? key}) : super(key: key);
 
   @override
-  State<myPage> createState() => _myPageState();
+  ConsumerState<MyPage> createState() => _MyPageState();
 }
 
-class _myPageState extends State<myPage> {
+class _MyPageState extends ConsumerState<MyPage> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
+    var uvm = ref.watch(userProvider);
+    String inputName = "";
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation:0.0,
-        ),
         body:SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(left:20),
-                child: Text("마이 프로필",
+              SizedBox(height:60),
+              Container(
+                margin: const EdgeInsets.only(right:20),
+                alignment: Alignment.centerRight,
+                  child: GestureDetector(
+                    onTap: (){},
+                    child: Icon(Icons.settings)
+                  )
+              ),
+              Container(
+                margin: EdgeInsets.only(left:20),
+                child: const Text("마이 프로필",
                   style:TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600
                   )
                 ),
               ),
-              SizedBox(height:20),
-              Padding(
-                padding: const EdgeInsets.only(left:20),
+              const SizedBox(height:20),
+              Container(
+                margin: EdgeInsets.only(left:20),
                 child: Row(
                   children: [
                     CircleAvatar(minRadius: 45,),
                     SizedBox(width:size.width*0.05),
-                    Text.rich(
-                      TextSpan(
-                        children: [
-                          TextSpan(
-                            text: "주드벨링엄",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 20,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text.rich(
+                              TextSpan(
+                                children: [
+                                  TextSpan(
+                                    text: uvm.userData.name!,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 20,
+                                    )
+                                  ),
+                                  const TextSpan(
+                                    text: " 님",
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600
+                                    )
+                                  ),
+                                ]
+                              )
+                            ),
+                            SizedBox(width: size.width*0.02),
+                            GestureDetector(
+                              onTap: () => showDialog(
+                                context: context,
+                                builder: (BuildContext context) => AlertDialog(
+                                  title: const Text("이름 변경"),
+                                  content: TextField(
+                                    onChanged: (value) {
+                                      inputName = value;
+                                    },
+                                  ),
+                                  actionsAlignment: MainAxisAlignment.spaceBetween,
+                                  actions: [
+                                    SizedBox(
+                                      height: 50,
+                                      child: OutlinedButton(
+                                        onPressed: () {
+                                          if(inputName == ""){
+                                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                              content: Text(
+                                                  '이름은 공백이 될 수 없습니다.'),
+                                              duration: Duration(seconds: 3),
+                                            ));
+                                            return;
+                                          }
+                                          Navigator.of(context).pop();
+                                          setState(() {
+                                            uvm.editUsername(inputName);
+                                          });
+                                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                            content: Text(
+                                                '성공적으로 이름을 변경했습니다.'),
+                                            duration: Duration(seconds: 3),
+                                          ));
+                                        },
+                                        style: OutlinedButton.styleFrom(
+                                          backgroundColor: color2,
+                                          side: const BorderSide(
+                                            color: color2,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(5),
+                                          ),
+                                        ),
+                                        child: const Text(
+                                          "변경된 이름 저장",
+                                          style: TextStyle(
+                                              fontSize: 15, color: Colors.white),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 50,
+                                      child: OutlinedButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        style: OutlinedButton.styleFrom(
+                                          backgroundColor: Colors.transparent,
+                                          side: const BorderSide(
+                                            color: Colors.grey,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(10),
+                                          ),
+                                        ),
+                                        child: const Text(
+                                          "취소",
+                                          style: TextStyle(
+                                              fontSize: 15, color: Colors.black),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              child: SizedBox(
+                                width: 15,
+                                height: 15,
+                                child: Image.asset('images/editGroupName.png'),
+                              ),
                             )
-                          ),
-                          TextSpan(
-                            text: " 님",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600
-                            )
-                          ),
-                        ]
-                      )
+                          ],
+                        ),
+                        Text("[친구찾기 닉네임]",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 20,
+                          )
+                        )
+                      ],
                     ),
-                    SizedBox(width: size.width*0.02),
-                    Image.asset('images/editGroupName.png', width: 20, height: 20)
+
                   ],
                 ),
               ),
-              SizedBox(height: 20),
-              Divider(thickness: 10,color: Color(0xFFF4F4F4)),
-              SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.only(left:20),
-                child: Text("내 계좌",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 20
-                  )
-                )
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left:20,right:20),
-                child: Divider(thickness: 1),
-              ),
-              SizedBox(height:10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left:20),
-                    child: CircleAvatar(
-                      backgroundColor: Color(0xFFFFC93D),
-                      minRadius: 30,
-                      child: Text("국민",
+              const SizedBox(height: 20),
+              const Divider(thickness: 10,color: Color(0xFFF4F4F4),),
+              const SizedBox(height: 20),
+              Container(
+                margin: EdgeInsets.only(left:20,right:20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    const Text("내 계좌",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 20
+                      )
+                    ),
+                    GestureDetector(
+                      onTap:(){},
+                      child:const Text(
+                        "자세히 보기>",
                         style: TextStyle(
-                          color:Colors.white,
+                          fontSize: 13,
                           fontWeight: FontWeight.w600
                         ),
                       ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right:20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text("123-456789-XXX-X",
-                          style:TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                          )
-                        ),
-                        Text("신성민",
-                          style:TextStyle(
-                            fontSize:15,
-                            fontWeight: FontWeight.w500
-                          )
-                        )
-                      ],
-                    ),
-                  )
-                ],
+                    )
+                  ],
+                ),
               ),
-              SizedBox(height:30),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Divider(thickness: 1),
+              ),
+              uvm.userData.accountInfo.isNotEmpty ? Container(
+                margin: EdgeInsets.only(left:20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GestureDetector(
+                      onTap: ()async{
+                        await Clipboard.setData(ClipboardData(text: uvm.userData.accountInfo.first));
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: const Center(
+                            child: Text(
+                                '계좌번호가 복사되었습니다.'),
+                          ),
+                          duration: const Duration(milliseconds: 1500),
+                          width: size.width*0.5,
+                          backgroundColor: color1,
+                          shape: StadiumBorder(),
+                          behavior: SnackBarBehavior.floating,
+                        ));
+                      },
+                      child: Text(uvm.userData.accountInfo.first,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                          decoration: TextDecoration.underline
+
+                        ),
+                      ),
+                    ),
+                    Text("자유 지정 가능한 계좌 이름",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600
+                      ),
+                    )
+                  ],
+                ),
+              ) : const Padding(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                child: Center(child:Text("현재 등록된 계좌가 없습니다.",
+                  style: TextStyle(
+                    color: Color(0xFF766E6E),
+                    fontWeight: FontWeight.w500,
+                    fontSize: 15
+                  ),
+                )),
+              ),
+              const SizedBox(height:15),
               Center(
                 child: Container(
                   width:size.width*0.9,
-                  height:50,
+                  height:60,
                   decoration: BoxDecoration(
-                    border: Border.all(width:1.5,color: Color(0xFFD9D9D9)),
+                    border: Border.all(width:0.5,color: const Color(0xFFD9D9D9)),
                     borderRadius: BorderRadius.circular(10)
                   ),
-                  child: Center(
-                    child: Text("계좌 추가하기",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500
-                      )
+                  child: OutlinedButton(
+                    onPressed: () {
+                      context.push('/MyPage/AddAccount');
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(
+                        color: Color(0xFFCCCCCC),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
-                  )
-                ),
-              ),
-              SizedBox(height:40),
-              Divider(thickness: 10,color: Color(0xFFF4F4F4)),
-              SizedBox(height:20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left:20),
-                    child: Text("진행 중인 정산",
-                      style:TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18
-                      )
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right:20,top:10),
-                    child: Text("자세히 보기>",
+                    child: const Text(
+                      "계좌 추가하기",
                       style: TextStyle(
+                        color: Colors.black,
                         fontWeight: FontWeight.w500,
-                        fontSize: 13
-                      )
-                    )
+                        fontSize: 18,
+                      ),
+                    ),
+                  ),
                   )
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left:20,right:20),
-                child: Divider(thickness: 1),
-              ),
-              SizedBox(height:10),
-              Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left:20),
-                    child: Text("그룹1",
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600
-                      )
-                    ),
-                  ),
-                  SizedBox(width:size.width*0.05),
-                  Container(
-                    width: size.width*0.5,
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          child: Container(
-                            width:size.width*0.05,
-                            height:size.width*0.05,
-                            decoration: BoxDecoration(
-                              color:Colors.grey,
-                              shape:BoxShape.circle,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left:size.width*0.03,
-                          child: Container(
-                            width:size.width*0.05,
-                            height:size.width*0.05,
-                            decoration: BoxDecoration(
-                              color:Colors.grey,
-                              shape:BoxShape.circle,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left:size.width*0.06,
-                          child: Container(
-                            width:size.width*0.05,
-                            height:size.width*0.05,
-                            decoration: BoxDecoration(
-                              color:Colors.grey,
-                              shape:BoxShape.circle,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left:size.width*0.09,
-                          child: Container(
-                            width:size.width*0.05,
-                            height:size.width*0.05,
-                            decoration: BoxDecoration(
-                              color:Colors.grey,
-                              shape:BoxShape.circle,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left:size.width*0.15,
-                          child: Text("+2")
-                        )
-                      ],
-                    ),
-                  ),
-                  SizedBox(width:size.width*0.2),
-                  Container(
-                    width: size.width*0.03,
-                    height: size.width*0.03,
-                    decoration: BoxDecoration(
-                        color: Color(0xFF07BEB8),
-                        shape: BoxShape.circle
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left:20,top:5),
-                child: Text("20230701 정산이 진행중입니다.",
-                  style: TextStyle(
-                    color: Color(0xFF07BEB8),
-                  ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left:20,right:20),
-                child: Divider(thickness: 1),
-              ),
-              SizedBox(height:10),
-              Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left:20),
-                    child: Text("그룹2",
-                        style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600
-                        )
-                    ),
-                  ),
-                  SizedBox(width:size.width*0.05),
-                  Container(
-                    width: size.width*0.5,
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          child: Container(
-                            width:size.width*0.05,
-                            height:size.width*0.05,
-                            decoration: BoxDecoration(
-                              color:Colors.grey,
-                              shape:BoxShape.circle,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left:size.width*0.03,
-                          child: Container(
-                            width:size.width*0.05,
-                            height:size.width*0.05,
-                            decoration: BoxDecoration(
-                              color:Colors.grey,
-                              shape:BoxShape.circle,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left:size.width*0.06,
-                          child: Container(
-                            width:size.width*0.05,
-                            height:size.width*0.05,
-                            decoration: BoxDecoration(
-                              color:Colors.grey,
-                              shape:BoxShape.circle,
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                  SizedBox(width:size.width*0.15),
-                  Container(
-                    width: size.width*0.03,
-                    height: size.width*0.03,
-                    decoration: BoxDecoration(
-                        color: Color(0xFFFE5F55),
-                        shape: BoxShape.circle
-                    ),
-                  ),
-                  SizedBox(width:size.width*0.02),
-                  Container(
-                    width: size.width*0.03,
-                    height: size.width*0.03,
-                    decoration: BoxDecoration(
-                        color: Color(0xFF07BEB8),
-                        shape: BoxShape.circle
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left:20,top:5),
-                child: Text("계모임 정산이 진행중입니다.",
-                  style: TextStyle(
-                    color: Color(0xFFFE5F55),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left:20),
-                child: Text("흑우팸 정산이 진행중입니다.",
-                  style: TextStyle(
-                    color: Color(0xFF07BEB8),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left:20,right:20),
-                child: Divider(thickness: 1),
-              ),
-              SizedBox(height:10),
-              Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left:20),
-                    child: Text("그룹3",
-                        style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600
-                        )
-                    ),
-                  ),
-                  SizedBox(width:size.width*0.05),
-                  Container(
-                    width: size.width*0.5,
-                    child: Stack(
-                      children: [
-                        Positioned(
-                          child: Container(
-                            width:size.width*0.05,
-                            height:size.width*0.05,
-                            decoration: BoxDecoration(
-                              color:Colors.grey,
-                              shape:BoxShape.circle,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left:size.width*0.03,
-                          child: Container(
-                            width:size.width*0.05,
-                            height:size.width*0.05,
-                            decoration: BoxDecoration(
-                              color:Colors.grey,
-                              shape:BoxShape.circle,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left:size.width*0.06,
-                          child: Container(
-                            width:size.width*0.05,
-                            height:size.width*0.05,
-                            decoration: BoxDecoration(
-                              color:Colors.grey,
-                              shape:BoxShape.circle,
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left:size.width*0.09,
-                          child: Container(
-                            width:size.width*0.05,
-                            height:size.width*0.05,
-                            decoration: BoxDecoration(
-                              color:Colors.grey,
-                              shape:BoxShape.circle,
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left:20,top:5),
-                child: Text("진행중인 정산이 없습니다.",
-                ),
-              ),
-              SizedBox(width:double.infinity,height:30),
-              Divider(thickness: 10,color: Color(0xFFF4F4F4)),
-              SizedBox(width:double.infinity,height:30),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left:20),
-                    child: Text("알림",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right:20),
-                    child: Text("자세히 보기>",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left:20,right:20),
-                child: Divider(thickness: 1),
-              ),
-              SizedBox(height:10),
-              Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left:20),
-                    child: Container(
-                      width: size.width*0.03,
-                      height: size.width*0.03,
-                      decoration: BoxDecoration(
-                          color: Color(0xFF07BEB8),
-                          shape: BoxShape.circle
-                      ),
-                    ),
-                  ),
-                  SizedBox(width:20),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("보낼 정산",
-                        style:TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        )
-                      ),
-                      Text("송금을 기다리고 있는 유저들이 있어요!",
-                        style:TextStyle(
-                          fontSize:12,
-                          color: Color(0xFF7C7C7C),
-                        )
-                      )
-                    ],
-                  ),
-                  SizedBox(width:size.width*0.28),
-                  Text("3",
-                    style:TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize:20,
-                      color: Color(0xFF07BEB8),
-                    )
-                  )
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left:20,right:20),
-                child: Divider(thickness: 2,color: Color(0xFF07BEB8)),
-              ),
-              SizedBox(height:10),
-              Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left:20),
-                    child: Container(
-                      width: size.width*0.03,
-                      height: size.width*0.03,
-                      decoration: BoxDecoration(
-                          color: Color(0xFFFE5F55),
-                          shape: BoxShape.circle
-                      ),
-                    ),
-                  ),
-                  SizedBox(width:20),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("받을 정산",
-                          style:TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          )
-                      ),
-                      Text("송금 현황을 확인해 볼까요?",
-                          style:TextStyle(
-                            fontSize:12,
-                            color: Color(0xFF7C7C7C),
-                          )
-                      )
-                    ],
-                  ),
-                  SizedBox(width:size.width*0.42),
-                  Text("5",
-                      style:TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize:20,
-                        color: Color(0xFFFE5F55),
-                      )
-                  )
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left:20,right:20),
-                child: Divider(thickness: 2,color: Color(0xFFFE5F55)),
-              ),
-              SizedBox(height:10),
-              Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left:20),
-                    child: Container(
-                      width: size.width*0.03,
-                      height: size.width*0.03,
-                      decoration: BoxDecoration(
-                          color: Color(0xFF565659),
-                          shape: BoxShape.circle
-                      ),
-                    ),
-                  ),
-                  SizedBox(width:20),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text("기타 알림",
-                          style:TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          )
-                      ),
-                      Text("다른 알림들을 볼까요??",
-                          style:TextStyle(
-                            fontSize:12,
-                            color: Color(0xFF7C7C7C),
-                          )
-                      )
-                    ],
-                  ),
-                  SizedBox(width:size.width*0.47),
-                  Text("5",
-                      style:TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize:20,
-                        color: Color(0xFF565659),
-                      )
-                  )
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left:20,right:20),
-                child: Divider(thickness: 2,color: Color(0xFF565659)),
-              ),
-              SizedBox(height:80)
+
+              const SizedBox(height:40),
+              const Divider(thickness: 10,color: Color(0xFFF4F4F4)),
+              const SizedBox(height:20),
+
             ],
           ),
-        )
+        ),
+        bottomNavigationBar: const CustomBottomNavigationBar(
+          index: 0,
+          isIn: true,
+        ),
     );
   }
 }
