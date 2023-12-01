@@ -233,8 +233,7 @@ class UserViewModel extends ChangeNotifier {
   }
 
   void updateAccount(Account account) async {
-    final accountRef = db.collection("accountlist").doc(userData.serviceUserId).collection('myaccountlist')
-        .doc(account.accountId);
+    final accountRef = db.collection("accountlist").doc(account.accountId);
     db.runTransaction((transaction) async {
       transaction.update(accountRef, account.toJson());
     }).then(
@@ -247,8 +246,7 @@ class UserViewModel extends ChangeNotifier {
 
   void deleteAccount(Account account, int index) async {
     final userRef = db.collection("userlist").doc(userData.serviceUserId);
-    final accountRef = db.collection("accountlist").doc(userData.serviceUserId).collection('myaccountlist')
-    .doc(account.accountId);
+    final accountRef = db.collection("accountlist").doc(account.accountId);
     db.runTransaction((transaction) async {
       userData.myAccounts.removeAt(index);
       transaction.delete(accountRef);
