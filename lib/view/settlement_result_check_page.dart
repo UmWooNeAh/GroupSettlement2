@@ -134,7 +134,7 @@ class _SettlementFinalCheckPage
                           title:
                               '${provider.settlementUsers[0].name}님이 정산 요청을 보냈어요.\n내역을 확인한 후 송금해주세요',
                           description:
-                              provider.settlementUsers[0].accountInfo.first,
+                              provider.settlementUsers[0].myAccounts.first,
                           imageUrl: Uri.parse(
                               'https://www.press9.kr/news/photo/201910/30004_craw1.jpg'),
                           link: Link(

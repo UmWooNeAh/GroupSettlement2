@@ -35,7 +35,7 @@ class SettlementCreateViewModel extends ChangeNotifier {
     settlement.groupId = myGroup.groupId;
     settlement.masterUserId = userData.serviceUserId;
     settlement.accountInfo =
-        userData.accountInfo.isNotEmpty ? userData.accountInfo[0] : "";
+        userData.myAccounts.isNotEmpty ? userData.myAccounts[0] : "";
 
     for (var user in myGroup.serviceUsers) {
       if (user == settlement.masterUserId) {

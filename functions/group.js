@@ -34,11 +34,18 @@ exports.sendNtf_CreateGroup  = functions.region("asia-northeast3").firestore
                 },
                 token: userDoc.data().fcmtoken,
             };
+
             const alarm = {
                 alarmid: alarmId,
                 title: alarmTitle,
                 body: alarmBody,
-                category: 2
+                category: 2,
+                route: "/GroupSelect/GroupMain",
+                args : [
+                    userDoc.data().serviceuserid,
+                    newvalue.groupid
+                ],
+                isread: false,
             };
 
             db.collection("alarmlist").doc(userDoc.data().serviceuserid)
