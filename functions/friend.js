@@ -43,7 +43,9 @@ exports.sendNtf_requestedFriend  = functions.region("asia-northeast3").firestore
                         alarmid: alarmId,
                         title: alarmTitle,
                         body: alarmBody,
-                        category: 1
+                        category: 1,
+                        route: "/MyPage",
+                        isread: false,
                   };
 
                 db.collection("alarmlist").doc(now.serviceuserid)
@@ -100,7 +102,9 @@ exports.sendNtf_acceptFriend  = functions.region("asia-northeast3").firestore
                               alarmid: alarmId,
                               title: alarmTitle,
                               body: alarmBody,
-                              category: 1
+                              category: 1,
+                              route: "/MyPage",
+                              isread: false,
                         };
 
                       db.collection("alarmlist").doc(now.serviceuserid)
@@ -137,7 +141,9 @@ exports.sendNtf_acceptFriend  = functions.region("asia-northeast3").firestore
                                   alarmid: alarmId,
                                   title: alarmTitle,
                                   body: alarmBody,
-                                  category: 1
+                                  category: 1,
+                                  route: "/MyPage",
+                                  isread: false,
                             };
 
                           db.collection("alarmlist").doc(now.serviceuserid)

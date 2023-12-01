@@ -48,7 +48,13 @@ exports.sendNtf_CreateSettlement  = functions.region("asia-northeast3").firestor
                 alarmid: alarmId,
                 title: alarmTitle,
                 body: alarmBody,
-                category: 1
+                category: 1,
+                route: "/SettlementInformation",
+                args: [
+                    newvalue.settlementid,
+                    newvalue.groupid,
+                ],
+                isread: false,
             };
 
             db.collection("alarmlist").doc(masterDoc.data().serviceuserid)
@@ -87,7 +93,14 @@ exports.sendNtf_CreateSettlement  = functions.region("asia-northeast3").firestor
             alarmid: alarmId,
             title: alarmTitle,
             body: alarmBody,
-            category: 1
+            category: 1,
+            route: "/SettlementInformation",
+            args: [
+                newvalue.settlementid,
+                newvalue.groupid,
+                userid,
+            ],
+            isread: false,
         };
 
         db.collection("alarmlist").doc(userDoc.data().serviceuserid)
@@ -147,7 +160,14 @@ exports.sendNtf_SendSettlementPaper  = functions.region("asia-northeast3").fires
             alarmid: alarmId,
             title: alarmTitle,
             body: alarmBody,
-            category: 1
+            category: 1,
+            route: "/SettlementInformation",
+            args: [
+                settlementDoc.data().settlementid,
+                settlementDoc.data().groupid,
+                userDoc.data().serviceuserid
+            ],
+            isread: false,
       };
 
       db.collection("alarmlist").doc(userDoc.data().serviceuserid)
@@ -210,7 +230,9 @@ exports.sendNtf_CheckSent  = functions.region("asia-northeast3").firestore
                       alarmid: alarmId,
                       title: alarmTitle,
                       body: alarmBody,
-                      category: 0
+                      category: 0,
+                      route: "/SettlementInformation",
+                      isread: false,
                 };
 
               db.collection("alarmlist").doc(userDoc.data().serviceuserid)
@@ -244,7 +266,9 @@ exports.sendNtf_CheckSent  = functions.region("asia-northeast3").firestore
                       alarmid: alarmId,
                       title: alarmTitle,
                       body: alarmBody,
-                      category: 1
+                      category: 1,
+                      route: "/SettlementInformation",
+                    isread: false,
                 };
 
               db.collection("alarmlist").doc(userDoc.data().serviceuserid)
@@ -278,7 +302,9 @@ exports.sendNtf_CheckSent  = functions.region("asia-northeast3").firestore
                       alarmid: alarmId,
                       title: alarmTitle,
                       body: alarmBody,
-                      category: 1
+                      category: 1,
+                      route: "/SettlementInformation",
+                      isread: false,
                 };
 
               db.collection("alarmlist").doc(userDoc.data().serviceuserid)
@@ -339,7 +365,9 @@ exports.sendNtf_finishSettlement  = functions.region("asia-northeast3").firestor
                     alarmid: alarmId,
                     title: alarmTitle,
                     body: alarmBody,
-                    category: 1
+                    category: 1,
+                    route: "/SettlementInformation",
+                    isread: false,
               };
 
             db.collection("alarmlist").doc(userDoc.data().serviceuserid)

@@ -157,7 +157,7 @@ class GroupViewModel extends ChangeNotifier {
   void unifyAccountInfo(int chosenAccount, List<int> indexes) async {
     indexes.forEach((index) async {
       settlementInGroup[index].accountInfo =
-          userData.accountInfo[chosenAccount];
+          userData.myAccounts[chosenAccount];
       FireService().updateDoc(
           "settlementlist",
           settlementInGroup[index].settlementId!,
