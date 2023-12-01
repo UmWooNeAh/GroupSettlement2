@@ -8,18 +8,12 @@ class Alarm {
   String? body;
   int? category;
   String? route;
+  List<String> args = <String> [];
   bool? isRead;
   Timestamp? time;
 
-  Alarm ({
-    this.alarmId,
-    this.title,
-    this.body,
-    this.category,
-    this.route,
-    this.isRead,
-    this.time
-  });
+  Alarm () {
+  }
 
   Alarm.fromJson(dynamic json) {
     alarmId = json['alarmid'];
@@ -27,6 +21,7 @@ class Alarm {
     body = json['body'];
     category = json['category'];
     route = json['route'];
+    args = List<String>.from(json['args']);
     isRead = json['isread'];
     time = json['time'];
   }
@@ -37,6 +32,7 @@ class Alarm {
     'body' : body,
     'category' : category,
     'route' : route,
+    'args' : args,
     'isread' : isRead,
     'time' : time,
   };
