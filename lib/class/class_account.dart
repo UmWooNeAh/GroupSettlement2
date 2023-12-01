@@ -10,7 +10,7 @@ class Account {
   String? accountAlias;
 
 
-  Account(){
+  Account () {
     ModelUuid uuid = ModelUuid();
     accountId = uuid.randomId;
   }
