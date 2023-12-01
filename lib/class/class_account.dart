@@ -9,13 +9,11 @@ class Account {
   String? accountHolder;
   String? accountAlias;
 
-  Account ({
-    this.accountId,
-    this.bank,
-    this.accountNum,
-    this.accountHolder,
-    this.accountAlias
-  });
+
+  Account(){
+    ModelUuid uuid = ModelUuid();
+    accountId = uuid.randomId;
+  }
 
   Account.fromJson(dynamic json) {
     accountId = json['accountid'];
@@ -33,7 +31,7 @@ class Account {
     'accountalias' : accountAlias,
   };
 
-  void creatAccount(String userid) async {
+  void createAccount(String userid) async {
     await FirebaseFirestore.instance.collection("accountlist").doc(accountId).set(toJson());
   }
 

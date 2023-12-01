@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:groupsettlement2/view/shared_basic_widget.dart';
 import 'package:flutter/services.dart';
 
+import '../class/class_account.dart';
 import '../design_element.dart';
 import '../viewmodel/UserViewModel.dart';
 class MyPage extends ConsumerStatefulWidget {
@@ -19,6 +20,7 @@ class _MyPageState extends ConsumerState<MyPage> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     var uvm = ref.watch(userProvider);
+    Account mainAccount = uvm.accounts.first;
     String inputName = "";
     return Scaffold(
         body:SingleChildScrollView(
@@ -214,7 +216,7 @@ class _MyPageState extends ConsumerState<MyPage> {
                   children: [
                     GestureDetector(
                       onTap: ()async{
-                        await Clipboard.setData(ClipboardData(text: uvm.userData.accountInfo.first));
+                        await Clipboard.setData(ClipboardData(text: uvm.accounts.first.accountNum.toString()));
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: const Center(
                             child: Text(
@@ -227,7 +229,7 @@ class _MyPageState extends ConsumerState<MyPage> {
                           behavior: SnackBarBehavior.floating,
                         ));
                       },
-                      child: Text(uvm.userData.accountInfo.first,
+                      child: Text(mainAccount.bank!+" "+mainAccount.accountNum.toString(),
                         style: const TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 16,
@@ -236,7 +238,7 @@ class _MyPageState extends ConsumerState<MyPage> {
                         ),
                       ),
                     ),
-                    Text("자유 지정 가능한 계좌 이름",
+                    Text(mainAccount.accountAlias!,
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600

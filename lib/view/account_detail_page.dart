@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/view/shared_basic_widget.dart';
 import 'package:groupsettlement2/viewmodel/UserViewModel.dart';
 
+import '../class/class_account.dart';
 import '../design_element.dart';
 
 class AccountDetailPage extends ConsumerStatefulWidget {
@@ -48,9 +49,9 @@ class _AccountDetailPageState extends ConsumerState<AccountDetailPage> {
           ),
           SizedBox(height:size.height*0.05),
           Column(
-            children: List.generate(provider.userData.accountInfo.length, (index){
-              String account = provider.userData.accountInfo[index];
-              return oneAccount(accountNum: account,nickName: "임시",bankName: "대구은행",isFavorite: index == 0,);
+            children: List.generate(provider.accounts.length, (index){
+              Account account = provider.accounts[index];
+              return oneAccount(accountNum: account.accountNum.toString(),nickName: account.accountAlias!,bankName: account.bank!,isFavorite: index == 0,);
             })
           ),
 

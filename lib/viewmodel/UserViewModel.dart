@@ -42,6 +42,7 @@ class UserViewModel extends ChangeNotifier {
     fetchUser(userData.serviceUserId!);
     fetchSettlement(0, initialStmCount);
     fetchAlarm(userData.serviceUserId!);
+    fetchAccount();
     return;
   }
 
@@ -223,7 +224,7 @@ class UserViewModel extends ChangeNotifier {
     final userRef = db.collection("userlist").doc(userData.serviceUserId);
     db.runTransaction((transaction) async {
       userData.accountInfo.add(account.accountId!);
-      account.creatAccount(userData.serviceUserId!);
+      account.createAccount(userData.serviceUserId!);
       transaction.update(userRef, userData.toJson());
     }).then(
           (value) {

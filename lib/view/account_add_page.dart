@@ -2,18 +2,21 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/view/shared_basic_widget.dart';
+import 'package:groupsettlement2/viewmodel/UserViewModel.dart';
 
+import '../class/class_account.dart';
 import '../design_element.dart';
 
-class AccountAddPage extends StatefulWidget {
+class AccountAddPage extends ConsumerStatefulWidget {
   const AccountAddPage({Key? key}) : super(key: key);
 
   @override
-  State<AccountAddPage> createState() => _AccountAddPageState();
+  ConsumerState<AccountAddPage> createState() => _AccountAddPageState();
 }
 
-class _AccountAddPageState extends State<AccountAddPage> {
+class _AccountAddPageState extends ConsumerState<AccountAddPage> {
   final List<String> _banks = ["하나은행","국민은행","외환은행","기업은행","부산은행","신한은행","대구은행"];
   String? bank;
   bool _makeFavorite = false;
@@ -21,6 +24,7 @@ class _AccountAddPageState extends State<AccountAddPage> {
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
     String accountNum = ""; String ownerName = "";
+    final provider = ref.watch(userProvider);
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -155,9 +159,12 @@ class _AccountAddPageState extends State<AccountAddPage> {
                       margin: EdgeInsets.only(bottom: 20),
                       child: OutlinedButton(
                           onPressed: (){
-                            print(bank);
-                            print(ownerName);
-                            print(accountNum);
+                            // Account account = Account();
+                            // account.accountNum = accountNum;
+                            // account.accountAlias = ;
+                            // account.accountHolder = ownerName;
+                            // account.bank = bank;
+                            // provider.addAccount(account);
                           },
                           style: OutlinedButton.styleFrom(
                             backgroundColor: Color(0xFF454545),

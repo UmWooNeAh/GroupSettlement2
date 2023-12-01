@@ -246,7 +246,7 @@ class _oneNotificationState extends State<oneNotification> {
     return GestureDetector(
       onTap: (){
         setState(() {
-
+          print(widget.alarm.route);
           if(read == Colors.grey){
             read = Colors.black;
           } else{
