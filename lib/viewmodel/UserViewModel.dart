@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/class/class_receiptitem.dart';
+import '../class/class_account.dart';
 import '../class/class_group.dart';
 import '../class/class_settlement.dart';
 import '../class/class_settlementpaper.dart';
@@ -23,6 +24,7 @@ class UserViewModel extends ChangeNotifier {
   List<Alarm> receiveStmAlarm = <Alarm> [];
   List<Alarm> sendStmAlarm = <Alarm> [];
   List<Alarm> etcStmAlarm = <Alarm> [];
+  List<Account> accounts = <Account> [];
   Map<String, String> firstReceiptItemName = <String, String>{};
   Map<Settlement, List<SettlementPaper>> settlementInfo = {};
   bool isFetchFinished = false;
@@ -157,6 +159,10 @@ class UserViewModel extends ChangeNotifier {
     return 1;
   }
 
+  Future<void> fetchAccount() async {
+   accounts = await Account().getMyAccountList(userData.accountInfo);
+  }
+
   void fetchAlarm(String userId) async {
     List<Alarm> allalarmlist = await Alarm().getAlarmListByUserId(userId);
     classifyAlarm(allalarmlist);
@@ -213,12 +219,11 @@ class UserViewModel extends ChangeNotifier {
 
   }
 
-  void addAccount(String bank, String accountNum, String holder) async {
-    String fullInfo = bank + " " + accountNum + " " + holder;
+  void addAccount(Account account) async {
     final userRef = db.collection("userlist").doc(userData.serviceUserId);
-
     db.runTransaction((transaction) async {
-      userData.accountInfo.add(fullInfo);
+      userData.accountInfo.add(account.accountId!);
+      account.creatAccount(userData.serviceUserId!);
       transaction.update(userRef, userData.toJson());
     }).then(
           (value) {
@@ -226,13 +231,26 @@ class UserViewModel extends ChangeNotifier {
       },
       onError: (e) => print("Error updating document $e"), //실패 메시지
     );
-
   }
 
-  void deleteAccount(int index) async {
+  void updateAccount(Account account) async {
+    final accountRef = db.collection("accountlist").doc(account.accountId);
+    db.runTransaction((transaction) async {
+      transaction.update(accountRef, account.toJson());
+    }).then(
+          (value) {
+        print("DocumentSnapshot successfully updated!"); //성공 메시지
+      },
+      onError: (e) => print("Error updating document $e"), //실패 메시지
+    );
+  }
+
+  void deleteAccount(Account account, int index) async {
     final userRef = db.collection("userlist").doc(userData.serviceUserId);
+    final accountRef = db.collection("accountlist").doc(account.accountId);
     db.runTransaction((transaction) async {
       userData.accountInfo.removeAt(index);
+      transaction.delete(accountRef);
       transaction.update(userRef, userData.toJson());
     }).then(
           (value) {

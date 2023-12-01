@@ -7,12 +7,18 @@ class Alarm {
   String? title;
   String? body;
   int? category;
+  String? route;
+  bool? isRead;
+  Timestamp? time;
 
   Alarm ({
     this.alarmId,
     this.title,
     this.body,
-    this.category
+    this.category,
+    this.route,
+    this.isRead,
+    this.time
   });
 
   Alarm.fromJson(dynamic json) {
@@ -20,13 +26,19 @@ class Alarm {
     title = json['title'];
     body = json['body'];
     category = json['category'];
+    route = json['route'];
+    isRead = json['isread'];
+    time = json['time'];
   }
 
   Map<String, dynamic> toJson() => {
     'alarmid' : alarmId,
     'title' : title,
     'body' : body,
-    'category' : category
+    'category' : category,
+    'route' : route,
+    'isread' : isRead,
+    'time' : time,
   };
 
   void creatAlarm(String userid) async {
