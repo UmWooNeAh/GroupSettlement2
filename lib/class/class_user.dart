@@ -18,7 +18,7 @@ class ServiceUser {
   List<String> groups = <String> [];
   List<String> settlements = <String> [];
   List<String> settlementPapers = <String> [];
-  List<String> myAccounts = <String> [];
+  List<String> accountInfo = <String> [];
   List<String> savedReceipts = <String> [];
   List<String> friends = [];
   List<String> requestedFriend = [];
@@ -42,7 +42,7 @@ class ServiceUser {
     groups = List<String>.from(json["groups"]);
     settlements = List<String>.from(json["settlements"]);
     settlementPapers = List<String>.from(json["settlementpapers"]);
-    myAccounts = List<String>.from(json["accountinfo"]);
+    accountInfo = List<String>.from(json["accountinfo"]);
     savedReceipts = List<String>.from(json["savedreceipts"]);
     friends = List<String>.from(json["friends"]);
     requestedFriend = List<String>.from(json["requestedfriend"]);
@@ -59,7 +59,7 @@ class ServiceUser {
     'groups' : groups,
     'settlements' : settlements,
     'settlementpapers' : settlementPapers,
-    'accountinfo' : myAccounts,
+    'accountinfo' : accountInfo,
     'savedreceipts' : savedReceipts,
     'friends' : friends,
     'requestedfriend' : requestedFriend,

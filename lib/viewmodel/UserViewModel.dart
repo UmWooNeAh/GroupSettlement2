@@ -160,7 +160,7 @@ class UserViewModel extends ChangeNotifier {
   }
 
   Future<void> fetchAccount() async {
-   accounts = await Account().getMyAccountList(userData.myAccounts);
+   accounts = await Account().getMyAccountList(userData.accountInfo);
   }
 
   void fetchAlarm(String userId) async {
@@ -222,7 +222,7 @@ class UserViewModel extends ChangeNotifier {
   void addAccount(Account account) async {
     final userRef = db.collection("userlist").doc(userData.serviceUserId);
     db.runTransaction((transaction) async {
-      userData.myAccounts.add(account.accountId!);
+      userData.accountInfo.add(account.accountId!);
       account.creatAccount(userData.serviceUserId!);
       transaction.update(userRef, userData.toJson());
     }).then(
@@ -249,7 +249,7 @@ class UserViewModel extends ChangeNotifier {
     final userRef = db.collection("userlist").doc(userData.serviceUserId);
     final accountRef = db.collection("accountlist").doc(account.accountId);
     db.runTransaction((transaction) async {
-      userData.myAccounts.removeAt(index);
+      userData.accountInfo.removeAt(index);
       transaction.delete(accountRef);
       transaction.update(userRef, userData.toJson());
     }).then(
