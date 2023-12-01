@@ -55,7 +55,22 @@ exports.sendNtf_CreateSettlement  = functions.region("asia-northeast3").firestor
                     newvalue.groupid,
                 ],
                 isread: false,
+                time: admin.firestore.Timestamp.fromDate(new Date())
             };
+
+            const alarmDoc = await db.collection("alarmlist").doc(masterDoc.data().serviceuserid)
+            .collection("myalarmlist").get();
+            const alarmCnt = alarmDoc.size;
+            console.log("알림 수: ", alarmCnt);
+            if(alarmCnt > 60) {
+               const collectionRef = db.collection("alarmlist").doc(masterDoc.data().serviceuserid)
+                  .collection("myalarmlist").orderBy("time").limit(1);
+               const collectionsnapshot = await collectionRef.get();
+               const oldestDoc = collectionsnapshot.docs[0];
+               const oldestid = oldestDoc.data().alarmid;
+               await  db.collection("alarmlist").doc(masterDoc.data().serviceuserid)
+                      .collection("myalarmlist").doc(oldestid).delete();
+            }
 
             db.collection("alarmlist").doc(masterDoc.data().serviceuserid)
                     .collection("myalarmlist").doc(alarmId).set(alarm);
@@ -101,8 +116,21 @@ exports.sendNtf_CreateSettlement  = functions.region("asia-northeast3").firestor
                 userid,
             ],
             isread: false,
+            time: admin.firestore.Timestamp.fromDate(new Date())
         };
-
+        const alarmDoc = await db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+        .collection("myalarmlist").get();
+        const alarmCnt = alarmDoc.size;
+        console.log("알림 수: ", alarmCnt);
+        if(alarmCnt > 60) {
+           const collectionRef = db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+              .collection("myalarmlist").orderBy("time").limit(1);
+           const collectionsnapshot = await collectionRef.get();
+           const oldestDoc = collectionsnapshot.docs[0];
+           const oldestid = oldestDoc.data().alarmid;
+           await  db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+                  .collection("myalarmlist").doc(oldestid).delete();
+        }
         db.collection("alarmlist").doc(userDoc.data().serviceuserid)
         .collection("myalarmlist").doc(alarmId).set(alarm);
 
@@ -168,8 +196,21 @@ exports.sendNtf_SendSettlementPaper  = functions.region("asia-northeast3").fires
                 userDoc.data().serviceuserid
             ],
             isread: false,
+            time: admin.firestore.Timestamp.fromDate(new Date())
       };
-
+      const alarmDoc = await db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+      .collection("myalarmlist").get();
+      const alarmCnt = alarmDoc.size;
+      console.log("알림 수: ", alarmCnt);
+      if(alarmCnt > 60) {
+         const collectionRef = db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+            .collection("myalarmlist").orderBy("time").limit(1);
+         const collectionsnapshot = await collectionRef.get();
+         const oldestDoc = collectionsnapshot.docs[0];
+         const oldestid = oldestDoc.data().alarmid;
+         await  db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+                .collection("myalarmlist").doc(oldestid).delete();
+      }
       db.collection("alarmlist").doc(userDoc.data().serviceuserid)
       .collection("myalarmlist").doc(alarmId).set(alarm);
 
@@ -233,8 +274,21 @@ exports.sendNtf_CheckSent  = functions.region("asia-northeast3").firestore
                       category: 0,
                       route: "/SettlementInformation",
                       isread: false,
+                      time: admin.firestore.Timestamp.fromDate(new Date())
                 };
-
+              const alarmDoc = await db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+              .collection("myalarmlist").get();
+              const alarmCnt = alarmDoc.size;
+              console.log("알림 수: ", alarmCnt);
+              if(alarmCnt > 60) {
+                 const collectionRef = db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+                    .collection("myalarmlist").orderBy("time").limit(1);
+                 const collectionsnapshot = await collectionRef.get();
+                 const oldestDoc = collectionsnapshot.docs[0];
+                 const oldestid = oldestDoc.data().alarmid;
+                 await  db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+                        .collection("myalarmlist").doc(oldestid).delete();
+              }
               db.collection("alarmlist").doc(userDoc.data().serviceuserid)
                 .collection("myalarmlist").doc(alarmId).set(alarm);
 
@@ -269,8 +323,21 @@ exports.sendNtf_CheckSent  = functions.region("asia-northeast3").firestore
                       category: 1,
                       route: "/SettlementInformation",
                     isread: false,
+                    time: admin.firestore.Timestamp.fromDate(new Date())
                 };
-
+              const alarmDoc = await db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+              .collection("myalarmlist").get();
+              const alarmCnt = alarmDoc.size;
+              console.log("알림 수: ", alarmCnt);
+              if(alarmCnt > 60) {
+                 const collectionRef = db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+                    .collection("myalarmlist").orderBy("time").limit(1);
+                 const collectionsnapshot = await collectionRef.get();
+                 const oldestDoc = collectionsnapshot.docs[0];
+                 const oldestid = oldestDoc.data().alarmid;
+                 await  db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+                        .collection("myalarmlist").doc(oldestid).delete();
+              }
               db.collection("alarmlist").doc(userDoc.data().serviceuserid)
                 .collection("myalarmlist").doc(alarmId).set(alarm);
 
@@ -305,8 +372,21 @@ exports.sendNtf_CheckSent  = functions.region("asia-northeast3").firestore
                       category: 1,
                       route: "/SettlementInformation",
                       isread: false,
+                      time: admin.firestore.Timestamp.fromDate(new Date())
                 };
-
+              const alarmDoc = await db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+              .collection("myalarmlist").get();
+              const alarmCnt = alarmDoc.size;
+              console.log("알림 수: ", alarmCnt);
+              if(alarmCnt > 60) {
+                 const collectionRef = db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+                    .collection("myalarmlist").orderBy("time").limit(1);
+                 const collectionsnapshot = await collectionRef.get();
+                 const oldestDoc = collectionsnapshot.docs[0];
+                 const oldestid = oldestDoc.data().alarmid;
+                 await  db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+                        .collection("myalarmlist").doc(oldestid).delete();
+              }
               db.collection("alarmlist").doc(userDoc.data().serviceuserid)
                 .collection("myalarmlist").doc(alarmId).set(alarm);
 
@@ -368,8 +448,21 @@ exports.sendNtf_finishSettlement  = functions.region("asia-northeast3").firestor
                     category: 1,
                     route: "/SettlementInformation",
                     isread: false,
+                    time: admin.firestore.Timestamp.fromDate(new Date())
               };
-
+            const alarmDoc = await db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+            .collection("myalarmlist").get();
+            const alarmCnt = alarmDoc.size;
+            console.log("알림 수: ", alarmCnt);
+            if(alarmCnt > 60) {
+               const collectionRef = db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+                  .collection("myalarmlist").orderBy("time").limit(1);
+               const collectionsnapshot = await collectionRef.get();
+               const oldestDoc = collectionsnapshot.docs[0];
+               const oldestid = oldestDoc.data().alarmid;
+               await  db.collection("alarmlist").doc(userDoc.data().serviceuserid)
+                      .collection("myalarmlist").doc(oldestid).delete();
+            }
             db.collection("alarmlist").doc(userDoc.data().serviceuserid)
               .collection("myalarmlist").doc(alarmId).set(alarm);
 
