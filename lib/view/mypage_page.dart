@@ -189,7 +189,9 @@ class _MyPageState extends ConsumerState<MyPage> {
                       )
                     ),
                     GestureDetector(
-                      onTap:(){},
+                      onTap:(){
+                        context.push("/MyPage/AccountDetail");
+                      },
                       child:const Text(
                         "자세히 보기>",
                         style: TextStyle(
@@ -293,7 +295,7 @@ class _MyPageState extends ConsumerState<MyPage> {
           ),
         ),
         bottomNavigationBar: const CustomBottomNavigationBar(
-          index: 0,
+          index: 4,
           isIn: true,
         ),
     );
