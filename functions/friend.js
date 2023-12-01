@@ -43,9 +43,24 @@ exports.sendNtf_requestedFriend  = functions.region("asia-northeast3").firestore
                         alarmid: alarmId,
                         title: alarmTitle,
                         body: alarmBody,
-                        category: 1
+                        category: 1,
+                        route: "/MyPage",
+                        isread: false,
+                        time: admin.firestore.Timestamp.fromDate(new Date())
                   };
-
+                const alarmDoc = await db.collection("alarmlist").doc(friendDoc.data().serviceuserid)
+                .collection("myalarmlist").get();
+                const alarmCnt = alarmDoc.size;
+                console.log("알림 수: ", alarmCnt);
+                if(alarmCnt > 60) {
+                   const collectionRef = db.collection("alarmlist").doc(friendDoc.data().serviceuserid)
+                      .collection("myalarmlist").orderBy("time").limit(1);
+                   const collectionsnapshot = await collectionRef.get();
+                   const oldestDoc = collectionsnapshot.docs[0];
+                   const oldestid = oldestDoc.data().alarmid;
+                   await  db.collection("alarmlist").doc(friendDoc.data().serviceuserid)
+                          .collection("myalarmlist").doc(oldestid).delete();
+                }
                 db.collection("alarmlist").doc(now.serviceuserid)
                   .collection("myalarmlist").doc(alarmId).set(alarm);
 
@@ -100,9 +115,24 @@ exports.sendNtf_acceptFriend  = functions.region("asia-northeast3").firestore
                               alarmid: alarmId,
                               title: alarmTitle,
                               body: alarmBody,
-                              category: 1
+                              category: 1,
+                              route: "/MyPage",
+                              isread: false,
+                              time: admin.firestore.Timestamp.fromDate(new Date())
                         };
-
+                      const alarmDoc = await db.collection("alarmlist").doc(otherFriendDoc.data().serviceuserid)
+                      .collection("myalarmlist").get();
+                      const alarmCnt = alarmDoc.size;
+                      console.log("알림 수: ", alarmCnt);
+                      if(alarmCnt > 60) {
+                         const collectionRef = db.collection("alarmlist").doc(otherFriendDoc.data().serviceuserid)
+                            .collection("myalarmlist").orderBy("time").limit(1);
+                         const collectionsnapshot = await collectionRef.get();
+                         const oldestDoc = collectionsnapshot.docs[0];
+                         const oldestid = oldestDoc.data().alarmid;
+                         await  db.collection("alarmlist").doc(otherFriendDoc.data().serviceuserid)
+                                .collection("myalarmlist").doc(oldestid).delete();
+                      }
                       db.collection("alarmlist").doc(now.serviceuserid)
                         .collection("myalarmlist").doc(alarmId).set(alarm);
 
@@ -137,9 +167,24 @@ exports.sendNtf_acceptFriend  = functions.region("asia-northeast3").firestore
                                   alarmid: alarmId,
                                   title: alarmTitle,
                                   body: alarmBody,
-                                  category: 1
+                                  category: 1,
+                                  route: "/MyPage",
+                                  isread: false,
+                                  time: admin.firestore.Timestamp.fromDate(new Date())
                             };
-
+                          const alarmDoc = await db.collection("alarmlist").doc(otherFriendDoc.data().serviceuserid)
+                          .collection("myalarmlist").get();
+                          const alarmCnt = alarmDoc.size;
+                          console.log("알림 수: ", alarmCnt);
+                          if(alarmCnt > 60) {
+                             const collectionRef = db.collection("alarmlist").doc(otherFriendDoc.data().serviceuserid)
+                                .collection("myalarmlist").orderBy("time").limit(1);
+                             const collectionsnapshot = await collectionRef.get();
+                             const oldestDoc = collectionsnapshot.docs[0];
+                             const oldestid = oldestDoc.data().alarmid;
+                             await  db.collection("alarmlist").doc(otherFriendDoc.data().serviceuserid)
+                                    .collection("myalarmlist").doc(oldestid).delete();
+                          }
                           db.collection("alarmlist").doc(now.serviceuserid)
                             .collection("myalarmlist").doc(alarmId).set(alarm);
 
