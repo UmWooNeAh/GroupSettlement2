@@ -34,7 +34,7 @@ class Account {
   };
 
   void creatAccount(String userid) async {
-    await FirebaseFirestore.instance.collection("accountlist").doc(userid).collection("myaccountlist").doc(accountId).set(toJson());
+    await FirebaseFirestore.instance.collection("accountlist").doc(accountId).set(toJson());
   }
 
   Future<List<Account>> getMyAccountList(List<String> accounts) async {
