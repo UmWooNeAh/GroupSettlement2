@@ -51,6 +51,20 @@ class UserViewModel extends ChangeNotifier {
       ..sort((e1, e2) => e2.key.time!.compareTo(e1.key.time!)));
   }
 
+  Future<List<dynamic>> linkAlarm(Alarm alarm)async{
+    if(alarm.route == "/MyPage"){
+      return [];
+    } else if(alarm.route == "/GroupSelect/GroupMain"){
+      Group group = await Group().getGroupByGroupId(alarm.args[1]);
+      return [userData,group];
+    } else if(alarm.route == "/SettlementInformation"){
+      Settlement stm = await Settlement().getSettlementBySettlementId(alarm.args[0]);
+      Group group = await Group().getGroupByGroupId(alarm.args[1]);
+      return [stm,group,userData];
+    }
+    return [];
+  }
+
   Future<void> editUsername(String newName) async{
     userData.name = newName;
     FireService().updateDoc("userlist", userData.serviceUserId!, userData.toJson());
@@ -190,11 +204,6 @@ class UserViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  //해당 알림 클릭시 이동할 페이지 지정(미구현)
-  void linkAlarm() {
-
-  }
-
   Future<void> deleteAlarm(int category, Alarm removeAlarm) async {
 
     final alarmRef = db.collection("alarmlist/" + userData.serviceUserId! + "/myalarmlist");
@@ -220,10 +229,14 @@ class UserViewModel extends ChangeNotifier {
 
   }
 
-  void addAccount(Account account) async {
+  void addAccount(Account account,bool isFavorite) async {
     final userRef = db.collection("userlist").doc(userData.serviceUserId);
     db.runTransaction((transaction) async {
-      userData.accountInfo.add(account.accountId!);
+      if(isFavorite){
+        userData.accountInfo.insert(0,account.accountId!);
+      } else {
+        userData.accountInfo.add(account.accountId!);
+      }
       account.createAccount(userData.serviceUserId!);
       transaction.update(userRef, userData.toJson());
     }).then(
