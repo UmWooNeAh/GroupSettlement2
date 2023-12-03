@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/view/shared_basic_widget.dart';
 import 'package:groupsettlement2/viewmodel/UserViewModel.dart';
@@ -19,11 +20,12 @@ class AccountAddPage extends ConsumerStatefulWidget {
 class _AccountAddPageState extends ConsumerState<AccountAddPage> {
   final List<String> _banks = ["하나은행","국민은행","외환은행","기업은행","부산은행","신한은행","대구은행"];
   String? bank;
+  String accountNum = ""; String ownerName = ""; String accountNickname = "";
   bool _makeFavorite = false;
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
-    String accountNum = ""; String ownerName = "";
+
     final provider = ref.watch(userProvider);
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -85,7 +87,23 @@ class _AccountAddPageState extends ConsumerState<AccountAddPage> {
                         color: Colors.black,
                       ),
                     ),
-                    SizedBox(height:size.height*0.12),
+                    SizedBox(height:size.height*0.06),
+                    Text("계좌 별명을 입력해주세요.",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black,
+                      ),
+                    ),
+                    TextField(
+                      decoration: InputDecoration(
+                        hintText: "계좌 별명",
+                      ),
+                      onChanged: (val){
+                        accountNickname = val;
+                      },
+                    ),
+                    SizedBox(height:20),
                     Text("은행사를 선택해주세요.",
                       style: TextStyle(
                         fontSize: 18,
@@ -94,10 +112,9 @@ class _AccountAddPageState extends ConsumerState<AccountAddPage> {
                       ),
                     ),
                     Container(
-                      width: size.width*0.9,
+                      width: size.width*0.4,
                       child: DropdownButton(
                           isExpanded: true,
-
                           value: bank,
                           items: _banks.map((e)=>
                               DropdownMenuItem(child: Text(e),value: e,)).toList(),
@@ -119,6 +136,13 @@ class _AccountAddPageState extends ConsumerState<AccountAddPage> {
                       ),
                     ),
                     TextField(
+                      keyboardType: TextInputType.number,
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.digitsOnly
+                      ],
+                      decoration: InputDecoration(
+                        hintText: "계좌번호 ('-'기호를 제외하고 입력\)",
+                      ),
                       onChanged: (val){
                         accountNum = val;
                       },
@@ -132,6 +156,9 @@ class _AccountAddPageState extends ConsumerState<AccountAddPage> {
                       ),
                     ),
                     TextField(
+                      decoration: InputDecoration(
+                        hintText: "예금주ㅅ",
+                      ),
                       onChanged: (val){
                         ownerName = val;
                       },
@@ -145,6 +172,9 @@ class _AccountAddPageState extends ConsumerState<AccountAddPage> {
                           contentPadding: EdgeInsets.zero,
                           dense : true,
                           activeColor: Colors.black,
+                          checkboxShape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(100)
+                          ),
                           onChanged: (val){
                             setState(() {
                               _makeFavorite = !_makeFavorite;
@@ -159,12 +189,23 @@ class _AccountAddPageState extends ConsumerState<AccountAddPage> {
                       margin: EdgeInsets.only(bottom: 20),
                       child: OutlinedButton(
                           onPressed: (){
-                            // Account account = Account();
-                            // account.accountNum = accountNum;
-                            // account.accountAlias = ;
-                            // account.accountHolder = ownerName;
-                            // account.bank = bank;
-                            // provider.addAccount(account);
+                            Account account = Account();
+                            try{
+                              account.accountNum = int.parse(accountNum);
+                            }catch(e){
+                              print(e);
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                content: Text(
+                                    '계좌번호에는 숫자만 넣어주세요.'),
+                                duration: Duration(seconds: 2),
+                              ));
+                              return;
+                            }
+                            account.accountAlias = accountNickname;
+                            account.accountHolder = ownerName;
+                            account.bank = bank;
+
+                            provider.addAccount(account,_makeFavorite);
                           },
                           style: OutlinedButton.styleFrom(
                             backgroundColor: Color(0xFF454545),
