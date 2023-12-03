@@ -3,8 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:groupsettlement2/design_element.dart';
 import 'package:groupsettlement2/view/shared_basic_widget.dart';
-import '../class/class_receiptitem.dart';
-import '../viewmodel/SettlementCreateViewModel.dart';
+import 'package:groupsettlement2/viewmodel/receipt_viewmodel.dart';
 
 class ReceiptEditPage extends ConsumerStatefulWidget {
   const ReceiptEditPage({super.key});
@@ -14,23 +13,14 @@ class ReceiptEditPage extends ConsumerStatefulWidget {
 }
 
 class _EditReceiptState extends ConsumerState<ReceiptEditPage> {
-  List<TextEditingController> menuController = [];
-  List<TextEditingController> countController = [];
-  List<TextEditingController> priceController = [];
   bool isFirst = true;
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    final provider = ref.watch(stmCreateProvider);
+    final provider = ref.watch(receiptProvider);
     if (isFirst) {
-      for (ReceiptItem receiptItem in provider.newReceiptItems) {
-        menuController.add(TextEditingController(text: receiptItem.menuName));
-        countController
-            .add(TextEditingController(text: receiptItem.menuCount.toString()));
-        priceController.add(TextEditingController(
-            text: priceToString.format(receiptItem.menuPrice ?? 0)));
-      }
+      provider.textEditorInitialize();
       isFirst = false;
     }
     return Scaffold(
@@ -201,7 +191,7 @@ class _EditReceiptState extends ConsumerState<ReceiptEditPage> {
                                     SizedBox(
                                       width: 140,
                                       child: TextField(
-                                        controller: menuController[index],
+                                        controller: provider.menuController[index],
                                         showCursor: true,
                                         maxLength: 13,
                                         decoration: const InputDecoration(
@@ -216,7 +206,7 @@ class _EditReceiptState extends ConsumerState<ReceiptEditPage> {
                                         alignment: const Alignment(1, 0),
                                         child: TextField(
                                           textAlign: TextAlign.end,
-                                          controller: countController[index],
+                                          controller: provider.countController[index],
                                           showCursor: true,
                                           maxLength: 13,
                                           decoration: const InputDecoration(
@@ -232,7 +222,7 @@ class _EditReceiptState extends ConsumerState<ReceiptEditPage> {
                                         alignment: const Alignment(1, 0),
                                         child: TextField(
                                           textAlign: TextAlign.end,
-                                          controller: priceController[index],
+                                          controller: provider.priceController[index],
                                           showCursor: true,
                                           maxLength: 13,
                                           decoration: const InputDecoration(
@@ -242,10 +232,10 @@ class _EditReceiptState extends ConsumerState<ReceiptEditPage> {
                                           onChanged: (value) {
                                             setState(() {
                                               if (value == '') {
-                                                priceController[index].text =
+                                                provider.priceController[index].text =
                                                     '0';
                                               } else {
-                                                priceController[index].text =
+                                                provider.priceController[index].text =
                                                     priceToString.format(
                                                         priceToString
                                                             .parse(value));
@@ -286,7 +276,7 @@ class _EditReceiptState extends ConsumerState<ReceiptEditPage> {
                             ),
                           ),
                           Text(
-                            "${priceToString.format(priceController.map((price) => priceToString.parse(price.text)).reduce((value, element) => value + element))}원",
+                            "${priceToString.format(provider.priceController.map((price) => priceToString.parse(price.text)).reduce((value, element) => value + element))}원",
                             style: const TextStyle(
                               fontSize: 21,
                               fontWeight: FontWeight.w700,
@@ -330,42 +320,23 @@ class _EditReceiptState extends ConsumerState<ReceiptEditPage> {
               margin: const EdgeInsets.all(10),
               child: OutlinedButton(
                 onPressed: () {
-                  provider.newReceipt.totalPrice = priceController
-                      .map((price) => priceToString.parse(price.text))
-                      .reduce((value, element) => value + element)
-                      .toInt();
-                  for (var index
-                      in Iterable.generate(provider.newReceiptItems.length)) {
-                    provider.newReceiptItems[index].menuName =
-                        menuController[index].text;
-                    try {
-                      provider.newReceiptItems[index].menuCount =
-                          int.parse(countController[index].text);
-                      if (provider.newReceiptItems[index].menuCount! < 1) {
-                        return;
-                      }
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  List<int> result = provider.completeEditReceipt();
+                  if (result[0] == -1){
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text(
-                            '${index + 1}번째 항목의 수량이 잘못되었어요. : ${countController[index].text}'),
+                            '${result[1] + 1}번째 항목의 수량이 잘못되었어요. : ${provider.countController[result[1]].text}'),
                         duration: const Duration(seconds: 3),
                       ));
                       return;
-                    }
-                    try {
-                      provider.newReceiptItems[index].menuPrice = priceToString
-                          .parse(priceController[index].text)
-                          .toInt();
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  }else if (result[0] == -2){
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text(
-                            '${index + 1}번째 항목의 가격이 잘못되었어요. : ${priceController[index].text}'),
+                            '${result[1] + 1}번째 항목의 가격이 잘못되었어요. : ${provider.priceController[result[1]].text}'),
                         duration: const Duration(seconds: 3),
                       ));
                       return;
-                    }
                   }
-                  provider.completeEditReceipt(provider.newReceipt.receiptId!);
+                  provider.addReceipt();
                   context.pop();
                 },
                 style: OutlinedButton.styleFrom(

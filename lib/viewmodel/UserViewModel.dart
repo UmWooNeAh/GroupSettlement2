@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:groupsettlement2/class/class_receiptitem.dart';
-import 'package:groupsettlement2/viewmodel/master_viewmodel.dart';
+import 'package:groupsettlement2/viewmodel/shared_data.dart';
 import '../class/class_group.dart';
 import '../class/class_settlement.dart';
 import '../class/class_settlementpaper.dart';
@@ -12,11 +12,10 @@ import '../common_fireservice.dart';
 
 final userProvider = ChangeNotifierProvider<UserViewModel>(
         (ref) {
-          return UserViewModel(ref.watch(masterProvider));
+          return UserViewModel();
         });
 
 class UserViewModel extends ChangeNotifier {
-  MasterViewModel provider;
   ServiceUser userData = ServiceUser();
   List<Group> myGroup = <Group> [];
   List<Receipt> myReceipts = <Receipt> [];
@@ -33,7 +32,7 @@ class UserViewModel extends ChangeNotifier {
   int initialStmCount = 2;
   // String testString = "";
 
-  UserViewModel(this.provider);
+  UserViewModel();
 
   // void masterProviderTest(){
   //   provider.valueChangeTest("jytcjc");

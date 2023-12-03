@@ -28,7 +28,6 @@ import 'package:groupsettlement2/common_fireservice.dart';
 import 'package:groupsettlement2/view/viewmodelTest_page.dart';
 import 'class/class_group.dart';
 import 'class/class_settlement.dart';
-import 'clova/clovaPage.dart';
 import 'design_element.dart';
 import 'firebase_options.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -41,8 +40,8 @@ import 'dart:math';
 import 'Kakao/kakao_login_page.dart';
 
 Future<void> initializeNotification() async {
-
-  const AndroidNotificationChannel androidNotificationChannel = AndroidNotificationChannel(
+  const AndroidNotificationChannel androidNotificationChannel =
+      AndroidNotificationChannel(
     'high_importance_channel', // 임의의 id
     'High Importance Notifications', // 설정에 보일 채널명
     importance: Importance.max,
@@ -51,7 +50,7 @@ Future<void> initializeNotification() async {
   final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   await flutterLocalNotificationsPlugin
       .resolvePlatformSpecificImplementation<
-      AndroidFlutterLocalNotificationsPlugin>()
+          AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(androidNotificationChannel);
 
   await flutterLocalNotificationsPlugin.initialize(
@@ -63,58 +62,54 @@ Future<void> initializeNotification() async {
   );
 
   await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-      alert: true, badge: true, sound: true
-  );
-
+      alert: true, badge: true, sound: true);
 }
 
 void parsingRoute(Map<String, dynamic> data) async {
-  if(data["topic"] != null ) {
-    if(data["topic"] == "GroupCreate") {
+  if (data["topic"] != null) {
+    if (data["topic"] == "GroupCreate") {
       ServiceUser user = await ServiceUser().getUserByUserId(data["arg0"]);
       _router.push(data["route"], extra: [user, data["arg1"]]);
-    }
-    else if(data["topic"] == "SettlementCreate" ) {
-      Settlement stm = await Settlement().getSettlementBySettlementId(data["arg0"]);
+    } else if (data["topic"] == "SettlementCreate") {
+      Settlement stm =
+          await Settlement().getSettlementBySettlementId(data["arg0"]);
       Group group = await Group().getGroupByGroupId(data["arg1"]);
       ServiceUser user = await ServiceUser().getUserByUserId(data["arg2"]);
       _router.push(data["route"], extra: [stm, group, user]);
-    }
-    else if(data["topic"] == "SendStmPaper" ) {
-      Settlement stm = await Settlement().getSettlementBySettlementId(data["arg0"]);
+    } else if (data["topic"] == "SendStmPaper") {
+      Settlement stm =
+          await Settlement().getSettlementBySettlementId(data["arg0"]);
       Group group = await Group().getGroupByGroupId(data["arg1"]);
       ServiceUser user = await ServiceUser().getUserByUserId(data["arg2"]);
       _router.push(data["route"], extra: [stm, group, user]);
-    }
-    else if(data["topic"] == "RequestCheckSent" ) {
-      Settlement stm = await Settlement().getSettlementBySettlementId(data["arg0"]);
+    } else if (data["topic"] == "RequestCheckSent") {
+      Settlement stm =
+          await Settlement().getSettlementBySettlementId(data["arg0"]);
       Group group = await Group().getGroupByGroupId(data["arg1"]);
       ServiceUser user = await ServiceUser().getUserByUserId(data["arg2"]);
       _router.push(data["route"], extra: [stm, group, user]);
-    }
-    else if(data["topic"] == "finishSettlement" ) {
-      Settlement stm = await Settlement().getSettlementBySettlementId(data["arg0"]);
+    } else if (data["topic"] == "finishSettlement") {
+      Settlement stm =
+          await Settlement().getSettlementBySettlementId(data["arg0"]);
       Group group = await Group().getGroupByGroupId(data["arg1"]);
       ServiceUser user = await ServiceUser().getUserByUserId(data["arg2"]);
       _router.push(data["route"], extra: [stm, group, user]);
-    }
-    else if(data["topic"] == "RequestFriend" ) {
+    } else if (data["topic"] == "RequestFriend") {
+      _router.push(data["route"]);
+    } else if (data["topic"] == "acceptFriend") {
       _router.push(data["route"]);
     }
-    else if(data["topic"] == "acceptFriend" ) {
-      _router.push(data["route"]);
-    }
-  }
-  else {
+  } else {
     print("Error 발생.");
   }
 }
 
-void onSelectNotification(NotificationResponse details) async { // 여기서 핸들링!
-    if(details.payload != null) {
-      Map<String, dynamic> data = jsonDecode(details.payload ?? "");
-      parsingRoute(data);
-    }
+void onSelectNotification(NotificationResponse details) async {
+  // 여기서 핸들링!
+  if (details.payload != null) {
+    Map<String, dynamic> data = jsonDecode(details.payload ?? "");
+    parsingRoute(data);
+  }
 }
 
 void showFlutterNotificaiton(RemoteMessage message) {
@@ -247,17 +242,18 @@ final GoRouter _router = GoRouter(
           },
         ),
         GoRoute(
-          path: 'SettlementMatchingComplete',
-          builder: (context, state) {
-            return const SettlementMatchingCompletePage();
-          },
-          routes: <RouteBase>[
-            GoRoute(path: 'SettlementResultCheck',
+            path: 'SettlementMatchingComplete',
             builder: (context, state) {
-              return const SettlementResultCheckPage();
-            },)
-          ]
-        )
+              return const SettlementMatchingCompletePage();
+            },
+            routes: <RouteBase>[
+              GoRoute(
+                path: 'SettlementResultCheck',
+                builder: (context, state) {
+                  return const SettlementResultCheckPage();
+                },
+              )
+            ])
       ],
     ),
   ],
@@ -287,7 +283,7 @@ void main() async {
       parsingRoute(message.data);
     }
   });
-  if(!kIsWeb) {
+  if (!kIsWeb) {
     await initializeNotification();
   }
   runApp(

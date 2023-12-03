@@ -1,9 +1,8 @@
-import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../viewmodel/SettlementCreateViewModel.dart';
+import 'package:groupsettlement2/viewmodel/receipt_viewmodel.dart';
 
 class ReceiptAddPage extends ConsumerStatefulWidget {
   final Object camera;
@@ -19,7 +18,7 @@ class _ReceiptAddPageState extends ConsumerState<ReceiptAddPage> {
 
   @override
   Widget build(BuildContext context) {
-    final stmcvm = ref.watch(stmCreateProvider);
+    final provider = ref.watch(receiptProvider);
     final CameraDescription camera = widget.camera as CameraDescription;
     _controller = CameraController(camera, ResolutionPreset.medium,imageFormatGroup: ImageFormatGroup.yuv420);
     _initializeControllerFuture = _controller.initialize();
@@ -71,21 +70,21 @@ class _ReceiptAddPageState extends ConsumerState<ReceiptAddPage> {
                     try {
                       dynamic analyzeResult;
                       Future(() async {
-                        await stmcvm.clova.pickPicture().then((value) {
-                          if (stmcvm.clova.imageFile != null){
+                        await provider.clova.pickPicture().then((value) {
+                          if (provider.clova.imageFile != null){
                             context.push('/ReceiptAdd/WaitingAnalyze');                          
                           }
                         });
-                        if(stmcvm.clova.imageFile == null){
+                        if(provider.clova.imageFile == null){
                           return;
                         }
-                        analyzeResult = await stmcvm.clova.analyze();
+                        analyzeResult = await provider.clova.analyze();
                       }).then((value) {
-                        if(stmcvm.clova.imageFile == null){
+                        if(provider.clova.imageFile == null){
                           return;
                         }
                         _controller.dispose();  
-                        stmcvm.createReceiptFromNaverOCR(analyzeResult);
+                        provider.createReceiptFromNaverOCR(analyzeResult);
                         context.pushReplacement("/ReceiptAdd/ReceiptCheckScanned");
                       });
                     }catch(e){
@@ -107,16 +106,16 @@ class _ReceiptAddPageState extends ConsumerState<ReceiptAddPage> {
                     dynamic analyzeResult;
                     Future(() async {
                       await _controller.takePicture().then((value) {
-                        print(stmcvm.clova.imageFile);
+                        print(provider.clova.imageFile);
                         context.push('/ReceiptAdd/WaitingAnalyze');
                       });
-                      if (!mounted || stmcvm.clova.imageFile == null) return;
-                      analyzeResult = stmcvm.clova.analyze();
+                      if (!mounted || provider.clova.imageFile == null) return;
+                      analyzeResult = provider.clova.analyze();
                     }).then((value) {
                       context.pushReplacement("/ReceiptAdd/ReceiptCheckScanned");
-                      if (stmcvm.clova.imageFile != null){
+                      if (provider.clova.imageFile != null){
                         _controller.dispose();
-                        stmcvm.createReceiptFromNaverOCR(analyzeResult);
+                        provider.createReceiptFromNaverOCR(analyzeResult);
                         context.go("/ReceiptAdd/ReceiptCheckScanned");
                       }
                     });

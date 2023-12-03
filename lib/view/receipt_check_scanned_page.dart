@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:groupsettlement2/class/class_receiptitem.dart';
 import 'package:groupsettlement2/design_element.dart';
 import 'package:groupsettlement2/view/shared_basic_widget.dart';
-import 'package:groupsettlement2/viewmodel/SettlementCreateViewModel.dart';
+import 'package:groupsettlement2/viewmodel/receipt_viewmodel.dart';
 
 class ReceiptCheckScannedPage extends ConsumerStatefulWidget {
   const ReceiptCheckScannedPage({super.key});
@@ -18,7 +18,7 @@ class _CheckScannedReceiptPge extends ConsumerState<ReceiptCheckScannedPage> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    final provider = ref.watch(stmCreateProvider);
+    final provider = ref.watch(receiptProvider);
     return Scaffold(
       appBar: AppBar(),
       body: Column(
