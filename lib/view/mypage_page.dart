@@ -20,7 +20,6 @@ class _MyPageState extends ConsumerState<MyPage> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
     var uvm = ref.watch(userProvider);
-    Account mainAccount = uvm.accounts.first;
     String inputName = "";
     return Scaffold(
         body:SingleChildScrollView(
@@ -99,7 +98,7 @@ class _MyPageState extends ConsumerState<MyPage> {
                                             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                                               content: Text(
                                                   '이름은 공백이 될 수 없습니다.'),
-                                              duration: Duration(seconds: 3),
+                                              duration: Duration(milliseconds: 1000),
                                             ));
                                             return;
                                           }
@@ -110,7 +109,7 @@ class _MyPageState extends ConsumerState<MyPage> {
                                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                                             content: Text(
                                                 '성공적으로 이름을 변경했습니다.'),
-                                            duration: Duration(seconds: 3),
+                                            duration: Duration(milliseconds: 1000),
                                           ));
                                         },
                                         style: OutlinedButton.styleFrom(
@@ -222,14 +221,14 @@ class _MyPageState extends ConsumerState<MyPage> {
                             child: Text(
                                 '계좌번호가 복사되었습니다.'),
                           ),
-                          duration: const Duration(milliseconds: 1500),
+                          duration: const Duration(milliseconds: 1000),
                           width: size.width*0.5,
                           backgroundColor: color1,
                           shape: StadiumBorder(),
                           behavior: SnackBarBehavior.floating,
                         ));
                       },
-                      child: Text(mainAccount.bank!+" "+mainAccount.accountNum.toString(),
+                      child: Text(uvm.accounts.first.bank!+" "+uvm.accounts.first.accountNum.toString(),
                         style: const TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 16,
@@ -238,7 +237,7 @@ class _MyPageState extends ConsumerState<MyPage> {
                         ),
                       ),
                     ),
-                    Text(mainAccount.accountAlias!,
+                    Text(uvm.accounts.first.accountAlias!,
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w600
