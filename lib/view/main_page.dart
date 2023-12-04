@@ -718,15 +718,15 @@ class _RecentSettlementState extends ConsumerState<RecentSettlement> {
 
   @override
   Widget build(BuildContext context) {
-    var mvm = ref.watch(userProvider);
+    var provider = ref.watch(userProvider);
     bool masterFlag =
-        widget.settlement.masterUserId == mvm.userData.serviceUserId;
-    barSize = widget.size.width * 0.67;
-    currentMoney = mvm.getCurrentMoney(widget.settlement);
-    totalPrice = mvm.getTotalPrice(widget.settlement);
+        widget.settlement.masterUserId == provider.userData.serviceUserId;
+    barSize = widget.size.width * 0.64;
+    currentMoney = provider.getCurrentMoney(widget.settlement);
+    totalPrice = provider.getTotalPrice(widget.settlement);
     if (!masterFlag) {
-      sendMoney = mvm.getSendMoney(widget.settlement);
-      _didSend = widget.settlement.checkSent[mvm.userData.serviceUserId] == 2;
+      sendMoney = provider.getSendMoney(widget.settlement);
+      _didSend = widget.settlement.checkSent[provider.userData.serviceUserId] == 2;
     }
     dt = widget.settlement.time != null
         ? DateTime.parse(widget.settlement.time!.toDate().toString())
@@ -736,12 +736,12 @@ class _RecentSettlementState extends ConsumerState<RecentSettlement> {
         GestureDetector(
           onTap: () {
             context.go(
-                "/SettlementInformation", extra: [widget.settlement, mvm.myGroup[mvm.myGroup.indexWhere((group) {
+                "/SettlementInformation", extra: [widget.settlement, provider.myGroup[provider.myGroup.indexWhere((group) {
                   if (group.groupId == widget.settlement.groupId){
                     return true;
                   }
                   return false;
-                })], mvm.userData]);
+                })], provider.userData]);
           },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -796,7 +796,7 @@ class _RecentSettlementState extends ConsumerState<RecentSettlement> {
                               ])),
                               Padding(
                                 padding: const EdgeInsets.only(top: 20, left: 5),
-                                child: Text(mvm.getGroupName(widget.settlement),
+                                child: Text(provider.getGroupName(widget.settlement),
                                     style: TextStyle(
                                         color: Colors.grey,
                                         fontWeight: FontWeight.w600)),
@@ -814,58 +814,63 @@ class _RecentSettlementState extends ConsumerState<RecentSettlement> {
                                 child: Divider(),
                               ),
                               Row(
-                                  //mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.only(left: 10),
-                                      child: Text(masterFlag ? "받을 금액" : "보낼 금액",
-                                          style: TextStyle(
-                                              color: Colors.grey,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600)),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(left: 10),
-                                      child: Text(
-                                          masterFlag
-                                              ? priceToString.format(currentMoney)
-                                              : _didSend
-                                                  ? "송금 완료"
-                                                  : priceToString.format(sendMoney),
-                                          style: TextStyle(
-                                              color: masterFlag ? color1 : color2,
-                                              fontWeight: FontWeight.w600,
-                                              fontSize: 20)),
-                                    ),
-                                    Text(
-                                        masterFlag
-                                            ? " / ${priceToString.format(totalPrice)}"
-                                            : "",
-                                        style: TextStyle(
-                                            color: Colors.grey,
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.w800)),
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 35),
-                                      child: Text(
-                                        masterFlag
-                                            ? currentMoney == totalPrice
-                                                ? "정산이 완료되었습니다"
-                                                : ""
-                                            : widget.settlement.checkSent[mvm
-                                                        .userData.serviceUserId] ==
-                                                    2
-                                                ? ""
-                                                : "항목을 눌러 송금 확인하기",
-                                        //정산 완료 확인 체크필요
-                                        style: TextStyle(
-                                          color: masterFlag ? color1 : color2,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 13,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                      //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 10),
+                                          child: Text(masterFlag ? "받을 금액" : "보낼 금액",
+                                              style: TextStyle(
+                                                  color: Colors.grey,
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w600)),
                                         ),
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 10),
+                                          child: Text(
+                                              masterFlag
+                                                  ? priceToString.format(currentMoney)
+                                                  : _didSend
+                                                      ? "송금 완료"
+                                                      : priceToString.format(sendMoney),
+                                              style: TextStyle(
+                                                  color: masterFlag ? color1 : color2,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 20)),
+                                        ),
+                                        Text(
+                                            masterFlag
+                                                ? " / ${priceToString.format(totalPrice)}"
+                                                : "",
+                                            style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w800)),
+                                      ]),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right:10),
+                                    child: Text(
+                                      masterFlag
+                                          ? currentMoney == totalPrice
+                                          ? "정산이 완료되었습니다"
+                                          : ""
+                                          : widget.settlement.checkSent[provider
+                                          .userData.serviceUserId] ==
+                                          2
+                                          ? ""
+                                          : "항목을 눌러 송금 확인하기",
+                                      //정산 완료 확인 체크필요
+                                      style: TextStyle(
+                                        color: masterFlag ? color1 : color2,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 13,
                                       ),
-                                    )
-                                  ]),
+                                    ),
+                                  )
+                                ],
+                              ),
                               Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 10),
                                 child: Divider(),
