@@ -581,7 +581,7 @@ class _SimpleSettlementerResState extends State<SimpleSettlementerRes> {
 
   @override
   Widget build(BuildContext context) {
-    bool isRealNum = widget.res == widget.res.toInt();
+    bool isInt = widget.res == widget.res.toInt();
     double res = widget.res * 1;
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -612,16 +612,16 @@ class _SimpleSettlementerResState extends State<SimpleSettlementerRes> {
                       AnimatedDigitWidget(
                         fractionDigits: 0,
                         duration: Duration(seconds: 1),
-                        value: isRealNum ? res : res.toInt(),
+                        value: isInt ? res : res.toInt(),
                         enableSeparator: true,
-                        suffix: isRealNum ? "원" : ".",
+                        suffix: isInt ? "원" : ".",
                         textStyle: TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.w600,
                           color: color1,
                         ),
                       ),
-                      isRealNum && (res * 100 % 100) / 10 < 1 ? SizedBox.shrink() : AnimatedDigitWidget(
+                      (res * 10 % 10) > 1 || isInt ? SizedBox.shrink() : AnimatedDigitWidget(
                         value: 0,
                         textStyle: TextStyle(
                           textBaseline: TextBaseline.alphabetic,
@@ -630,7 +630,7 @@ class _SimpleSettlementerResState extends State<SimpleSettlementerRes> {
                           color: Colors.grey,
                         ),
                       ),
-                      isRealNum ? SizedBox.shrink() : AnimatedDigitWidget(
+                      isInt ? SizedBox.shrink() : AnimatedDigitWidget(
                         duration: Duration(seconds: 1),
                         value : res * 100 % 100,
                         enableSeparator: true,
