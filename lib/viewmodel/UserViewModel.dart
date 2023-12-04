@@ -279,6 +279,40 @@ class UserViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  String getGroupRecentActivityTime(Group group){
+    Settlement recentStm = Settlement();
+    if(group.settlements.isEmpty){
+      return "";
+    }
+    for(var stm in settlementInfo.keys){
+      if(stm.settlementId == group.settlements.last){
+        recentStm = stm;
+      }
+    }
+    return getTimeAgo(recentStm.time!);
+  }
+
+  String getTimeAgo(Timestamp time){
+    DateTime dt = time != null
+        ? DateTime.parse(time!.toDate().toString())
+        : DateTime.utc(1000, 01, 01);
+    String timeAgo;
+
+    if(DateTime.now().month - dt.month > 0){
+      timeAgo = (DateTime.now().month - dt.month).toString() + "개월 전";
+    } else if(DateTime.now().day - dt.day > 0){
+      timeAgo = (DateTime.now().day - dt.day).toString() + "일 전";
+    } else if(DateTime.now().hour - dt.hour > 0){
+      timeAgo = (DateTime.now().hour - dt.hour).toString() + "시간 전";
+    } else if(DateTime.now().minute - dt.minute > 0){
+      timeAgo = (DateTime.now().minute - dt.minute).toString() + "분 전";
+    } else {
+      timeAgo = "방금";
+    }
+
+    return timeAgo;
+  }
+
   double getCurrentMoney(Settlement settlement) {
     double currentMoney = 0;
 

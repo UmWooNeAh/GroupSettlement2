@@ -253,22 +253,7 @@ class _oneNotificationState extends ConsumerState<oneNotification> {
     final provider = ref.watch(userProvider);
 
     Color read = widget.alarm.isRead == true ? Colors.grey : Colors.black;
-    DateTime dt = widget.alarm.time != null
-        ? DateTime.parse(widget.alarm.time!.toDate().toString())
-        : DateTime.utc(1000, 01, 01);
-    String timeAgo;
-
-    if(DateTime.now().month - dt.month > 0){
-      timeAgo = (DateTime.now().month - dt.month).toString() + "달 전";
-    } else if(DateTime.now().day - dt.day > 0){
-      timeAgo = (DateTime.now().day - dt.day).toString() + "일 전";
-    } else if(DateTime.now().hour - dt.hour > 0){
-      timeAgo = (DateTime.now().hour - dt.hour).toString() + "시간 전";
-    } else if(DateTime.now().minute - dt.minute > 0){
-      timeAgo = (DateTime.now().minute - dt.minute).toString() + "분 전";
-    } else {
-      timeAgo = "방금";
-    }
+    String timeAgo = provider.getTimeAgo(widget.alarm.time!);
 
     return GestureDetector(
       onTap: ()async{
