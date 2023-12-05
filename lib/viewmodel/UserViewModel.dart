@@ -167,9 +167,6 @@ class UserViewModel extends ChangeNotifier {
     List<Alarm> allalarmlist = await Alarm().getAlarmListByUserId(userId);
     classifyAlarm(allalarmlist);
 
-    for(int i=0; i<3;i++) {
-      newAlarm[i] = false;
-    }
     notifyListeners();
   }
 

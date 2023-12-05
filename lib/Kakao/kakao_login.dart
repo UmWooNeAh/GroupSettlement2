@@ -34,7 +34,7 @@ class kakaoLogin implements socialLogin {
   @override
   Future<bool> logout() async {
     try {
-      await UserApi.instance.unlink();
+      await UserApi.instance.logout();
       return true;
     }
     catch (error) {

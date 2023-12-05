@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="groupsettlement2"
         android:name="${applicationName}"
@@ -41,7 +42,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <!-- Redirect URI, "kakao${YOUR_NATIVE_APP_KEY}://oauth" 형식 -->
-                <data android:scheme="kakao00b83bf69fba554145c773d6737772fc" android:host="oauth"/>
+                <data android:scheme="kakao86cf64645f879a1106b56780ecebb371" android:host="oauth"/>
             </intent-filter>
         </activity>
 

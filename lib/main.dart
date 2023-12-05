@@ -40,6 +40,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:math';
 import 'Kakao/kakao_login_page.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fbAuth;
 
 Future<void> initializeNotification() async {
 
@@ -277,7 +278,13 @@ final GoRouter _router = GoRouter(
               return const SettlementResultCheckPage();
             },)
           ]
-        )
+        ),
+        GoRoute(
+          path: 'KakaoLogin',
+          builder: (context, state) {
+            return const kakaoLoginPage();
+          }
+        ),
       ],
     ),
   ],
@@ -294,9 +301,7 @@ void main() async {
   // final jsKey = await File("./Kakao/kakaoJsKey.txt").readAsString();
   WidgetsFlutterBinding.ensureInitialized();
   KakaoSdk.init(
-      nativeAppKey: '00b83bf69fba554145c773d6737772fc',
-      javaScriptAppKey: 'aa3a51d84f03c87a103a1a127dfcd8f9');
-
+      nativeAppKey: '86cf64645f879a1106b56780ecebb371');
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   FirebaseMessaging.onMessage.listen(showFlutterNotificaiton);
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
@@ -376,7 +381,7 @@ class _SplashViewState extends ConsumerState<SplashView> {
       Timer(
         const Duration(seconds: 2),
             () {
-          context.go("/");
+          context.go("/KakaoLogin");
         },
       );
     });

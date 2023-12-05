@@ -143,3 +143,7 @@ app.*.symbols
 # Kakao App keys
 /lib/Kakao/kakaoJsKey.txt
 /lib/Kakao/kakaoKey.txt
+
+#firebase
+android/app/src/google-services.json
+lib/firebase_options.dart

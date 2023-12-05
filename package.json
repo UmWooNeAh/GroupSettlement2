@@ -9,7 +9,14 @@
     "typescript": "^5.3.2"
   },
   "dependencies": {
+    "@google-cloud/firestore": "^7.1.0",
+    "@google-cloud/storage": "^7.7.0",
+    "@grpc/grpc-js": "^1.9.12",
     "@types/eslint": "^8.44.8",
-    "firebase-functions": "^4.5.0"
+    "firebase-auth": "^0.1.2",
+    "firebase-functions": "^4.5.0",
+    "gaxios": "^6.1.1",
+    "google-auth-library": "^9.4.1",
+    "proto3-json-serializer": "^2.0.0"
   }
 }

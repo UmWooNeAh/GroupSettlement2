@@ -65,6 +65,7 @@ dependencies:
   infinite_scroll_pagination: ^4.0.0
   firebase_analytics: ^10.6.3
   dotted_border: ^2.1.0
+  firebase_auth: ^4.15.0
 
 dev_dependencies:
   flutter_test:

@@ -9,13 +9,10 @@ class Account {
   String? accountHolder;
   String? accountAlias;
 
-  Account ({
-    this.accountId,
-    this.bank,
-    this.accountNum,
-    this.accountHolder,
-    this.accountAlias
-  });
+  Account (){
+    ModelUuid uuid = ModelUuid();
+    accountId = uuid.randomId;
+  }
 
   Account.fromJson(dynamic json) {
     accountId = json['accountid'];
