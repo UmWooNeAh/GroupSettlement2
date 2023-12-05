@@ -521,6 +521,7 @@ class _GroupMainPageState extends ConsumerState<GroupMainPage> {
                                                           provider.addByDirect(
                                                               inputName!);
                                                         } else {
+                                                          ScaffoldMessenger.of(context).clearSnackBars();
                                                           ScaffoldMessenger.of(
                                                                   context)
                                                               .showSnackBar(

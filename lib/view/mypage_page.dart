@@ -95,6 +95,7 @@ class _MyPageState extends ConsumerState<MyPage> {
                                       child: OutlinedButton(
                                         onPressed: () {
                                           if(inputName == ""){
+                                            ScaffoldMessenger.of(context).clearSnackBars();
                                             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                                               content: Text(
                                                   '이름은 공백이 될 수 없습니다.'),
@@ -106,6 +107,7 @@ class _MyPageState extends ConsumerState<MyPage> {
                                           setState(() {
                                             uvm.editUsername(inputName);
                                           });
+                                          ScaffoldMessenger.of(context).clearSnackBars();
                                           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                                             content: Text(
                                                 '성공적으로 이름을 변경했습니다.'),
@@ -216,6 +218,7 @@ class _MyPageState extends ConsumerState<MyPage> {
                     GestureDetector(
                       onTap: ()async{
                         await Clipboard.setData(ClipboardData(text: uvm.accounts.first.accountNum.toString()));
+                        ScaffoldMessenger.of(context).clearSnackBars();
                         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: const Center(
                             child: Text(

@@ -194,6 +194,7 @@ class _AccountAddPageState extends ConsumerState<AccountAddPage> {
                               account.accountNum = int.parse(accountNum);
                             }catch(e){
                               print(e);
+                              ScaffoldMessenger.of(context).clearSnackBars();
                               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                                 content: Text(
                                     '계좌번호에는 숫자만 넣어주세요.'),
@@ -206,6 +207,13 @@ class _AccountAddPageState extends ConsumerState<AccountAddPage> {
                             account.bank = bank;
 
                             provider.addAccount(account,_makeFavorite);
+                            Navigator.of(context).pop();
+                            ScaffoldMessenger.of(context).clearSnackBars();
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                              content: Text(
+                                  '성공적으로 계좌를 등록했어요.'),
+                              duration: Duration(seconds: 2),
+                            ));
                           },
                           style: OutlinedButton.styleFrom(
                             backgroundColor: Color(0xFF454545),
