@@ -97,25 +97,22 @@ class _MainPage extends ConsumerState<MainPage> {
                 height: 1,
                 decoration: const BoxDecoration(color: Color(0xFFF4F4F4)),
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 0, right: 0),
-                child: Container(
-                    width: double.infinity,
-                    height: 200,
-                    decoration: BoxDecoration(color: Colors.white, boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.7),
-                        blurRadius: 7,
-                      )
-                    ]),
-                    child: const Center(
-                      child: Text("문구 들어갈 위치",
-                          style: TextStyle(
-                              color: Colors.red,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15)),
-                    )),
-              ),
+              Container(
+                  width: double.infinity,
+                  height: 200,
+                  decoration: BoxDecoration(color: Colors.white, boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.7),
+                      blurRadius: 7,
+                    )
+                  ]),
+                  child: const Center(
+                    child: Text("문구 들어갈 위치",
+                        style: TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15)),
+                  )),
               Container(
                   width: double.infinity,
                   height: 160,

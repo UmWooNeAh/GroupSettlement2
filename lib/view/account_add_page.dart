@@ -27,6 +27,7 @@ class _AccountAddPageState extends ConsumerState<AccountAddPage> {
     final Size size = MediaQuery.of(context).size;
 
     final provider = ref.watch(userProvider);
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -156,8 +157,9 @@ class _AccountAddPageState extends ConsumerState<AccountAddPage> {
                       ),
                     ),
                     TextField(
+                      controller: TextEditingController()..text = provider.userData.name!,
                       decoration: InputDecoration(
-                        hintText: "예금주ㅅ",
+                        hintText: "예금주",
                       ),
                       onChanged: (val){
                         ownerName = val;
