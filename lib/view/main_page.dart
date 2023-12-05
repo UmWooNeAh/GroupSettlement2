@@ -583,6 +583,7 @@ class _SimpleSettlementerResState extends State<SimpleSettlementerRes> {
   Widget build(BuildContext context) {
     bool isInt = widget.res == widget.res.toInt();
     double res = widget.res * 1;
+    Size size = MediaQuery.of(context).size;
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       physics: const NeverScrollableScrollPhysics(),
@@ -591,72 +592,67 @@ class _SimpleSettlementerResState extends State<SimpleSettlementerRes> {
           duration: Duration(milliseconds: widget.flag ? 700 : 300),
           width: widget.flag ? 1000 : 0,
           height: 100,
-          child: Stack(
-            children: [
-              Positioned(
-                top: 10,
-                left: 20,
-                child: Text("1인당",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                    )),
-              ),
-              Positioned(
-                  top: 25,
-                  left: 80,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.ideographic,
-                    children: [
-                      AnimatedDigitWidget(
-                        fractionDigits: 0,
-                        duration: Duration(seconds: 1),
-                        value: isInt ? res : res.toInt(),
-                        enableSeparator: true,
-                        suffix: isInt ? "원" : ".",
-                        textStyle: TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.w600,
-                          color: color1,
-                        ),
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(left:20,top:5),
+                      child: Text("1인당",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                          )),
+                    ),
+                    Container(
+                      width: size.width*0.6,
+                      margin: EdgeInsets.only(right:20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.ideographic,
+                        children: [
+                          AnimatedDigitWidget(
+                            fractionDigits: 0,
+                            duration: Duration(seconds: 1),
+                            value: isInt ? res : res.toInt(),
+                            enableSeparator: true,
+                            suffix: isInt ? "원" : ".",
+                            textStyle: TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.w600,
+                              color: color1,
+                            ),
+                          ),
+                          (res * 10 % 10) > 1 || isInt ? SizedBox.shrink() : AnimatedDigitWidget(
+                            value: 0,
+                            textStyle: TextStyle(
+                              textBaseline: TextBaseline.alphabetic,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          isInt ? SizedBox.shrink() : AnimatedDigitWidget(
+                            duration: Duration(seconds: 1),
+                            value : res * 100 % 100,
+                            enableSeparator: true,
+                            suffix: "원",
+                            textStyle: TextStyle(
+                              textBaseline: TextBaseline.alphabetic,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey,
+                            ),
+                          )
+                        ],
                       ),
-                      (res * 10 % 10) > 1 || isInt ? SizedBox.shrink() : AnimatedDigitWidget(
-                        value: 0,
-                        textStyle: TextStyle(
-                          textBaseline: TextBaseline.alphabetic,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      isInt ? SizedBox.shrink() : AnimatedDigitWidget(
-                        duration: Duration(seconds: 1),
-                        value : res * 100 % 100,
-                        enableSeparator: true,
-                        suffix: "원",
-                        textStyle: TextStyle(
-                          textBaseline: TextBaseline.alphabetic,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey,
-                        ),
-                      )
-                    ],
-                  )
-                  // child: Text("${priceToString.format(widget.res)}원",
-                  //   textAlign: TextAlign.start,
-                  //   style: TextStyle(
-                  //     fontSize: 30,
-                  //     fontWeight: FontWeight.w600,
-                  //     color: color1,
-                  //   )
-                  // ),
-                  ),
-              Positioned(
-                top: 13,
-                left: 265,
-                child: Stack(
+                    ),
+                  ],
+                ),
+                Stack(
                   children: [
                     SizedBox(
                       height: 60,
@@ -687,9 +683,9 @@ class _SimpleSettlementerResState extends State<SimpleSettlementerRes> {
                               fontSize: 15)),
                     )
                   ],
-                ),
-              )
-            ],
+                )
+              ],
+            ),
           )),
     );
   }
