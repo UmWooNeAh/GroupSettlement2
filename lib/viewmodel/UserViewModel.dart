@@ -233,12 +233,13 @@ class UserViewModel extends ChangeNotifier {
     final userRef = db.collection("userlist").doc(userData.serviceUserId);
     db.runTransaction((transaction) async {
       if(isFavorite){
-        userData.accountInfo.insert(0,account.accountId!);
+        accounts.insert(0,account);
       } else {
-        userData.accountInfo.add(account.accountId!);
+        accounts.add(account);
       }
       account.createAccount(userData.serviceUserId!);
       transaction.update(userRef, userData.toJson());
+      notifyListeners();
     }).then(
           (value) {
         print("DocumentSnapshot successfully updated!"); //성공 메시지
@@ -263,9 +264,10 @@ class UserViewModel extends ChangeNotifier {
     final userRef = db.collection("userlist").doc(userData.serviceUserId);
     final accountRef = db.collection("accountlist").doc(account.accountId);
     db.runTransaction((transaction) async {
-      userData.accountInfo.removeAt(index);
+      accounts.removeAt(index);
       transaction.delete(accountRef);
       transaction.update(userRef, userData.toJson());
+      notifyListeners();
     }).then(
           (value) {
         print("DocumentSnapshot successfully updated!"); //성공 메시지

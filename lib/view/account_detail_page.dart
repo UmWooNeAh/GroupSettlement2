@@ -195,6 +195,9 @@ class _oneAccountState extends ConsumerState<oneAccount> {
                       margin: EdgeInsets.only(right:15),
                       child: OutlinedButton(
                           onPressed: (){
+                            setState(() {
+                              provider.deleteAccount(widget.account, provider.accounts.indexOf(widget.account));
+                            });
                           },
                           style: OutlinedButton.styleFrom(
                             backgroundColor: color1,
