@@ -25,11 +25,11 @@ class _GroupMainPageState extends ConsumerState<GroupMainPage> {
   int i = 0;
   @override
   Widget build(BuildContext context) {
-    final gvm = ref.watch(groupProvider);
+    final provider = ref.watch(groupProvider);
     Size size = MediaQuery.of(context).size;
     if (isFirst) {
       Future(() {
-        gvm.settingGroupViewModel(widget.info[0], widget.info[1]);
+        provider.settingGroupViewModel(widget.info[0], widget.info[1]);
       });
       ref
           .watch(bottomSheetSliderChangeNotifierProvider.notifier)
@@ -41,7 +41,7 @@ class _GroupMainPageState extends ConsumerState<GroupMainPage> {
     final bottomsheetValue = ref.watch(bottomSheetSliderChangeNotifierProvider);
 
     Map<String, int> countMap = Map<String, int>();
-    gvm.settlementInGroup.forEach((settlement) {
+    provider.settlementInGroup.forEach((settlement) {
       if (countMap.containsKey(settlement.masterUserId)) {
         countMap[settlement.masterUserId!] =
             countMap[settlement.masterUserId!]! + 1;
@@ -60,7 +60,7 @@ class _GroupMainPageState extends ConsumerState<GroupMainPage> {
       }
     });
 
-    gvm.serviceUsers.forEach((user) {
+    provider.serviceUsers.forEach((user) {
       if (user.serviceUserId == mostCommonName) commonStmName = user.name!;
     });
 
@@ -86,7 +86,7 @@ class _GroupMainPageState extends ConsumerState<GroupMainPage> {
                   ),
                   Row(children: [
                     Text(
-                      gvm.myGroup.groupName ?? "",
+                      provider.myGroup.groupName ?? "",
                       style: const TextStyle(
                           color: Colors.black,
                           fontSize: 30,
@@ -112,8 +112,8 @@ class _GroupMainPageState extends ConsumerState<GroupMainPage> {
                                 onPressed: () {
                                   Navigator.of(context).pop();
                                   setState(() {
-                                    gvm.updateGroup(
-                                        gvm.myGroup.groupId!, inputName);
+                                    provider.updateGroup(
+                                        provider.myGroup.groupId!, inputName);
                                   });
                                 },
                                 style: OutlinedButton.styleFrom(
@@ -179,7 +179,7 @@ class _GroupMainPageState extends ConsumerState<GroupMainPage> {
                             text: "   ",
                           ),
                           TextSpan(
-                            text: gvm.settlementInGroup.length.toString(),
+                            text: provider.settlementInGroup.length.toString(),
                             style: const TextStyle(
                               color: Color(0xFFFE5F55),
                               fontSize: 25,
@@ -207,13 +207,13 @@ class _GroupMainPageState extends ConsumerState<GroupMainPage> {
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
-                        children: List.generate(gvm.settlementInGroup.length,
+                        children: List.generate(provider.settlementInGroup.length,
                             (index) {
-                      Settlement settlement = gvm.settlementInGroup[index];
+                      Settlement settlement = provider.settlementInGroup[index];
                       return StmItem(
                           size: size,
                           masterId: settlement.masterUserId!,
-                          userId: gvm.userData.serviceUserId!,
+                          userId: provider.userData.serviceUserId!,
                           settlement: settlement);
                     })),
                   ),
@@ -236,7 +236,7 @@ class _GroupMainPageState extends ConsumerState<GroupMainPage> {
                         TextSpan(
                           children: [
                             TextSpan(
-                              text: '${gvm.myGroup.groupName} 그룹에서 가장 많이 \n',
+                              text: '${provider.myGroup.groupName} 그룹에서 가장 많이 \n',
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 15,
@@ -271,7 +271,8 @@ class _GroupMainPageState extends ConsumerState<GroupMainPage> {
                   SizedBox(height: 20),
                   GestureDetector(
                     onTap: () {
-                      // context.push();
+                      context.push(
+                          "/SettlementCreate", extra: [provider.myGroup, provider.userData]);
                     },
                     child: Padding(
                       padding: EdgeInsets.only(right: 15),
@@ -349,7 +350,7 @@ class _GroupMainPageState extends ConsumerState<GroupMainPage> {
                                       EdgeInsets.only(left: size.width * 0.65),
                                   child: Text.rich(TextSpan(children: [
                                     TextSpan(
-                                        text: "${gvm.serviceUsers.length} ",
+                                        text: "${provider.serviceUsers.length} ",
                                         style: TextStyle(
                                           color: Color(0xFFFE5F55),
                                           fontSize: 20,
@@ -418,7 +419,7 @@ class _GroupMainPageState extends ConsumerState<GroupMainPage> {
                                       SizedBox(height: 20),
                                       Column(
                                         children: List.generate(
-                                            (gvm.serviceUsers.length / 4)
+                                            (provider.serviceUsers.length / 4)
                                                     .toInt() +
                                                 1, (index) {
                                           return Row(
@@ -427,7 +428,7 @@ class _GroupMainPageState extends ConsumerState<GroupMainPage> {
                                               try {
                                                 return oneUser(
                                                     flag: false,
-                                                    user: gvm.serviceUsers[
+                                                    user: provider.serviceUsers[
                                                         index * 4 +
                                                             innerIndex]);
                                               } on RangeError catch (e) {
@@ -517,9 +518,10 @@ class _GroupMainPageState extends ConsumerState<GroupMainPage> {
                                                         ServiceUser user =
                                                             ServiceUser();
                                                         if (inputName != null) {
-                                                          gvm.addByDirect(
+                                                          provider.addByDirect(
                                                               inputName!);
                                                         } else {
+                                                          ScaffoldMessenger.of(context).clearSnackBars();
                                                           ScaffoldMessenger.of(
                                                                   context)
                                                               .showSnackBar(

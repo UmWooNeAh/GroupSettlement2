@@ -352,6 +352,7 @@ class _GroupSettlementListPageState
                                                 Navigator.of(context).pop();
                                               }
                                             } else {
+                                              ScaffoldMessenger.of(context).clearSnackBars();
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(SnackBar(
                                                 content:

@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:groupsettlement2/view/account_add_page.dart';
+import 'package:groupsettlement2/view/account_detail_page.dart';
 import 'package:groupsettlement2/view/group_create_page.dart';
 import 'package:groupsettlement2/view/group_main_page.dart';
 import 'package:groupsettlement2/view/group_select_page.dart';
@@ -192,6 +193,11 @@ final GoRouter _router = GoRouter(
               builder: (context,state) {
               return AccountAddPage();
               }
+            ),
+            GoRoute(path: 'AccountDetail',
+                builder: (context,state) {
+                  return AccountDetailPage();
+                }
             )
           ]
         ),

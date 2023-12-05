@@ -9,6 +9,7 @@ class Account {
   String? accountHolder;
   String? accountAlias;
 
+
   Account () {
     ModelUuid uuid = ModelUuid();
     accountId = uuid.randomId;
@@ -30,7 +31,7 @@ class Account {
     'accountalias' : accountAlias,
   };
 
-  void creatAccount(String userid) async {
+  void createAccount(String userid) async {
     await FirebaseFirestore.instance.collection("accountlist").doc(accountId).set(toJson());
   }
 

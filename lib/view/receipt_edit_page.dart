@@ -345,6 +345,7 @@ class _EditReceiptState extends ConsumerState<ReceiptEditPage> {
                         return;
                       }
                     } catch (e) {
+                      ScaffoldMessenger.of(context).clearSnackBars();
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text(
                             '${index + 1}번째 항목의 수량이 잘못되었어요. : ${countController[index].text}'),
@@ -357,6 +358,7 @@ class _EditReceiptState extends ConsumerState<ReceiptEditPage> {
                           .parse(priceController[index].text)
                           .toInt();
                     } catch (e) {
+                      ScaffoldMessenger.of(context).clearSnackBars();
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text(
                             '${index + 1}번째 항목의 가격이 잘못되었어요. : ${priceController[index].text}'),

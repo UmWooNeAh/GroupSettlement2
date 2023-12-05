@@ -1,10 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:groupsettlement2/view/shared_basic_widget.dart';
 import 'package:groupsettlement2/viewmodel/UserViewModel.dart';
+import 'package:intl/intl.dart';
 
 import '../class/class_alarm.dart';
+import '../class/class_group.dart';
+import '../class/class_settlement.dart';
+import '../class/class_user.dart';
+import '../common_fireservice.dart';
 import '../design_element.dart';
 
 class NotificationPage extends ConsumerStatefulWidget {
@@ -70,11 +76,11 @@ class _NotificationPageState extends ConsumerState<NotificationPage> with Ticker
                     indicator: UnderlineTabIndicator(
                       borderSide: BorderSide(width:3,color: cp.color),
                     ),
-                    //indicatorSize: TabBarIndicatorSize.values.first,
+                    indicatorSize: TabBarIndicatorSize.tab,
                     isScrollable: true,
                     tabs:<Widget>[
                       Container(
-                        width:size.width*0.3,
+                        width:size.width*0.25,
                         child: Tab(
                           text: "보낼 정산",
 
@@ -87,7 +93,7 @@ class _NotificationPageState extends ConsumerState<NotificationPage> with Ticker
                         ),
                       ),
                       Container(
-                        width:size.width*0.1,
+                        width:size.width*0.25,
                         child: Tab(
                           text: "기타",
                         ),
@@ -230,29 +236,38 @@ class _NotificationPageState extends ConsumerState<NotificationPage> with Ticker
   }
 }
 
-class oneNotification extends StatefulWidget {
+class oneNotification extends ConsumerStatefulWidget {
   final Alarm alarm;
   final Size size;
   const oneNotification({Key? key, required this.alarm,required this.size}) : super(key: key);
 
   @override
-  State<oneNotification> createState() => _oneNotificationState();
+  ConsumerState<oneNotification> createState() => _oneNotificationState();
 }
 
-class _oneNotificationState extends State<oneNotification> {
-  Color read = Colors.black;
+class _oneNotificationState extends ConsumerState<oneNotification> {
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: (){
-        setState(() {
 
-          if(read == Colors.grey){
-            read = Colors.black;
-          } else{
-            read = Colors.grey;
-          }
-        });
+    final provider = ref.watch(userProvider);
+
+    Color read = widget.alarm.isRead == true ? Colors.grey : Colors.black;
+    String timeAgo = provider.getTimeAgo(widget.alarm.time!);
+
+    return GestureDetector(
+      onTap: ()async{
+        print(widget.alarm.category);
+        var extra = await provider.linkAlarm(widget.alarm);
+        print(extra);
+        context.push(widget.alarm.route!,extra: extra);
+
+        if(widget.alarm.isRead == false) {
+          widget.alarm.isRead = true;
+        }
+          await FireService().updateDoc("alarmlist/${provider.userData.serviceUserId}/myalarmlist", widget.alarm.alarmId!, widget.alarm.toJson());
+
+
       },
       child: Container(
         width: widget.size.width*0.9,
@@ -260,19 +275,34 @@ class _oneNotificationState extends State<oneNotification> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children:[
             SizedBox(height:10),
-            Text(widget.alarm.title!,
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 18,
-                color: read,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(widget.alarm.title!,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                    color: read,
+                  ),
+                ),
+                Text(timeAgo.toString(),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w400,
+                    fontSize: 13,
+                    color: read,
+                  ),
+                )
+              ],
             ),
             SizedBox(height:5),
-            Text(widget.alarm.body == null ? "\n" : widget.alarm.body!,
-              style: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 15,
-                color: read,
+            Container(
+              height:widget.size.height*0.03,
+              child: Text(widget.alarm.body == null ? "\n" : widget.alarm.body!,
+                style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 15,
+                  color: read,
+                ),
               ),
             ),
             SizedBox(height:10),

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:groupsettlement2/class/class_user.dart';
 import 'package:groupsettlement2/view/shared_basic_widget.dart';
 import '../class/class_group.dart';
+import '../class/class_settlement.dart';
 import '../design_element.dart';
 import '../viewmodel/UserViewModel.dart';
 
@@ -115,13 +116,14 @@ class OneGroup extends ConsumerStatefulWidget {
 class _OneGroupState extends ConsumerState<OneGroup> {
   @override
   Widget build(BuildContext context) {
-    var uvm = ref.watch(userProvider);
+    var provider = ref.watch(userProvider);
+
     return Column(
       children: [
         GestureDetector(
           onTap: () {
             context.push("/GroupSelect/GroupMain",
-                extra: [uvm.userData, widget.group.groupId!]);
+                extra: [provider.userData, widget.group.groupId!]);
           },
           child:
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -167,15 +169,12 @@ class _OneGroupState extends ConsumerState<OneGroup> {
                 ),
               ],
             ),
-            GestureDetector(
-              onTap: () {},
-              child: const Padding(
-                padding: EdgeInsets.only(bottom: 25),
-                child: Text("시간",
-                    style: TextStyle(
-                      color: Color(0xFF838383),
-                    )),
-              ),
+            Padding(
+              padding: EdgeInsets.only(bottom: 25),
+              child: Text(provider.getGroupRecentActivityTime(widget.group),
+                  style: TextStyle(
+                    color: Color(0xFF838383),
+                  )),
             )
           ]),
         ),

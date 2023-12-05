@@ -280,6 +280,7 @@ class _GroupCreatePageState extends ConsumerState<GroupCreatePage> {
                                           if (inputName != "") {
                                             provider.addByDirect(inputName);
                                           } else {
+                                            ScaffoldMessenger.of(context).clearSnackBars();
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(
@@ -376,6 +377,7 @@ class _GroupCreatePageState extends ConsumerState<GroupCreatePage> {
                         child: GestureDetector(
                           onTap: () {
                             if (inputGroupName == "") {
+                              ScaffoldMessenger.of(context).clearSnackBars();
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('그룹명은 공백이 될 수 없습니다'),
