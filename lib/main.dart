@@ -357,7 +357,14 @@ class _SplashViewState extends ConsumerState<SplashView> {
     FireService().updateDoc("userlist", user.serviceUserId!, user.toJson());
   }
 
-  Future<void> _checkToken(String userid) async {
+  Future<bool> _checkToken() async {
+    //print("함수로부터 도출된 firebaseAuth uid: ${userid}");
+    if (fbAuth.FirebaseAuth.instance.currentUser == null) {
+     print("사용자가 로그인되어 있지 않습니다.");
+     return false;
+    }
+    String userid = fbAuth.FirebaseAuth.instance.currentUser!.uid;
+    print("성공적으로 Auth-uid 불러옴: ${fbAuth.FirebaseAuth.instance.currentUser?.uid}");
     ServiceUser user = await ServiceUser().getUserByUserId(userid);
     ref.watch(userProvider).settingUserData(user);
     var nowtime = DateTime.now().millisecondsSinceEpoch;
@@ -370,20 +377,25 @@ class _SplashViewState extends ConsumerState<SplashView> {
         28) {
       _getMyDeviceToken(user);
     }
-    return;
+    return true;
   }
 
   @override
   void initState() {
     super.initState();
     // 사용하고 싶은 유저의 userId
-    _checkToken("8969xxwf-8wf8-pf89-9x6p-88p0wpp9ppfb").then((value){
-      Timer(
-        const Duration(seconds: 2),
-            () {
-          context.go("/KakaoLogin");
-        },
-      );
+    _checkToken().then((value){
+      if(value == true) {
+        Timer(
+          const Duration(seconds: 2),
+              () {
+            context.go("/");
+          },
+        );
+      }
+      else {
+        context.go("/KakaoLogin");
+      }
     });
   }
 
